@@ -1,6 +1,20 @@
-# Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
+# Visual Studio artifacts
 bin
 obj
+*.obj
+*.exe
+*.pdb
+*.user
+*.suo
 
-# mstest test results
-TestResults
+# NUnit artifacts
+TestResult.xml
+
+# Nuget package repositories
+packages
+
+# Resharper artifacts
+_ReSharper.*
+
+# Nupkg artifacts
+*.nupkg
