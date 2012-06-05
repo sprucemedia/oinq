@@ -110,6 +110,11 @@ namespace Oinq.Core
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Translates and returns an expression tree as query text.
+        /// </summary>
+        /// <param name="expression">The query expression.</param>
+        /// <returns>The query text.</returns>
         public String GetQueryText(Expression expression)
         {
             if (expression == null)
