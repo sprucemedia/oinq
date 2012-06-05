@@ -8,7 +8,7 @@ namespace Oinq.Core
 {
     /// <summary>
     /// QueryBinder is a visitor that converts method calls to LINQ operations into 
-    /// custom EsExpression nodes and references to class members into references to columns.
+    /// custom PigExpression nodes and references to class members into references to columns.
     /// </summary>
     internal class QueryBinder : ExpressionVisitor
     {
@@ -309,7 +309,7 @@ namespace Oinq.Core
                     );
             var alias = GetNextAlias();
 
-            // make it possible to tie aggregates back to this group-by
+            // make it possible to tie _aggregates back to this group-by
             GroupByInfo info = new GroupByInfo(alias, elemExpr);
             _groupByMap.Add(elementSubquery, info);
 
@@ -335,7 +335,7 @@ namespace Oinq.Core
 
             ProjectedColumns pc = ProjectColumns(resultExpr, alias, projection.Source.Alias);
 
-            // make it possible to tie aggregates back to this group-by
+            // make it possible to tie _aggregates back to this group-by
             Expression projectedElementSubquery = ((NewExpression)pc.Projector).Arguments[1];
             _groupByMap.Add(projectedElementSubquery, info);
 

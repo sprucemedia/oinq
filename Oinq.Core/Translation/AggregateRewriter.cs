@@ -59,7 +59,7 @@ namespace Oinq.Core
         class AggregateGatherer : PigExpressionVisitor
         {
             // private fields
-            private List<AggregateSubqueryExpression> aggregates = new List<AggregateSubqueryExpression>();
+            private List<AggregateSubqueryExpression> _aggregates = new List<AggregateSubqueryExpression>();
 
             // constructors
             private AggregateGatherer()
@@ -71,13 +71,13 @@ namespace Oinq.Core
             {
                 AggregateGatherer gatherer = new AggregateGatherer();
                 gatherer.Visit(expression);
-                return gatherer.aggregates;
+                return gatherer._aggregates;
             }
 
             // protected override fields
             protected override Expression VisitAggregateSubquery(AggregateSubqueryExpression node)
             {
-                this.aggregates.Add(node);
+                _aggregates.Add(node);
                 return base.VisitAggregateSubquery(node);
             }
         }

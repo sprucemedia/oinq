@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 namespace Oinq.Core
 {
     /// <summary>
-    /// Removes column declarations in SelectExpression's that are not referenced
+    /// Removes column declarations in SelectExpressions that are not referenced.
     /// </summary>
     internal class UnusedColumnRemover : PigExpressionVisitor
     {
@@ -23,36 +23,6 @@ namespace Oinq.Core
         internal static Expression Remove(Expression expression)
         {
             return new UnusedColumnRemover().Visit(expression);
-        }
-
-        // private methods
-        private void MarkColumnAsUsed(SourceAlias alias, String name)
-        {
-            HashSet<String> columns;
-            if (!_allColumnsUsed.TryGetValue(alias, out columns))
-            {
-                columns = new HashSet<String>();
-                _allColumnsUsed.Add(alias, columns);
-            }
-            columns.Add(name);
-        }
-
-        private Boolean IsColumnUsed(SourceAlias alias, String name)
-        {
-            HashSet<String> columnsUsed;
-            if (_allColumnsUsed.TryGetValue(alias, out columnsUsed))
-            {
-                if (columnsUsed != null)
-                {
-                    return columnsUsed.Contains(name);
-                }
-            }
-            return false;
-        }
-
-        private void ClearColumnsUsed(SourceAlias alias)
-        {
-            this._allColumnsUsed[alias] = new HashSet<String>();
         }
 
         // protected override methods
@@ -130,7 +100,7 @@ namespace Oinq.Core
 
         protected override Expression VisitProjection(ProjectionExpression node)
         {
-            // visit _mapping in reverse order
+            // visit mapping in reverse order
             Expression projector = Visit(node.Projector);
             SelectExpression source = (SelectExpression)Visit(node.Source);
             if (projector != node.Projector || source != node.Source)
@@ -151,6 +121,36 @@ namespace Oinq.Core
                 return new JoinExpression(node.Join, left, right, condition);
             }
             return node;
+        }
+
+        // private methods
+        private void MarkColumnAsUsed(SourceAlias alias, String name)
+        {
+            HashSet<String> columns;
+            if (!_allColumnsUsed.TryGetValue(alias, out columns))
+            {
+                columns = new HashSet<String>();
+                _allColumnsUsed.Add(alias, columns);
+            }
+            columns.Add(name);
+        }
+
+        private Boolean IsColumnUsed(SourceAlias alias, String name)
+        {
+            HashSet<String> columnsUsed;
+            if (_allColumnsUsed.TryGetValue(alias, out columnsUsed))
+            {
+                if (columnsUsed != null)
+                {
+                    return columnsUsed.Contains(name);
+                }
+            }
+            return false;
+        }
+
+        private void ClearColumnsUsed(SourceAlias alias)
+        {
+            this._allColumnsUsed[alias] = new HashSet<String>();
         }
     }
 }
