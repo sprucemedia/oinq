@@ -52,6 +52,10 @@
     <Compile Include="UrlTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Oinq.Core\Oinq.Core.csproj">
+      <Project>{0E6AB5DD-CAE7-45AC-A0ED-46A8D4566684}</Project>
+      <Name>Oinq.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Oinq.EdgeSpring\Oinq.EdgeSpring.csproj">
       <Project>{00AEB212-EB21-47A3-B817-428596284079}</Project>
       <Name>Oinq.EdgeSpring</Name>

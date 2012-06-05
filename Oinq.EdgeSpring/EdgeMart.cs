@@ -1,11 +1,12 @@
 ﻿using System;
+using Oinq.Core;
 
 namespace Oinq.EdgeSpring
 {
     /// <summary>
     /// Represents an EdgeSpring EdgeMart and the settings used to access it.
     /// </summary>
-    public class EdgeMart
+    public class EdgeMart : ISource
     {
         // private fields
         private Url _url;
@@ -51,6 +52,14 @@ namespace Oinq.EdgeSpring
         /// Gets the name of this EdgeMart.
         /// </summary>
         public virtual String Name
+        {
+            get { return _url.EdgeMartName; }
+        }
+
+        /// <summary>
+        /// Gets the path to the EdgeMart.
+        /// </summary>
+        public virtual string Path
         {
             get { return _url.EdgeMartName; }
         }

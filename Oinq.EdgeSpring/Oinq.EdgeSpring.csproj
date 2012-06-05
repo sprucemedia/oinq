@@ -46,6 +46,12 @@
     <Compile Include="Url.cs" />
     <Compile Include="UrlBuilder.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Oinq.Core\Oinq.Core.csproj">
+      <Project>{0E6AB5DD-CAE7-45AC-A0ED-46A8D4566684}</Project>
+      <Name>Oinq.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
