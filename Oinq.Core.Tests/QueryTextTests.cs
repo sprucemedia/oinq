@@ -3,13 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace Oinq.Core.Tests
 {
     [TestFixture]
     public class When_building_query_command_text
     {
-        private Query<FakeData> _fakeData = new Query<FakeData>(new QueryProvider());
+        private String SOURCE_NAME = "FakeData";
+        private const String PATH_NAME = "FakeData";
+        private ISource _source;
+        private Query<FakeData> _fakeData;
+
+        [SetUp]
+        public void Setup()
+        {
+            _source = MockRepository.GenerateStub<ISource>();
+            _source.Stub(s => s.Name).Return(SOURCE_NAME);
+            _source.Stub(s => s.Path).Return(PATH_NAME);
+            _fakeData = new Query<FakeData>(new QueryProvider(_source));
+        }
 
         [Test]
         public void it_can_filter_rows()

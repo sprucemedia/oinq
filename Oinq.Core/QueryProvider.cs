@@ -19,13 +19,30 @@ namespace Oinq.Core
     /// </summary>
     public class QueryProvider : IQueryProvider, IQueryText
     {
+        // private fields
+        private ISource _source;
+
         // constructors
         /// <summary>
         /// Initializes a new instance of the QueryProvider class.
         /// </summary>
-        /// <param name="collection">The EdgeMart being queried.</param>
-        public QueryProvider()
+        /// <param name="source">The data source being queried.</param>
+        public QueryProvider(ISource source)
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException("source");
+            }
+            _source = source;
+        }
+
+        // public properties
+        /// <summary>
+        /// Gets the data source.
+        /// </summary>
+        public ISource Source
+        {
+            get { return _source; }
         }
 
         // public methods
