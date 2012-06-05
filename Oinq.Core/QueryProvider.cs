@@ -52,7 +52,7 @@ namespace Oinq.Core
         /// <typeparam name="T">The type of the returned elements.</typeparam>
         /// <param name="expression">The query expression.</param>
         /// <returns>A new instance of Query{{T}}.</returns>
-        public IQueryable<T> CreateQuery<T>(Expression expression)
+        public virtual IQueryable<T> CreateQuery<T>(Expression expression)
         {
             if (expression == null)
             {
@@ -71,7 +71,7 @@ namespace Oinq.Core
         /// </summary>
         /// <param name="expression">The query expression.</param>
         /// <returns>A new instance of Query{{T}}.</returns>
-        public IQueryable CreateQuery(Expression expression)
+        public virtual IQueryable CreateQuery(Expression expression)
         {
             if (expression == null)
             {
@@ -95,7 +95,7 @@ namespace Oinq.Core
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="expression">The query expression.</param>
         /// <returns>The result of the query.</returns>
-        public TResult Execute<TResult>(Expression expression)
+        public virtual TResult Execute<TResult>(Expression expression)
         {
             throw new NotImplementedException();
         }
@@ -105,7 +105,7 @@ namespace Oinq.Core
         /// </summary>
         /// <param name="expression">The query expression.</param>
         /// <returns>The result of the query.</returns>
-        public Object Execute(Expression expression)
+        public virtual Object Execute(Expression expression)
         {
             throw new NotImplementedException();
         }
@@ -115,7 +115,7 @@ namespace Oinq.Core
         /// </summary>
         /// <param name="expression">The query expression.</param>
         /// <returns>The query text.</returns>
-        public String GetQueryText(Expression expression)
+        public virtual String GetQueryText(Expression expression)
         {
             if (expression == null)
             {
@@ -126,7 +126,7 @@ namespace Oinq.Core
         }
 
         // private methods
-        private TranslatedQuery Translate(Expression expression)
+        protected TranslatedQuery Translate(Expression expression)
         {
             ProjectionExpression projection = expression as ProjectionExpression;
             if (projection == null)
@@ -144,7 +144,7 @@ namespace Oinq.Core
             return new TranslatedQuery(commandText, projector, projection.Aggregator);
         }
 
-        private Boolean CanBeEvaluatedLocally(Expression expression)
+        protected Boolean CanBeEvaluatedLocally(Expression expression)
         {
             // any operation on a query can't be done locally
             ConstantExpression cex = expression as ConstantExpression;

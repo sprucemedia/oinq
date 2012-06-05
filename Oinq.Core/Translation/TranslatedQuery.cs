@@ -6,7 +6,7 @@ namespace Oinq.Core
     /// <summary>
     /// Represents a LINQ query that has been translated to an EdgeSpring query.
     /// </summary>
-    internal class TranslatedQuery
+    public class TranslatedQuery
     {
         // constructors
         /// <summary>
@@ -14,27 +14,27 @@ namespace Oinq.Core
         /// </summary>
         /// <param name="commandText">The command text of the query.</param>
         /// <param name="projector">The projector.</param>
-        internal TranslatedQuery(String commandText, LambdaExpression projector, LambdaExpression aggregator)
+        public TranslatedQuery(String commandText, LambdaExpression projector, LambdaExpression aggregator)
         {
             CommandText = commandText;
             Projector = projector;
             Aggregator = aggregator;
         }
 
-        // internal properties
+        // public properties
         /// <summary>
         /// Gets the command text of the query.
         /// </summary>
-        internal String CommandText { get; private set; }
+        public String CommandText { get; private set; }
 
         /// <summary>
         /// Gets the projector.
         /// </summary>
-        internal LambdaExpression Projector { get; private set; }
+        public LambdaExpression Projector { get; private set; }
 
         /// <summary>
         /// Gets the aggregator.
         /// </summary>
-        internal LambdaExpression Aggregator { get; private set; }
+        public LambdaExpression Aggregator { get; private set; }
     }
 }
