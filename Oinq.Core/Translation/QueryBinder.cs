@@ -10,7 +10,7 @@ namespace Oinq.Core
     /// QueryBinder is a visitor that converts method calls to LINQ operations into 
     /// custom PigExpression nodes and references to class members into references to columns.
     /// </summary>
-    internal class QueryBinder : ExpressionVisitor
+    internal class QueryBinder : PigExpressionVisitor
     {
         // private fields
         private Dictionary<ParameterExpression, Expression> _map;
