@@ -26,5 +26,15 @@ namespace Oinq.EdgeSpring.Tests.Web
             // Assert
             Assert.AreEqual(String.Format("{{\"action\":\"query\",\"query\":\"{0}\",\"otherscope\":{{}}}}", QUERY_TEXT), json);
         }
+
+        [Test]
+        public void it_can_be_done_using_to_string()
+        {
+            // Act
+            String json = _query.ToString();
+
+            // Assert
+            Assert.AreEqual(String.Format("{{\"action\":\"query\",\"query\":\"{0}\",\"otherscope\":{{}}}}", QUERY_TEXT), json);
+        }
     }
 }

@@ -19,6 +19,12 @@ namespace Oinq.EdgeSpring.Web
             _otherScope = new Object();
         }
 
+        // public methods
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
         // public properties
         [JsonProperty(PropertyName = "action", Order = 1)]
         public String Action
