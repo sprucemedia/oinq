@@ -58,7 +58,7 @@ namespace Oinq.EdgeSpring.Tests.Web
 
             // Assert
             Assert.IsNotNull(qrr.Records);
-            Assert.AreEqual(_recordCount, qrr.Records.Count);
+            Assert.AreEqual(_recordCount, qrr.Records.Count());
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
+using Oinq.Core;
 
 namespace Oinq.EdgeSpring.Web
 {
@@ -16,7 +17,7 @@ namespace Oinq.EdgeSpring.Web
         }
 
         [JsonProperty("records")]
-        public IList<Object> Records
+        public IEnumerable<Object> Records
         {
             get { return _records; }
         }

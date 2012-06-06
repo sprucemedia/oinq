@@ -33,7 +33,7 @@ namespace Oinq.EdgeSpring
 
         // public operators
         /// <summary>
-        /// Compares two ESUrls.
+        /// Compares two Urls.
         /// </summary>
         /// <param name="lhs">The first URL.</param>
         /// <param name="rhs">The other URL.</param>
@@ -44,7 +44,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Compares two ESUrls.
+        /// Compares two Urls.
         /// </summary>
         /// <param name="lhs">The first URL.</param>
         /// <param name="rhs">The other URL.</param>
@@ -65,7 +65,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates an instance of EsUrl (might be an existing instance if the same URL has been used before).
+        /// Creates an instance of Url (might be an existing instance if the same URL has been used before).
         /// </summary>
         /// <param name="url">The URL containing the settings.</param>
         /// <returns>An instance of Url.</returns>
@@ -98,7 +98,7 @@ namespace Oinq.EdgeSpring
 
         // public methods
         /// <summary>
-        /// Compares two ESUrls.
+        /// Compares two Urls.
         /// </summary>
         /// <param name="rhs">The other URL.</param>
         /// <returns>True if the two URLs are equal.</returns>
@@ -109,7 +109,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Compares two ESUrls.
+        /// Compares two Urls.
         /// </summary>
         /// <param name="obj">The other URL.</param>
         /// <returns>True if the two URLs are equal.</returns>
@@ -128,7 +128,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Returns the canonical URL based on the settings in this ESUrlBuilder.
+        /// Returns the canonical URL based on the settings in this UrlBuilder.
         /// </summary>
         /// <returns>The canonical URL.</returns>
         public override String ToString()

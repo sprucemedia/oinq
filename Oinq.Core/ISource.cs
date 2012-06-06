@@ -9,5 +9,6 @@ namespace Oinq.Core
     {
         String Name { get; }
         String Path { get; }
+        Uri ServerUrl { get; }
     }
 }

@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EdgeMart.cs" />
+    <Compile Include="EdgeSpringQueryProvider.cs" />
     <Compile Include="Web\Query.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerAddress.cs" />

@@ -16,7 +16,7 @@ namespace Oinq.EdgeSpring.Web
             _query = query;
         }
 
-        public static Object SendQuery(Uri address, Query query)
+        public static QueryResponse SendQuery(Uri address, Query query)
         {
             QueryRequest queryRequest = new QueryRequest(address, query);
             return queryRequest.ExecuteQuery();

@@ -73,6 +73,14 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
+        /// Gets the Uri for the server hosting the EdgeMart.
+        /// </summary>
+        public virtual Uri ServerUrl
+        {
+            get { return new Uri(String.Format("http://{0}:{1}/remote", Server.Host, Server.Port)); }
+        }
+
+        /// <summary>
         /// Gets the url string for this EdgeMart.
         /// </summary>
         public virtual String UrlString

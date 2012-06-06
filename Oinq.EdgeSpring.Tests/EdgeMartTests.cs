@@ -67,5 +67,19 @@ namespace Oinq.EdgeSpring.Tests
             // Assert
             Assert.Throws<ArgumentException>(a);
         }
+
+        [Test]
+        public void it_can_return_the_server_url()
+        {
+            // Arrange
+            var esUrl = new Url(String.Format("http://{0}:{1}/remote?edgemart={2}", SERVER_NAME, DEFAULT_PORT.ToString(), EDGEMART_NAME));
+
+            // Act
+            var em = new EdgeMart(esUrl);
+
+            // Assert
+            Assert.AreEqual(String.Format("http://{0}:{1}/remote", SERVER_NAME, DEFAULT_PORT.ToString()), em.ServerUrl.ToString());
+            
+        }
     }
 }
