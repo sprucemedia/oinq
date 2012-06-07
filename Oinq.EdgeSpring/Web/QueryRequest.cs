@@ -5,30 +5,43 @@ using System.Text;
 
 namespace Oinq.EdgeSpring.Web
 {
+    /// <summary>
+    /// Represents a query request made against the EdgeSpring EdgeMart.
+    /// </summary>
     public class QueryRequest
     {
+        // private fields
         private Uri _address;
         private Query _query;
 
+        // constructors
         private QueryRequest(Uri address, Query query)
         {
             _address = address;
             _query = query;
         }
 
+        // public static methods
+        /// <summary>
+        /// Sends the Pig query to the EdgeMart via REST API.
+        /// </summary>
+        /// <param name="address">Uri of the EdgeSpring server.</param>
+        /// <param name="query">Query object to send.</param>
+        /// <returns>A QueryResponse.</returns>
         public static QueryResponse SendQuery(Uri address, Query query)
         {
             QueryRequest queryRequest = new QueryRequest(address, query);
             return queryRequest.ExecuteQuery();
         }
 
+        // private methods
         private QueryResponse ExecuteQuery()
         {
-            HttpWebRequest request = WebRequest.Create(_address) as HttpWebRequest;
+            WebRequest request = WebRequest.Create(_address);
             request.Method = "POST";
             request.ContentType = "application/json";
 
-            Byte[] byteData = ASCIIEncoding.ASCII.GetBytes(_query.ToString());
+            Byte[] byteData = UTF8Encoding.UTF8.GetBytes(_query.ToString());
 
             // Write data
             using (Stream postStream = request.GetRequestStream())
@@ -39,14 +52,14 @@ namespace Oinq.EdgeSpring.Web
             return GetQueryResponse(request);
         }
 
-        private QueryResponse GetQueryResponse(HttpWebRequest request)
+        private QueryResponse GetQueryResponse(WebRequest request)
         {
-            HttpWebResponse response = null;
+            WebResponse response = null;
             StreamReader reader = null;
             try
             {
                 // Get response
-                response = request.GetResponse() as HttpWebResponse;
+                response = request.GetResponse();
                 // Get the response stream
                 reader = new StreamReader(response.GetResponseStream());
             }

@@ -53,6 +53,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UrlBuilderTests.cs" />
     <Compile Include="UrlTests.cs" />
+    <Compile Include="Web\Mocks\WebRequestMocks.cs" />
+    <Compile Include="Web\QueryRequestTests.cs" />
     <Compile Include="Web\QueryResponseResultTests.cs" />
     <Compile Include="Web\QueryTests.cs" />
     <Compile Include="Web\ResponseParserTests.cs" />
