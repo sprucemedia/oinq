@@ -59,9 +59,11 @@ namespace Oinq.EdgeSpring.Web
             try
             {
                 // Get response
-                response = request.GetResponse();
-                // Get the response stream
-                reader = new StreamReader(response.GetResponseStream());
+                using (response = request.GetResponse())
+                {
+                    // Get the response stream
+                    reader = new StreamReader(response.GetResponseStream());
+                }
             }
             catch (WebException wex)
             {
@@ -77,12 +79,8 @@ namespace Oinq.EdgeSpring.Web
                             errorResponse.StatusCode), wex);
                     }
                 }
+                throw wex;
             }
-            finally
-            {
-                if (response != null) { response.Close(); }
-            }
-
             return new QueryResponse(reader.ReadToEnd()); 
         }
     }

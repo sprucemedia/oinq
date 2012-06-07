@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using NUnit.Framework;
 using Oinq.EdgeSpring.Web;
@@ -14,7 +13,6 @@ namespace Oinq.EdgeSpring.Tests.Web
         private const String EXPECTED_REQUEST = "{\"action\":\"query\",\"query\":\"Fake Query Text\",\"otherscope\":{}}";
         private const String _response = "Fake Response Text";
         private WebRequestMock _request;
-
         private Query _query;
 
         [TestFixtureSetUp]
@@ -51,6 +49,34 @@ namespace Oinq.EdgeSpring.Tests.Web
         {
             // Assert
             Assert.AreEqual("application/json", _request.ContentType);
+        }
+    }
+
+    [TestFixture]
+    public class When_receiving_an_error_during_a_query_request
+    {
+        private readonly Uri _uri = new Uri("test://mock.com");
+        private const String COMMAND_TEXT = "Fake Query Text";
+        private const String _response = "Fake Response Text";
+        private WebRequestMock _request;
+        private Query _query;
+
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            WebRequest.RegisterPrefix("test", new WebRequestCreateMock());
+            _query = new Query(COMMAND_TEXT);
+            _request = WebRequestCreateMock.CreateErrorWebRequestMock(_response);
+        }
+
+        [Test]
+        public void it_rethrows_a_web_exception()
+        {
+            // Act
+            TestDelegate a = () => QueryRequest.SendQuery(_uri, _query);
+
+            // Assert
+            Assert.Throws<WebException>(a);
         }
     }
 }

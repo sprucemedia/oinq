@@ -33,6 +33,13 @@ namespace Oinq.EdgeSpring.Tests.Web
             NextRequest = request;
             return request;
         }
+
+        public static WebRequestMock CreateErrorWebRequestMock(String response)
+        {
+            WebRequestMock request = new ErrorWebRequestMock(response);
+            NextRequest = request;
+            return request;
+        }
     }
 
     public class WebRequestMock : WebRequest
@@ -62,8 +69,21 @@ namespace Oinq.EdgeSpring.Tests.Web
         public override WebResponse GetResponse()
         {
             return new WebResponseMock(_responseStream);
+        }  
+    }
+
+    public class ErrorWebRequestMock : WebRequestMock
+    {
+        public ErrorWebRequestMock(String response)
+            : base(response)
+        {
         }
-        
+
+        public override WebResponse GetResponse()
+        {
+            var wex = new WebException("Mock WebException", null, WebExceptionStatus.UnknownError, null);
+            throw wex;
+        }
     }
 
     public class WebResponseMock : WebResponse
