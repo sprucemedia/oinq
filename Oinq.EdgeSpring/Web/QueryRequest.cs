@@ -83,7 +83,7 @@ namespace Oinq.EdgeSpring.Web
                 if (response != null) { response.Close(); }
             }
 
-            return new QueryResponse(ResponseParser.BuildQueryResponseResult(reader.ReadToEnd())); 
+            return new QueryResponse(reader.ReadToEnd()); 
         }
     }
 }

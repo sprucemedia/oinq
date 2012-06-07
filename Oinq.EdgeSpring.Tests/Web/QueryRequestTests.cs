@@ -12,25 +12,14 @@ namespace Oinq.EdgeSpring.Tests.Web
         private readonly Uri _uri = new Uri("test://mock.com");
         private const String COMMAND_TEXT = "Fake Query Text";
         private const String EXPECTED_REQUEST = "{\"action\":\"query\",\"query\":\"Fake Query Text\",\"otherscope\":{}}";
-        private const String TEST_FILE = @"..\..\Web\JsonData\response.txt";
+        private const String _response = "Fake Response Text";
         private WebRequestMock _request;
-        private String _response;
+
         private Query _query;
 
         [TestFixtureSetUp]
         public void TestFixtureSetUp()
         {
-            StreamReader testFile = null;
-            try
-            {
-                testFile = new StreamReader(TEST_FILE);
-                _response = testFile.ReadToEnd();
-            }
-            finally
-            {
-                testFile.Close();
-            }
-
             WebRequest.RegisterPrefix("test", new WebRequestCreateMock());
             _query = new Query(COMMAND_TEXT);
             _request = WebRequestCreateMock.CreateWebRequestMock(_response);

@@ -57,7 +57,7 @@
     <Compile Include="Web\QueryRequestTests.cs" />
     <Compile Include="Web\QueryResponseResultTests.cs" />
     <Compile Include="Web\QueryTests.cs" />
-    <Compile Include="Web\ResponseParserTests.cs" />
+    <Compile Include="Web\QueryResponseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Oinq.Core\Oinq.Core.csproj">
