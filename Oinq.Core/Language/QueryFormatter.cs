@@ -650,12 +650,10 @@ namespace Oinq.Core
                     AddAlias();
                 }
 
-                if (_levelCount == 0)
-                {
-                    Write(String.Format("{0} = FOREACH {1} GENERATE ", GetNextAliasName(), GetLastAliasName()));
-                    WriteColumns(node.Columns);
-                    Write("; ");
-                }
+                Write(String.Format("{0} = FOREACH {1} GENERATE ", GetNextAliasName(), GetLastAliasName()));
+                WriteColumns(node.Columns);
+                Write("; ");
+                AddAlias();
             }
 
             return node;

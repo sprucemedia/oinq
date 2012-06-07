@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using NUnit.Framework;
 using Rhino.Mocks;
 
@@ -87,7 +85,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 == 5); t2 = FOREACH t1 GENERATE Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Mea1; t2 = FILTER t1 BY (Mea1 == 5); t3 = FOREACH t2 GENERATE Mea1 AS Mea1; ", queryText);
         }
 
         [Test]
@@ -139,7 +137,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 > 5); t2 = GROUP t1 BY Dim1; t3 = FOREACH t2 GENERATE Dim1 AS Dim1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 > 5); t2 = FOREACH t1 GENERATE Dim1 AS Dim1; t3 = GROUP t2 BY Dim1; t4 = FOREACH t3 GENERATE Dim1 AS Dim1; ", queryText);
         }
 
         [Test]
@@ -153,6 +151,20 @@ namespace Oinq.Core.Tests
 
             // Assert
             Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; ", queryText);
+        }
+
+        [Test]
+        public void it_can_filter_grouped_data()
+        {
+            // Arrange
+            var query = _fakeData.GroupBy(f => f.Dim1, f => f.Mea1, (dimension, measure) => new { Dimension = dimension, Total = measure.Sum() })
+                .Where(g => g.Total > 5);
+
+            // Act
+            var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; t3 = FILTER t2 BY (c0 > 5); t4 = FOREACH t3 GENERATE Dim1 AS Dim1, c0 AS c0; ", queryText);
         }
     }
 }
