@@ -51,12 +51,9 @@ namespace Oinq.Core
 
         // internal properties
         internal ReadOnlyCollection<ColumnDeclaration> Columns { get; private set; }
-        internal Boolean IsDistinct { get; private set; }
-        internal Boolean IsReverse { get; private set; }
         internal Expression From { get; private set; }
         internal ReadOnlyCollection<Expression> GroupBy { get; private set; }
         internal ReadOnlyCollection<OrderExpression> OrderBy { get; private set; }
-        internal String QueryText { get { return QueryFormatter.Format(this); } }
         internal Expression Skip { get; private set; }
         internal Expression Take { get; private set; }
         internal Expression Where { get; private set; }
