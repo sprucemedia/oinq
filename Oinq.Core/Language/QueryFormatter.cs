@@ -73,7 +73,7 @@ namespace Oinq.Core
                 case ExpressionType.Equal:
                     return "==";
                 case ExpressionType.NotEqual:
-                    return "<>";
+                    return "!=";
                 case ExpressionType.LessThan:
                     return "<";
                 case ExpressionType.LessThanOrEqual:
@@ -95,12 +95,6 @@ namespace Oinq.Core
                     return "/";
                 case ExpressionType.Modulo:
                     return "%";
-                case ExpressionType.ExclusiveOr:
-                    return "^";
-                case ExpressionType.LeftShift:
-                    return "<<";
-                case ExpressionType.RightShift:
-                    return ">>";
                 default:
                     return "";
             }
