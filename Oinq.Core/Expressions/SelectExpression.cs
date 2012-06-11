@@ -34,6 +34,8 @@ namespace Oinq.Core
             }
             From = from;
             Where = where;
+            Skip = skip;
+            Take = take;
         }
 
 

@@ -217,6 +217,20 @@ namespace Oinq.Core
             }
         }
 
+        protected void WriteOutput(Expression take, String lastAlias)
+        {
+            if (take != null)
+            {
+                Write(String.Format("limit {0} ", lastAlias));
+                Visit(take);
+                Write("; ");
+            }
+            else
+            {
+                Write(String.Format("dump {0}; ", lastAlias)); 
+            }
+        }
+
         protected void WriteSourceName(String sourceName)
         {
             Write(sourceName);
@@ -631,16 +645,16 @@ namespace Oinq.Core
 
                 if (node.GroupBy != null && node.GroupBy.Count > 0)
                 {
-                    _sb.Append(String.Format("{0} = GROUP {1} BY ", GetNextAliasName(), GetLastAliasName()));
+                   Write(String.Format("{0} = GROUP {1} BY ", GetNextAliasName(), GetLastAliasName()));
                     for (Int32 i = 0, n = node.GroupBy.Count; i < n; i++)
                     {
                         if (i > 0)
                         {
-                            _sb.Append(", ");
+                            Write(", ");
                         }
                         Visit(node.GroupBy[i]);
                     }
-                    _sb.Append("; ");
+                    Write("; ");
                     AddAlias();
                 }
 
@@ -648,6 +662,11 @@ namespace Oinq.Core
                 WriteColumns(node.Columns);
                 Write("; ");
                 AddAlias();
+            }
+
+            if (_levelCount == 0)
+            {
+                WriteOutput(node.Take, GetLastAliasName());
             }
 
             return node;

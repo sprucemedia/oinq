@@ -41,7 +41,7 @@ namespace Oinq.Core
                     _map.Add(ae, new ColumnExpression(ae.Type, ae.GroupByAlias, name));
                     aggColumns.Add(cd);
                 }
-                return new SelectExpression(node.Alias, aggColumns, node.From, node.Where, node.OrderBy, node.GroupBy);
+                return new SelectExpression(node.Alias, aggColumns, node.From, node.Where, node.OrderBy, node.GroupBy, false, node.Skip, node.Take, false);
             }
             return node;
         }

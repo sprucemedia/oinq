@@ -10,7 +10,7 @@ namespace Oinq.Core
     /// QueryBinder is a visitor that converts method calls to LINQ operations into 
     /// custom PigExpression nodes and references to class members into references to columns.
     /// </summary>
-    internal class QueryBinder : PigExpressionVisitor
+    internal class QueryBinder : ExpressionVisitor
     {
         // private fields
         private Dictionary<ParameterExpression, Expression> _map;
@@ -38,9 +38,9 @@ namespace Oinq.Core
         // protected override methods
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (IsTable(node.Value))
+            if (IsTable(node))
             {
-                return GetTableProjection(node.Value);
+                return GetTableProjection(TypeHelper.GetElementType(node.Type));
             }
             return node;
         }
@@ -143,6 +143,12 @@ namespace Oinq.Core
                         {
                             return BindGroupBy(node.Arguments[0], GetLambda(node.Arguments[1]),
                                 GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]));
+                        }
+                        break;
+                    case "Take":
+                        if (node.Arguments.Count == 2)
+                        {
+                            return BindTake(node.Arguments[0], node.Arguments[1]);
                         }
                         break;
                     case "Count":
@@ -412,6 +418,19 @@ namespace Oinq.Core
                 );
         }
 
+        private Expression BindTake(Expression source, Expression take)
+        {
+            ProjectionExpression projection = VisitSequence(source);
+            take = Visit(take);
+            SelectExpression select = projection.Source;
+            var alias = GetNextAlias();
+            ProjectedColumns pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
+            return new ProjectionExpression(
+                new SelectExpression(alias, pc.Columns, projection.Source, null, null, null, false, null, take, false),
+                pc.Projector
+                );
+        }
+
         private Expression BindThenBy(Expression source, LambdaExpression orderSelector, OrderType orderType)
         {
             if (_thenBys == null)
@@ -509,21 +528,18 @@ namespace Oinq.Core
             return new SourceAlias();
         }
 
-        private String GetTableName(Object table)
+        private String GetTableName(Type rowType)
         {
-            IQueryable tableQuery = (IQueryable)table;
-            Type rowType = tableQuery.ElementType;
             return rowType.Name;
         }
 
-        private ProjectionExpression GetTableProjection(Object value)
+        private ProjectionExpression GetTableProjection(Type rowType)
         {
-            IQueryable table = (IQueryable)value;
             var sourceAlias = GetNextAlias();
             var selectAlias = GetNextAlias();
             List<MemberBinding> bindings = new List<MemberBinding>();
             List<ColumnDeclaration> columns = new List<ColumnDeclaration>();
-            foreach (MemberInfo mi in GetMappedMembers(table.ElementType))
+            foreach (MemberInfo mi in GetMappedMembers(rowType))
             {
                 String columnName = GetColumnName(mi);
                 Type columnType = GetColumnType(mi);
@@ -531,13 +547,13 @@ namespace Oinq.Core
                 columns.Add(new ColumnDeclaration(columnName, new ColumnExpression(columnType, sourceAlias, columnName)));
             }
 
-            Expression projector = Expression.MemberInit(Expression.New(table.ElementType), bindings);
-            Type resultType = typeof(IEnumerable<>).MakeGenericType(table.ElementType);
+            Expression projector = Expression.MemberInit(Expression.New(rowType), bindings);
+            Type resultType = typeof(IEnumerable<>).MakeGenericType(rowType);
             return new ProjectionExpression(
                 new SelectExpression(
                     selectAlias,
                     columns,
-                    new SourceExpression(sourceAlias, GetTableName(table)),
+                    new SourceExpression(sourceAlias, GetTableName(rowType)),
                     null),
                 projector);
         }
@@ -549,14 +565,7 @@ namespace Oinq.Core
 
         private Boolean IsTable(Expression expression)
         {
-            ConstantExpression c = expression as ConstantExpression;
-            return c != null && IsTable(c.Value);
-        }
-
-        private Boolean IsTable(Object value)
-        {
-            IQueryable q = value as IQueryable;
-            return q != null && q.Provider == _provider && q.Expression.NodeType == ExpressionType.Constant;
+            return expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Query<>);  
         }
 
         private Expression MakeMember(Expression source, MemberInfo mi)

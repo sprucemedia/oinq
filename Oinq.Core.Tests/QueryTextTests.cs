@@ -32,7 +32,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY ((Dim1 == 'Fake') AND (Mea1 == 5)); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY ((Dim1 == 'Fake') AND (Mea1 == 5)); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Mea1 AS Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Mea1; t2 = FILTER t1 BY (Mea1 == 5); t3 = FOREACH t2 GENERATE Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Mea1; t2 = FILTER t1 BY (Mea1 == 5); t3 = FOREACH t2 GENERATE Mea1 AS Mea1; dump t3; ", queryText);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Mea1; dump t1; ", queryText);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t1; ", queryText);
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1; dump t2; ", queryText);
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 > 5); t2 = FOREACH t1 GENERATE Dim1 AS Dim1; t3 = GROUP t2 BY Dim1; t4 = FOREACH t3 GENERATE Dim1 AS Dim1; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 > 5); t2 = FOREACH t1 GENERATE Dim1 AS Dim1; t3 = GROUP t2 BY Dim1; t4 = FOREACH t3 GENERATE Dim1 AS Dim1; dump t4; ", queryText);
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; dump t2; ", queryText);
         }
 
         [Test]
@@ -164,7 +164,20 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; t3 = FILTER t2 BY (c0 > 5); t4 = FOREACH t3 GENERATE Dim1 AS Dim1, c0 AS c0; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; t3 = FILTER t2 BY (c0 > 5); t4 = FOREACH t3 GENERATE Dim1 AS Dim1, c0 AS c0; dump t4; ", queryText);
+        }
+
+        [Test]
+        public void it_can_limit_the_number_of_rows_returned()
+        {
+            // Arrange
+            var query = _fakeData.Take(100);
+
+            // Act
+            var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; limit t1 100; ", queryText);
         }
     }
 

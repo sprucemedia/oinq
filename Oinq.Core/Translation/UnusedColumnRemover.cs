@@ -79,6 +79,7 @@ namespace Oinq.Core
                 columns = alternate.AsReadOnly();
             }
 
+            Expression take = Visit(node.Take);
             ReadOnlyCollection<Expression> groupbys = Visit(node.GroupBy);
             ReadOnlyCollection<OrderExpression> orderbys = VisitOrderBy(node.OrderBy);
             Expression where = Visit(node.Where);
@@ -87,12 +88,13 @@ namespace Oinq.Core
             ClearColumnsUsed(node.Alias);
 
             if (columns != node.Columns
+                || take != node.Take
                 || orderbys != node.OrderBy
                 || groupbys != node.GroupBy
                 || where != node.Where
                 || from != node.From)
             {
-                node = new SelectExpression(node.Alias, columns, from, where, orderbys, groupbys);
+                node = new SelectExpression(node.Alias, columns, from, where, orderbys, groupbys, false, null, take, false);
             }
 
             return node;

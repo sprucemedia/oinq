@@ -140,6 +140,7 @@ namespace Oinq.Core
                 return (select.From is SelectExpression || select.From is SourceExpression)
                     && (ProjectionIsSimple(select) || ProjectionIsNameMapOnly(select))
                     && (select.Where == null)
+                    && (select.Take == null)
                     && (select.OrderBy == null || select.OrderBy.Count == 0)
                     && (select.GroupBy == null || select.GroupBy.Count == 0);
             }

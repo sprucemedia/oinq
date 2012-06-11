@@ -166,6 +166,8 @@ namespace Oinq.Core
         {
             Expression from = VisitSource(node.From);
             Expression where = Visit(node.Where);
+            Expression take = Visit(node.Take);
+            Expression skip = Visit(node.Skip);
             ReadOnlyCollection<ColumnDeclaration> columns = VisitColumnDeclarations(node.Columns);
             ReadOnlyCollection<OrderExpression> orderBy = VisitOrderBy(node.OrderBy);
             ReadOnlyCollection<Expression> groupBy = Visit(node.GroupBy);
@@ -173,9 +175,11 @@ namespace Oinq.Core
                 || where != node.Where
                 || columns != node.Columns
                 || orderBy != node.OrderBy
-                || groupBy != node.GroupBy)
+                || groupBy != node.GroupBy
+                || take != node.Take
+                || skip != node.Skip)
             {
-                return new SelectExpression(node.Alias, columns, from, where, orderBy, groupBy);
+                return new SelectExpression(node.Alias, columns, from, where, orderBy, groupBy, false, skip, take, false);
             }
             return node;
         }
