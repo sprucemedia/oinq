@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Collections;
 
 namespace Oinq.Core
 {
@@ -13,13 +11,22 @@ namespace Oinq.Core
     /// objects via a projector function,
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ProjectionReader<T> : IEnumerable<T>, IEnumerable
+    public class ProjectionReader<T> : IEnumerable<T>, IEnumerable, IDisposable
     {
         private Enumerator _enumerator;
 
-        public ProjectionReader(IEnumerable<Object> reader, Func<ProjectionRow, T> projector, IQueryProvider provider)
+        public ProjectionReader(IEnumerable<Object> reader, Func<IEnumerable<Object>, T> projector)
         {
-            _enumerator = new Enumerator(reader, projector, provider);
+            _enumerator = new Enumerator(reader, projector);
+        }
+
+        void IDisposable.Dispose()
+        {
+            if (_enumerator != null)
+            {
+                _enumerator.Dispose();
+                _enumerator = null;
+            }
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -38,41 +45,16 @@ namespace Oinq.Core
             return GetEnumerator();
         }
 
-        class Enumerator : ProjectionRow, IEnumerator<T>, IEnumerator
+        class Enumerator : IEnumerator<T>, IEnumerator
         {
             private IList<Object> _reader;
-            private Int32 _currentIndex = 0;
             private T _current;
-            private Func<ProjectionRow, T> _projector;
-            private IQueryProvider _provider;
+            Func<IEnumerable<Object>, T> _projector;
 
-            internal Enumerator(IEnumerable<Object> reader, Func<ProjectionRow, T> projector, IQueryProvider provider)
+            internal Enumerator(IEnumerable<Object> reader, Func<IEnumerable<Object>, T> projector)
             {
                 _reader = reader.ToList();
                 _projector = projector;
-                _provider = provider;
-            }
-
-            public override Object GetValue(Int32 index)
-            {
-                if (index >= 0)
-                {
-                    return _reader[index];
-                }
-                throw new IndexOutOfRangeException();
-            }
-
-            public override IEnumerable<T> ExecuteSubQuery<T>(LambdaExpression query)
-            {
-                ProjectionExpression projection = (ProjectionExpression)Replacer.Replace(query.Body, query.Parameters[0], Expression.Constant(this));
-                projection = (ProjectionExpression)PartialEvaluator.Evaluate(projection, CanEvaluateLocally);
-                IEnumerable<T> result = (IEnumerable<T>)_provider.Execute(projection);
-                IList<T> list = new List<T>(result);
-                if (typeof(IQueryable<T>).IsAssignableFrom(query.Body.Type))
-                {
-                    return list.AsQueryable();
-                }
-                return list;
             }
 
             public T Current
@@ -87,14 +69,8 @@ namespace Oinq.Core
 
             public Boolean MoveNext()
             {
-                _current = _projector(this);
-                _currentIndex += 1;
+                _current = _projector(_reader);
                 return true;
-            }
-
-            private static Boolean CanEvaluateLocally(Expression expression)
-            {
-                return (expression.NodeType != ExpressionType.Parameter);
             }
 
             public void Reset()

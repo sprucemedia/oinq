@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Linq.Expressions;
-using System.Reflection;
+using System.Collections.Generic;
 using Oinq.Core;
 using Oinq.EdgeSpring.Web;
 
@@ -14,41 +12,13 @@ namespace Oinq.EdgeSpring
         {          
         }
 
-        public override Object Execute(Expression expression)
+        public override Object  Execute(String commandText, String[] paramNames, Object[] paramValues, 
+            Func<IEnumerable<Object>,Object> fnRead)
         {
-            return Execute(Translate(expression));   
-        }
-
-        private Object Execute(TranslatedQuery query)
-        {
-            Delegate projector = query.Projector.Compile();
-            Type elementType = TypeHelper.GetElementType(query.Projector.Body.Type);
-
-            Query esQuery = new Query(query.CommandText);
+            Query esQuery = new Query(commandText);
             QueryResponse response = QueryRequest.SendQuery(Source.ServerUrl, esQuery);
 
-            IEnumerable sequence = (IEnumerable)Activator.CreateInstance(
-                typeof(ProjectionReader<>).MakeGenericType(elementType),
-                BindingFlags.Instance | BindingFlags.NonPublic, null,
-                new object[] { response.Result.Records, projector, this },
-                null
-                );
-
-            if (query.Aggregator != null)
-            {
-                Delegate aggregator = query.Aggregator.Compile();
-                AggregateReader aggReader = (AggregateReader)Activator.CreateInstance(
-                    typeof(AggregateReader<,>).MakeGenericType(elementType, query.Aggregator.Body.Type),
-                    BindingFlags.Instance | BindingFlags.NonPublic, null,
-                    new object[] { aggregator },
-                    null
-                    );
-                return aggReader.Read(sequence);
-            }
-            else
-            {
-                return sequence;
-            }
+            return fnRead(response.Result.Records);
         }
     }
 }

@@ -150,7 +150,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; dump t2; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS node0; dump t2; ", queryText);
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace Oinq.Core.Tests
             var queryText = ((IQueryText)query.Provider).GetQueryText(query.Expression);
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS c0; t3 = FILTER t2 BY (c0 > 5); t4 = FOREACH t3 GENERATE Dim1 AS Dim1, c0 AS c0; dump t4; ", queryText);
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, sum(Mea1) AS node0; t3 = FILTER t2 BY (node0 > 5); t4 = FOREACH t3 GENERATE Dim1 AS Dim1, node0 AS node0; dump t4; ", queryText);
         }
 
         [Test]

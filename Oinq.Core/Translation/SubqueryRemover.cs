@@ -65,6 +65,6 @@ namespace Oinq.Core
             {
                 return base.VisitSelect(node);
             }
-        }  
+        }
     }
 }

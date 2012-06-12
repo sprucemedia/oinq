@@ -38,6 +38,8 @@ namespace Oinq.Core
                     return VisitIsNull((IsNullExpression)node);
                 case PigExpressionType.Projection:
                     return VisitProjection((ProjectionExpression)node);
+                case PigExpressionType.NamedValue:
+                    return this.VisitNamedValue((NamedValueExpression)node);
                 default:
                     return base.Visit(node);
             }
@@ -112,6 +114,11 @@ namespace Oinq.Core
             {
                 return new JoinExpression(node.Join, left, right, condition);
             }
+            return node;
+        }
+
+        protected virtual Expression VisitNamedValue(NamedValueExpression node)
+        {
             return node;
         }
 

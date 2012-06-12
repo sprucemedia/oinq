@@ -328,6 +328,7 @@ namespace Oinq.Core
                 case (ExpressionType)PigExpressionType.AggregateSubquery:
                 case (ExpressionType)PigExpressionType.IsNull:
                 case (ExpressionType)PigExpressionType.Projection:
+                case (ExpressionType)PigExpressionType.NamedValue:
                     return base.Visit(node);
 
                 case ExpressionType.ArrayLength:

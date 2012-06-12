@@ -35,7 +35,7 @@ namespace Oinq.EdgeSpring
         /// <summary>
         /// Parses a string representation of a server address.
         /// </summary>
-        /// <param name="value">The string representation of a server address.</param>
+        /// <param name="node">The string representation of a server address.</param>
         /// <returns>A new instance of ServerAddress initialized with values parsed from the string.</returns>
         public static ServerAddress Parse(String value)
         {
@@ -53,12 +53,12 @@ namespace Oinq.EdgeSpring
         /// <summary>
         /// Tries to parse a string representation of a server address.
         /// </summary>
-        /// <param name="value">The string representation of a server address.</param>
+        /// <param name="node">The string representation of a server address.</param>
         /// <param name="address">The server address (set to null if TryParse fails).</param>
         /// <returns>True if the string is parsed succesfully.</returns>
         public static Boolean TryParse(String value, out ServerAddress address)
         {
-            // don't throw ArgumentNullException if value is null
+            // don't throw ArgumentNullException if node is null
             if (value != null)
             {
                 Match match = Regex.Match(value, @"^(?<host>(\[[^]]+?\]|[^:]+))(:(?<port>\d+))?$");

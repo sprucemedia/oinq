@@ -113,13 +113,13 @@ namespace Oinq.EdgeSpring
 
         private static IEnumerable<KeyValuePair<String, String>> ParseQueryString(String url)
         {
-            var queryStringPattern = new Regex(@"[\?&](?<name>[^&=]+)=(?<value>[^&=]+)");
+            var queryStringPattern = new Regex(@"[\?&](?<name>[^&=]+)=(?<node>[^&=]+)");
             var matches = queryStringPattern.Matches(url);
             for (Int32 i = 0; i < matches.Count; i++)
             {
                 var match = matches[i];
                 yield return new KeyValuePair<String, String>
-                    (match.Groups["name"].Value, match.Groups["value"].Value);
+                    (match.Groups["name"].Value, match.Groups["node"].Value);
             }
         }
     }

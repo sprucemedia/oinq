@@ -41,8 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Expressions\AggregateExpression.cs" />
+    <Compile Include="Expressions\NamedValueExpression.cs" />
     <Compile Include="ISource.cs" />
-    <Compile Include="Translation\AggregateReader.cs" />
     <Compile Include="Translation\AggregateRewriter.cs" />
     <Compile Include="Expressions\AggregateSubqueryExpression.cs" />
     <Compile Include="Expressions\AliasedExpression.cs" />
@@ -53,16 +53,15 @@
     <Compile Include="Translation\Grouping.cs" />
     <Compile Include="Expressions\IsNullExpression.cs" />
     <Compile Include="Expressions\JoinExpression.cs" />
+    <Compile Include="Translation\NamedValueGatherer.cs" />
     <Compile Include="Translation\Nominator.cs" />
     <Compile Include="Expressions\OrderExpression.cs" />
     <Compile Include="Translation\PartialEvaluator.cs" />
     <Compile Include="Expressions\PigExpression.cs" />
     <Compile Include="Expressions\PigExpressionVisitor.cs" />
     <Compile Include="Translation\ProjectedColumns.cs" />
-    <Compile Include="Translation\ProjectionBuilder.cs" />
     <Compile Include="Expressions\ProjectionExpression.cs" />
     <Compile Include="Translation\ProjectionReader.cs" />
-    <Compile Include="Translation\ProjectionRow.cs" />
     <Compile Include="Translation\Projector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query.cs" />
@@ -74,7 +73,6 @@
     <Compile Include="Expressions\SelectExpression.cs" />
     <Compile Include="Expressions\SourceExpression.cs" />
     <Compile Include="Expressions\SubqueryExpression.cs" />
-    <Compile Include="Translation\Replacer.cs" />
     <Compile Include="Translation\SubqueryRemover.cs" />
     <Compile Include="Translation\TranslatedQuery.cs" />
     <Compile Include="Expressions\TypeEnums.cs" />

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Collections;
 
 namespace Oinq.Core
 {
@@ -46,6 +48,7 @@ namespace Oinq.Core
         }
 
         // public methods
+        // IQueryProvider methods
         /// <summary>
         /// Creates a new instance of Query{{T}} for this provider.
         /// </summary>
@@ -97,7 +100,7 @@ namespace Oinq.Core
         /// <returns>The result of the query.</returns>
         public virtual TResult Execute<TResult>(Expression expression)
         {
-            throw new NotImplementedException();
+            return (TResult)Execute(expression);
         }
 
         /// <summary>
@@ -107,9 +110,56 @@ namespace Oinq.Core
         /// <returns>The result of the query.</returns>
         public virtual Object Execute(Expression expression)
         {
+            // strip off lambda for now
+            LambdaExpression lambda = expression as LambdaExpression;
+            if (lambda != null)
+            {
+                expression = lambda.Body;
+            }
+
+            // translate query into component pieces
+            ProjectionExpression projection = Translate(expression);
+
+            String commandText = QueryFormatter.Format(projection.Source);
+            ReadOnlyCollection<NamedValueExpression> namedValues = NamedValueGatherer.Gather(projection.Source);
+            String[] names = namedValues.Select(v => v.Name).ToArray();
+
+            Expression rootQueryable = RootQueryableFinder.Find(expression);
+            Expression providerAccess = Expression.Convert(
+                Expression.Property(rootQueryable, typeof(IQueryable).GetProperty("Provider")), typeof(QueryProvider));
+
+            LambdaExpression projector = ProjectionBuilder.Build(this, projection, providerAccess);
+            LambdaExpression eRead = GetReader(projector, projection.Aggregator, true);
+
+            // if asked to execute a lambda, produce a function that will execute this query later.
+            if (lambda != null)
+            {
+                // call low-level execute directly on the supplied QueryProvider
+                Expression body = Expression.Call(
+                    providerAccess, "Execute", null,
+                    Expression.Constant(commandText),
+                    Expression.Constant(names),
+                    Expression.NewArrayInit(typeof(Object), namedValues.Select(v => Expression.Convert(v.Value, typeof(Object))).ToArray()),
+                    eRead);
+                body = Expression.Convert(body, expression.Type);
+                LambdaExpression fn = Expression.Lambda(lambda.Type, body, lambda.Parameters);
+                return fn.Compile();
+            }
+            else
+            {
+                // execute now!
+                Object[] values = namedValues.Select(v => v.Value as ConstantExpression).Select(c => c != null ? c.Value : null).ToArray();
+                var fnRead = (Func<IEnumerable<Object>, Object>)eRead.Compile();
+                return Execute(commandText, names, values, fnRead);
+            }
+        }
+
+        public virtual Object Execute(String commandText, String[] paramNames, Object[] paramValues, Func<IEnumerable<Object>, Object> fnRead)
+        {
             throw new NotImplementedException();
         }
 
+        // IQueryText implementation
         /// <summary>
         /// Translates and returns an expression tree as query text.
         /// </summary>
@@ -121,29 +171,12 @@ namespace Oinq.Core
             {
                 throw new ArgumentNullException("expression");
             }
-            return Translate(expression).CommandText;
+            ProjectionExpression projection = Translate(expression);
+            return QueryFormatter.Format(projection.Source);
 
         }
 
-        // private methods
-        protected TranslatedQuery Translate(Expression expression)
-        {
-            ProjectionExpression projection = expression as ProjectionExpression;
-            if (projection == null)
-            {
-                expression = PartialEvaluator.Evaluate(expression, CanBeEvaluatedLocally);
-                expression = QueryBinder.Bind(this, expression);
-                expression = AggregateRewriter.Rewrite(expression);
-                expression = UnusedColumnRemover.Remove(expression);
-                expression = RedundantSubqueryRemover.Remove(expression);
-                projection = (ProjectionExpression)expression;
-            }
-            string commandText = QueryFormatter.Format(projection.Source);
-            string[] columns = projection.Source.Columns.Select(c => c.Name).ToArray();
-            LambdaExpression projector = ProjectionBuilder.Build(projection.Projector, projection.Source.Alias, columns);
-            return new TranslatedQuery(commandText, projector, projection.Aggregator);
-        }
-
+        // protected methods
         protected Boolean CanBeEvaluatedLocally(Expression expression)
         {
             // any operation on a query can't be done locally
@@ -156,6 +189,173 @@ namespace Oinq.Core
             }
             return expression.NodeType != ExpressionType.Parameter &&
                    expression.NodeType != ExpressionType.Lambda;
+        }
+
+        // create a lambda function that will convert a DbDataReader into a projected (and possibly aggregated) result
+        protected static LambdaExpression GetReader(LambdaExpression fnProjector, LambdaExpression fnAggregator, Boolean boxReturn)
+        {
+            ParameterExpression reader = Expression.Parameter(typeof(IEnumerable<Object>), "reader");
+            Expression body = Expression.New(typeof(ProjectionReader<>).MakeGenericType(fnProjector.Body.Type).GetConstructors()[0], reader, fnProjector);
+            if (fnAggregator != null)
+            {
+                body = Expression.Invoke(fnAggregator, body);
+            }
+            if (boxReturn && body.Type != typeof(Object))
+            {
+                body = Expression.Convert(body, typeof(Object));
+            }
+            return Expression.Lambda(body, reader);
+        }
+
+        private ProjectionExpression Translate(Expression expression)
+        {
+            expression = PartialEvaluator.Evaluate(expression, CanBeEvaluatedLocally);
+            expression = QueryBinder.Bind(this, expression);
+            expression = AggregateRewriter.Rewrite(expression);
+            expression = UnusedColumnRemover.Remove(expression);
+            expression = RedundantSubqueryRemover.Remove(expression);
+            return (ProjectionExpression)expression;
+        }
+
+        /// <summary>
+        /// ProjectionBuilder is a visitor that converts an projector expression
+        /// that constructs result objects out of ColumnExpressions into an actual
+        /// LambdaExpression that constructs result objects out of accessing fields
+        /// of a ProjectionRow
+        /// </summary>
+        class ProjectionBuilder : PigExpressionVisitor
+        {
+            // private fields
+            private ParameterExpression _resultParam;
+            private QueryProvider _provider;
+            private ProjectionExpression _projection;
+            private Expression _providerAccess;
+            private Dictionary<String, Int32> _nameMap;
+
+            // constructors
+            private ProjectionBuilder(QueryProvider provider, ProjectionExpression projection, Expression providerAccess)
+            {
+                _provider = provider;
+                _projection = projection;
+                _providerAccess = providerAccess;
+                _resultParam = Expression.Parameter(typeof(IEnumerable), "reader");
+                _nameMap = projection.Source.Columns.Select((c, i) => new { c, i }).ToDictionary(x => x.c.Name, x => x.i);
+            }
+
+            // internal static methods
+            internal static LambdaExpression Build(QueryProvider provider, ProjectionExpression projection, Expression providerAccess)
+            {
+                ProjectionBuilder builder = new ProjectionBuilder(provider, projection, providerAccess);
+                Expression body = builder.Visit(projection.Projector);
+                return Expression.Lambda(body, builder._resultParam);
+            }
+
+            // protected override methods
+            protected override Expression VisitColumn(ColumnExpression column)
+            {
+                if (column.Alias == _projection.Source.Alias)
+                {
+                    Int32 iOrdinal = _nameMap[column.Name];
+
+                    Expression defValue;
+                    if (!column.Type.IsValueType || TypeHelper.IsNullableType(column.Type))
+                    {
+                        defValue = Expression.Constant(null, column.Type);
+                    }
+                    else
+                    {
+                        defValue = Expression.Constant(Activator.CreateInstance(column.Type), column.Type);
+                    }
+
+                    Expression value = Expression.Convert(
+                        Expression.Call(typeof(System.Convert), "ChangeType", null,
+                        Expression.Constant(TypeHelper.GetNonNullableType(column.Type))),
+                        column.Type);
+
+                    return Expression.Condition(
+                        Expression.Call(_resultParam, "IsNull", null, Expression.Constant(iOrdinal)), defValue, value);
+                }
+                return column;
+            }
+
+            protected override Expression VisitProjection(ProjectionExpression projection) 
+            {
+                String commandText = QueryFormatter.Format(projection.Source);
+                ReadOnlyCollection<NamedValueExpression> namedValues = NamedValueGatherer.Gather(projection.Source);
+                String[] names = namedValues.Select(v => v.Name).ToArray();
+                Expression[] values = namedValues.Select(v => Expression.Convert(Visit(v.Value), typeof(Object))).ToArray();
+
+                LambdaExpression projector = ProjectionBuilder.Build(_provider, projection, _providerAccess);
+                LambdaExpression eRead = GetReader(projector, projection.Aggregator, true);
+
+                Type resultType = projection.Aggregator != null ? projection.Aggregator.Body.Type : typeof(IEnumerable<>).MakeGenericType(projection.Projector.Type);
+
+                // return expression that will call Execute(...)
+                return Expression.Convert(
+                    Expression.Call(_providerAccess, "Execute", null, Expression.Constant(commandText), Expression.Constant(names),
+                        Expression.NewArrayInit(typeof(Object), values), eRead),
+                    resultType);
+            }
+
+            /// <summary>
+            /// columns referencing the outer alias are turned into special named-node parameters
+            /// </summary>
+            class OuterParameterizer : PigExpressionVisitor
+            {
+                private Int32 _param;
+                private String _outerAlias;
+
+                internal static Expression Parameterize(String outerAlias, Expression expr)
+                {
+                    OuterParameterizer op = new OuterParameterizer();
+                    op._outerAlias = outerAlias;
+                    return op.Visit(expr);
+                }
+
+                protected override Expression VisitProjection(ProjectionExpression proj)
+                {
+                    SelectExpression select = (SelectExpression)Visit(proj.Source);
+                    if (select != proj.Source)
+                    {
+                        return new ProjectionExpression(select, proj.Projector, proj.Aggregator);
+                    }
+                    return proj;
+                }
+
+                protected override Expression VisitColumn(ColumnExpression column)
+                {
+                    if (column.Alias.ToString() == _outerAlias)
+                    {
+                        return new NamedValueExpression("n" + (_param++), column);
+                    }
+                    return column;
+                }
+            }
+        }
+
+        // attempt to isolate a sub-expression that accesses a Query<T> object
+        class RootQueryableFinder : PigExpressionVisitor
+        {
+            Expression root;
+            internal static Expression Find(Expression expression)
+            {
+                RootQueryableFinder finder = new RootQueryableFinder();
+                finder.Visit(expression);
+                return finder.root;
+            }
+
+            protected override Expression Visit(Expression exp)
+            {
+                Expression result = base.Visit(exp);
+
+                // remember the first sub-expression that produces an IQueryable
+                if (this.root == null && result != null && typeof(IQueryable).IsAssignableFrom(result.Type))
+                {
+                    this.root = result;
+                }
+
+                return result;
+            }
         }
     }
 }

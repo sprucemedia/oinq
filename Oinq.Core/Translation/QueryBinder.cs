@@ -230,7 +230,7 @@ namespace Oinq.Core
 
             if (isRoot)
             {
-                ParameterExpression p = Expression.Parameter(typeof(IEnumerable<>).MakeGenericType(aggExpr.Type), "p");
+                ParameterExpression p = Expression.Parameter(typeof(IEnumerable<>).MakeGenericType(aggExpr.Type), "node");
                 LambdaExpression gator = Expression.Lambda(Expression.Call(typeof(Enumerable), "Single", new Type[] { returnType }, p), p);
                 return new ProjectionExpression(select, new ColumnExpression(returnType, alias, ""), gator);
             }

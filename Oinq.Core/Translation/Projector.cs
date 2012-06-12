@@ -83,7 +83,7 @@ namespace Oinq.Core
         // private methods
         private String GetNextColumnName()
         {
-            return GetUniqueColumnName("c" + (_iColumn++));
+            return GetUniqueColumnName("node" + (_iColumn++));
         }
 
         private String GetUniqueColumnName(String name)

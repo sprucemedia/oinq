@@ -39,7 +39,7 @@ namespace Oinq.EdgeSpring.Web
         }
 
         /// <summary>
-        /// Gets the other scope value of the query.
+        /// Gets the other scope node of the query.
         /// </summary>
         [JsonProperty(PropertyName = "otherscope", Order = 3)]
         public Object OtherScope

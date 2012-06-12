@@ -15,7 +15,8 @@ namespace Oinq.Core
         Grouping,
         AggregateSubquery,
         IsNull,
-        Scalar
+        Scalar,
+        NamedValue
     }
 
     internal static class PigExpressionExtensions
