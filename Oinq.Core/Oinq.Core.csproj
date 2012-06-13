@@ -49,6 +49,7 @@
     <Compile Include="Expressions\ColumnDeclaration.cs" />
     <Compile Include="Expressions\ColumnExpression.cs" />
     <Compile Include="Expressions\ExpressionVisitor.cs" />
+    <Compile Include="Translation\EnumerableDataReader.cs" />
     <Compile Include="Translation\GroupByInfo.cs" />
     <Compile Include="Translation\Grouping.cs" />
     <Compile Include="Expressions\IsNullExpression.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Translation\NamedValueGatherer.cs" />
     <Compile Include="Translation\Nominator.cs" />
     <Compile Include="Expressions\OrderExpression.cs" />
+    <Compile Include="Translation\ObjectDataReader.cs" />
     <Compile Include="Translation\PartialEvaluator.cs" />
     <Compile Include="Expressions\PigExpression.cs" />
     <Compile Include="Expressions\PigExpressionVisitor.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="Expressions\SelectExpression.cs" />
     <Compile Include="Expressions\SourceExpression.cs" />
     <Compile Include="Expressions\SubqueryExpression.cs" />
+    <Compile Include="Translation\ReflectionExtensions.cs" />
     <Compile Include="Translation\SubqueryRemover.cs" />
     <Compile Include="Expressions\TypeEnums.cs" />
     <Compile Include="Language\TypeHelper.cs" />

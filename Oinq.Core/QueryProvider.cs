@@ -149,12 +149,12 @@ namespace Oinq.Core
             {
                 // execute now!
                 Object[] values = namedValues.Select(v => v.Value as ConstantExpression).Select(c => c != null ? c.Value : null).ToArray();
-                var fnRead = (Func<IEnumerable<Object>, Object>)eRead.Compile();
+                var fnRead = (Func<EnumerableDataReader, Object>)eRead.Compile();
                 return Execute(commandText, names, values, fnRead);
             }
         }
 
-        public virtual Object Execute(String commandText, String[] paramNames, Object[] paramValues, Func<IEnumerable<Object>, Object> fnRead)
+        public virtual Object Execute(String commandText, String[] paramNames, Object[] paramValues, Func<EnumerableDataReader, Object> fnRead)
         {
             throw new NotImplementedException();
         }
@@ -194,7 +194,7 @@ namespace Oinq.Core
         // create a lambda function that will convert a DbDataReader into a projected (and possibly aggregated) result
         protected static LambdaExpression GetReader(LambdaExpression fnProjector, LambdaExpression fnAggregator, Boolean boxReturn)
         {
-            ParameterExpression reader = Expression.Parameter(typeof(IEnumerable<Object>), "reader");
+            ParameterExpression reader = Expression.Parameter((typeof(EnumerableDataReader)), "reader");
             Expression body = Expression.New(typeof(ProjectionReader<>).MakeGenericType(fnProjector.Body.Type).GetConstructors()[0], reader, fnProjector);
             if (fnAggregator != null)
             {
@@ -238,7 +238,7 @@ namespace Oinq.Core
                 _provider = provider;
                 _projection = projection;
                 _providerAccess = providerAccess;
-                _resultParam = Expression.Parameter(typeof(IEnumerable), "reader");
+                _resultParam = Expression.Parameter(typeof(EnumerableDataReader), "reader");
                 _nameMap = projection.Source.Columns.Select((c, i) => new { c, i }).ToDictionary(x => x.c.Name, x => x.i);
             }
 
@@ -267,13 +267,16 @@ namespace Oinq.Core
                         defValue = Expression.Constant(Activator.CreateInstance(column.Type), column.Type);
                     }
 
+                    // this sucks, but since we don't track true types through the query,
+                    // the best we can do is call GetValue and Convert.ChangeType.
                     Expression value = Expression.Convert(
                         Expression.Call(typeof(System.Convert), "ChangeType", null,
+                        Expression.Call(_resultParam, "GetValue", null, Expression.Constant(iOrdinal)),
                         Expression.Constant(TypeHelper.GetNonNullableType(column.Type))),
                         column.Type);
 
                     return Expression.Condition(
-                        Expression.Call(_resultParam, "IsNull", null, Expression.Constant(iOrdinal)), defValue, value);
+                        Expression.Constant(false), defValue, value);
                 }
                 return column;
             }
@@ -295,41 +298,6 @@ namespace Oinq.Core
                     Expression.Call(_providerAccess, "Execute", null, Expression.Constant(commandText), Expression.Constant(names),
                         Expression.NewArrayInit(typeof(Object), values), eRead),
                     resultType);
-            }
-
-            /// <summary>
-            /// columns referencing the outer alias are turned into special named-node parameters
-            /// </summary>
-            class OuterParameterizer : PigExpressionVisitor
-            {
-                private Int32 _param;
-                private String _outerAlias;
-
-                internal static Expression Parameterize(String outerAlias, Expression expr)
-                {
-                    OuterParameterizer op = new OuterParameterizer();
-                    op._outerAlias = outerAlias;
-                    return op.Visit(expr);
-                }
-
-                protected override Expression VisitProjection(ProjectionExpression proj)
-                {
-                    SelectExpression select = (SelectExpression)Visit(proj.Source);
-                    if (select != proj.Source)
-                    {
-                        return new ProjectionExpression(select, proj.Projector, proj.Aggregator);
-                    }
-                    return proj;
-                }
-
-                protected override Expression VisitColumn(ColumnExpression column)
-                {
-                    if (column.Alias.ToString() == _outerAlias)
-                    {
-                        return new NamedValueExpression("n" + (_param++), column);
-                    }
-                    return column;
-                }
             }
         }
 

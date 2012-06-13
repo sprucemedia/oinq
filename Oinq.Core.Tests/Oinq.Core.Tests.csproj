@@ -49,9 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fakes\FakeData.cs" />
+    <Compile Include="Fakes\FakeDataObject.cs" />
+    <Compile Include="Fakes\FakeQueryProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryProviderTests.cs" />
     <Compile Include="QueryTextTests.cs" />
     <Compile Include="QueryTests.cs" />
+    <Compile Include="EnumerableDataReaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

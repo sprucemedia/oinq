@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Oinq.Core;
 using Oinq.EdgeSpring.Web;
@@ -12,13 +13,13 @@ namespace Oinq.EdgeSpring
         {          
         }
 
-        public override Object  Execute(String commandText, String[] paramNames, Object[] paramValues, 
-            Func<IEnumerable<Object>,Object> fnRead)
+        public override Object Execute(String commandText, String[] paramNames, Object[] paramValues, 
+            Func<EnumerableDataReader, Object> fnRead)
         {
             Query esQuery = new Query(commandText);
             QueryResponse response = QueryRequest.SendQuery(Source.ServerUrl, esQuery);
 
-            return fnRead(response.Result.Records);
+            return fnRead(new EnumerableDataReader(response.Result.Records));
         }
     }
 }

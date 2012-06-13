@@ -15,7 +15,7 @@ namespace Oinq.Core
     {
         private Enumerator _enumerator;
 
-        public ProjectionReader(IEnumerable<Object> reader, Func<IEnumerable<Object>, T> projector)
+        public ProjectionReader(EnumerableDataReader reader, Func<EnumerableDataReader, T> projector)
         {
             _enumerator = new Enumerator(reader, projector);
         }
@@ -47,13 +47,13 @@ namespace Oinq.Core
 
         class Enumerator : IEnumerator<T>, IEnumerator
         {
-            private IList<Object> _reader;
+            private EnumerableDataReader _reader;
             private T _current;
-            Func<IEnumerable<Object>, T> _projector;
+            Func<EnumerableDataReader, T> _projector;
 
-            internal Enumerator(IEnumerable<Object> reader, Func<IEnumerable<Object>, T> projector)
+            internal Enumerator(EnumerableDataReader reader, Func<EnumerableDataReader, T> projector)
             {
-                _reader = reader.ToList();
+                _reader = reader;
                 _projector = projector;
             }
 
@@ -69,8 +69,13 @@ namespace Oinq.Core
 
             public Boolean MoveNext()
             {
-                _current = _projector(_reader);
-                return true;
+                if (_reader.Read())
+                {
+                    _current = _projector(_reader);
+                    return true;
+                }
+                _reader.Dispose();
+                return false;
             }
 
             public void Reset()
@@ -79,6 +84,7 @@ namespace Oinq.Core
 
             public void Dispose()
             {
+                _reader.Dispose();
             }
         }
     }
