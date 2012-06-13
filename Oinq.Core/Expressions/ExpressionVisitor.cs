@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Oinq.Core
 {
@@ -12,7 +13,7 @@ namespace Oinq.Core
     {
         // constructors
         /// <summary>
-        /// Initializes a new _instance of the ExpressionVisitor class.
+        /// Initializes a new instance of the ExpressionVisitor class.
         /// </summary>
         protected ExpressionVisitor()
         {
@@ -40,6 +41,7 @@ namespace Oinq.Core
                 case ExpressionType.ArrayLength:
                 case ExpressionType.Quote:
                 case ExpressionType.TypeAs:
+                case ExpressionType.UnaryPlus:
                     return VisitUnary((UnaryExpression)node);
                 case ExpressionType.Add:
                 case ExpressionType.AddChecked:
@@ -64,6 +66,7 @@ namespace Oinq.Core
                 case ExpressionType.RightShift:
                 case ExpressionType.LeftShift:
                 case ExpressionType.ExclusiveOr:
+                case ExpressionType.Power:
                     return VisitBinary((BinaryExpression)node);
                 case ExpressionType.TypeIs:
                     return VisitTypeBinary((TypeBinaryExpression)node);
@@ -91,43 +94,8 @@ namespace Oinq.Core
                 case ExpressionType.ListInit:
                     return VisitListInit((ListInitExpression)node);
                 default:
-                    throw new Exception(string.Format("Unhandled expression type: '{0}'", node.NodeType));
+                    return VisitUnknown(node);
             }
-        }
-
-        /// <summary>
-        /// Visits an Expression list.
-        /// </summary>
-        /// <param name="nodes">The Expression list.</param>
-        /// <returns>The Expression list (possibly modified).</returns>
-        protected ReadOnlyCollection<Expression> Visit(ReadOnlyCollection<Expression> nodes)
-        {
-            if (nodes != null)
-            {
-                List<Expression> list = null;
-                for (Int32 i = 0, n = nodes.Count; i < n; i++)
-                {
-                    Expression node = Visit(nodes[i]);
-                    if (list != null)
-                    {
-                        list.Add(node);
-                    }
-                    else if (node != nodes[i])
-                    {
-                        list = new List<Expression>(n);
-                        for (Int32 j = 0; j < i; j++)
-                        {
-                            list.Add(nodes[j]);
-                        }
-                        list.Add(node);
-                    }
-                }
-                if (list != null)
-                {
-                    return list.AsReadOnly();
-                }
-            }
-            return nodes;
         }
 
         /// <summary>
@@ -140,18 +108,7 @@ namespace Oinq.Core
             Expression left = Visit(node.Left);
             Expression right = Visit(node.Right);
             Expression conversion = Visit(node.Conversion);
-            if (left != node.Left || right != node.Right || conversion != node.Conversion)
-            {
-                if (node.NodeType == ExpressionType.Coalesce && node.Conversion != null)
-                {
-                    return Expression.Coalesce(left, right, conversion as LambdaExpression);
-                }
-                else
-                {
-                    return Expression.MakeBinary(node.NodeType, left, right, node.IsLiftedToNull, node.Method);
-                }
-            }
-            return node;
+            return UpdateBinary(node, left, right, conversion, node.IsLiftedToNull, node.Method);
         }
 
         /// <summary>
@@ -164,11 +121,7 @@ namespace Oinq.Core
             Expression test = Visit(node.Test);
             Expression ifTrue = Visit(node.IfTrue);
             Expression ifFalse = Visit(node.IfFalse);
-            if (test != node.Test || ifTrue != node.IfTrue || ifFalse != node.IfFalse)
-            {
-                return Expression.Condition(test, ifTrue, ifFalse);
-            }
-            return node;
+            return UpdateConditional(node, test, ifTrue, ifFalse);
         }
 
         /// <summary>
@@ -188,7 +141,7 @@ namespace Oinq.Core
         /// <returns>The ElementInit (possibly modified).</returns>
         protected virtual ElementInit VisitElementInit(ElementInit node)
         {
-            ReadOnlyCollection<Expression> arguments = Visit(node.Arguments);
+            ReadOnlyCollection<Expression> arguments = VisitExpressionList(node.Arguments);
             if (arguments != node.Arguments)
             {
                 return Expression.ElementInit(node.AddMethod, arguments);
@@ -230,19 +183,50 @@ namespace Oinq.Core
         }
 
         /// <summary>
+        /// Visits an Expression list.
+        /// </summary>
+        /// <param name="nodes">The Expression list.</param>
+        /// <returns>The Expression list (possibly modified).</returns>
+        protected ReadOnlyCollection<Expression> VisitExpressionList(ReadOnlyCollection<Expression> nodes)
+        {
+            if (nodes != null)
+            {
+                List<Expression> list = null;
+                for (Int32 i = 0, n = nodes.Count; i < n; i++)
+                {
+                    Expression node = Visit(nodes[i]);
+                    if (list != null)
+                    {
+                        list.Add(node);
+                    }
+                    else if (node != nodes[i])
+                    {
+                        list = new List<Expression>(n);
+                        for (Int32 j = 0; j < i; j++)
+                        {
+                            list.Add(nodes[j]);
+                        }
+                        list.Add(node);
+                    }
+                }
+                if (list != null)
+                {
+                    return list.AsReadOnly();
+                }
+            }
+            return nodes;
+        }
+
+        /// <summary>
         /// Visits an InvocationExpression.
         /// </summary>
         /// <param name="node">The InvocationExpression.</param>
         /// <returns>The InvocationExpression (possibly modified).</returns>
         protected virtual Expression VisitInvocation(InvocationExpression node)
         {
-            IEnumerable<Expression> args = Visit(node.Arguments);
+            IEnumerable<Expression> args = VisitExpressionList(node.Arguments);
             Expression expr = Visit(node.Expression);
-            if (args != node.Arguments || expr != node.Expression)
-            {
-                return Expression.Invoke(expr, args);
-            }
-            return node;
+            return UpdateInvocation(node, expr, args);
         }
 
         /// <summary>
@@ -253,11 +237,7 @@ namespace Oinq.Core
         protected virtual Expression VisitLambda(LambdaExpression node)
         {
             Expression body = Visit(node.Body);
-            if (body != node.Body)
-            {
-                return Expression.Lambda(node.Type, body, node.Parameters);
-            }
-            return node;
+            return UpdateLambda(node, node.Type, body, node.Parameters);
         }
 
         /// <summary>
@@ -269,11 +249,7 @@ namespace Oinq.Core
         {
             NewExpression n = VisitNew(node.NewExpression);
             IEnumerable<ElementInit> initializers = VisitElementInitList(node.Initializers);
-            if (n != node.NewExpression || initializers != node.Initializers)
-            {
-                return Expression.ListInit(n, initializers);
-            }
-            return node;
+            return UpdateListInit(node, n, initializers);
         }
 
         /// <summary>
@@ -284,11 +260,7 @@ namespace Oinq.Core
         protected virtual Expression VisitMember(MemberExpression node)
         {
             Expression exp = Visit(node.Expression);
-            if (exp != node.Expression)
-            {
-                return Expression.MakeMemberAccess(exp, node.Member);
-            }
-            return node;
+            return UpdateMember(node, exp, node.Member);
         }
 
         /// <summary>
@@ -299,11 +271,7 @@ namespace Oinq.Core
         protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment node)
         {
             Expression e = Visit(node.Expression);
-            if (e != node.Expression)
-            {
-                return Expression.Bind(node.Member, e);
-            }
-            return node;
+            return UpdateMemberAssignment(node, node.Member, e);
         }
 
         /// <summary>
@@ -367,11 +335,7 @@ namespace Oinq.Core
         {
             NewExpression n = VisitNew(node.NewExpression);
             IEnumerable<MemberBinding> bindings = VisitMemberBindingList(node.Bindings);
-            if (n != node.NewExpression || bindings != node.Bindings)
-            {
-                return Expression.MemberInit(n, bindings);
-            }
-            return node;
+            return UpdateMemberInit(node, n, bindings);
         }
 
         /// <summary>
@@ -382,11 +346,7 @@ namespace Oinq.Core
         protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding node)
         {
             IEnumerable<ElementInit> initializers = VisitElementInitList(node.Initializers);
-            if (initializers != node.Initializers)
-            {
-                return Expression.ListBind(node.Member, initializers);
-            }
-            return node;
+            return UpdateMemberListBinding(node, node.Member, initializers);
         }
 
         /// <summary>
@@ -397,11 +357,7 @@ namespace Oinq.Core
         protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
         {
             IEnumerable<MemberBinding> bindings = VisitMemberBindingList(node.Bindings);
-            if (bindings != node.Bindings)
-            {
-                return Expression.MemberBind(node.Member, bindings);
-            }
-            return node;
+            return UpdateMemberMemberBinding(node, node.Member, bindings);
         }
 
         /// <summary>
@@ -412,12 +368,8 @@ namespace Oinq.Core
         protected virtual Expression VisitMethodCall(MethodCallExpression node)
         {
             Expression obj = Visit(node.Object);
-            IEnumerable<Expression> args = Visit(node.Arguments);
-            if (obj != node.Object || args != node.Arguments)
-            {
-                return Expression.Call(obj, node.Method, args);
-            }
-            return node;
+            IEnumerable<Expression> args = VisitExpressionList(node.Arguments);
+            return UpdateMethodCall(node, obj, node.Method, args);
         }
 
         /// <summary>
@@ -427,19 +379,8 @@ namespace Oinq.Core
         /// <returns>The NewExpression (possibly modified).</returns>
         protected virtual NewExpression VisitNew(NewExpression node)
         {
-            IEnumerable<Expression> args = Visit(node.Arguments);
-            if (args != node.Arguments)
-            {
-                if (node.Members != null)
-                {
-                    return Expression.New(node.Constructor, args, node.Members);
-                }
-                else
-                {
-                    return Expression.New(node.Constructor, args);
-                }
-            }
-            return node;
+            IEnumerable<Expression> args = VisitExpressionList(node.Arguments);
+            return UpdateNew(node, node.Constructor, args, node.Members);
         }
 
         /// <summary>
@@ -449,19 +390,8 @@ namespace Oinq.Core
         /// <returns>The NewArrayExpression (possibly modified).</returns>
         protected virtual Expression VisitNewArray(NewArrayExpression node)
         {
-            IEnumerable<Expression> exprs = Visit(node.Expressions);
-            if (exprs != node.Expressions)
-            {
-                if (node.NodeType == ExpressionType.NewArrayInit)
-                {
-                    return Expression.NewArrayInit(node.Type.GetElementType(), exprs);
-                }
-                else
-                {
-                    return Expression.NewArrayBounds(node.Type.GetElementType(), exprs);
-                }
-            }
-            return node;
+            IEnumerable<Expression> exprs = VisitExpressionList(node.Expressions);
+            return UpdateNewArray(node, node.Type, exprs);
         }
 
         /// <summary>
@@ -482,11 +412,7 @@ namespace Oinq.Core
         protected virtual Expression VisitTypeBinary(TypeBinaryExpression node)
         {
             Expression expr = Visit(node.Expression);
-            if (expr != node.Expression)
-            {
-                return Expression.TypeIs(expr, node.TypeOperand);
-            }
-            return node;
+            return UpdateTypeBinary(node, expr, node.TypeOperand);
         }
 
         /// <summary>
@@ -497,9 +423,176 @@ namespace Oinq.Core
         protected virtual Expression VisitUnary(UnaryExpression node)
         {
             Expression operand = Visit(node.Operand);
-            if (operand != node.Operand)
+            return UpdateUnary(node, operand, node.Type, node.Method);
+        }
+
+        protected virtual Expression VisitUnknown(Expression node)
+        {
+            throw new Exception(String.Format("Unhandled expression type: '{0}'", node.NodeType));
+        }
+
+        // protected methods
+        protected BinaryExpression UpdateBinary(BinaryExpression node, Expression left, Expression right, 
+            Expression conversion, Boolean isLiftedToNull, MethodInfo method)
+        {
+            if (node.Left != left || node.Right != right || node.Conversion != conversion || 
+                node.Method != method || node.IsLiftedToNull != isLiftedToNull)
             {
-                return Expression.MakeUnary(node.NodeType, operand, node.Type, node.Method);
+                if (node.NodeType == ExpressionType.Coalesce && node.Conversion != null)
+                {
+                    return Expression.Coalesce(left, right, conversion as LambdaExpression);
+                }
+                else
+                {
+                    return Expression.MakeBinary(node.NodeType, left, right, isLiftedToNull, method);
+                }
+            }
+            return node;
+        }
+
+        protected ConditionalExpression UpdateConditional(ConditionalExpression node, Expression test, 
+            Expression ifTrue, Expression ifFalse)
+        {
+            if (node.Test != test || node.IfTrue != ifTrue || node.IfFalse != ifFalse)
+            {
+                return Expression.Condition(test, ifTrue, ifFalse);
+            }
+            return node;
+        }
+
+        protected InvocationExpression UpdateInvocation(InvocationExpression node, Expression expression, IEnumerable<Expression> args)
+        {
+            if (node.Arguments != args || node.Expression != expression)
+            {
+                return Expression.Invoke(expression, args);
+            }
+            return node;
+        }
+
+        protected LambdaExpression UpdateLambda(LambdaExpression node, Type delegateType, Expression body, 
+            IEnumerable<ParameterExpression> parameters)
+        {
+            if (node.Body != body || node.Parameters != parameters || node.Type != delegateType)
+            {
+                return Expression.Lambda(delegateType, body, parameters);
+            }
+            return node;
+        }
+
+        protected ListInitExpression UpdateListInit(ListInitExpression node, NewExpression nex, IEnumerable<ElementInit> initializers)
+        {
+            if (node.NewExpression != nex || node.Initializers != initializers)
+            {
+                return Expression.ListInit(nex, initializers);
+            }
+            return node;
+        }
+
+        protected Expression UpdateMember(MemberExpression node, Expression expression, MemberInfo member)
+        {
+            if (node.Expression != expression || node.Member != member)
+            {
+                return Expression.MakeMemberAccess(expression, member);
+            }
+            return node;
+        }
+
+        protected MemberAssignment UpdateMemberAssignment(MemberAssignment assignment, MemberInfo member, Expression expression)
+        {
+            if (assignment.Expression != expression || member != assignment.Member)
+            {
+                return Expression.Bind(member, expression);
+            }
+            return assignment;
+        }
+
+        protected MemberInitExpression UpdateMemberInit(MemberInitExpression node, NewExpression nex, 
+            IEnumerable<MemberBinding> bindings)
+        {
+            if (node.NewExpression != nex || node.Bindings != bindings)
+            {
+                return Expression.MemberInit(nex, bindings);
+            }
+            return node;
+        }
+
+        protected MemberListBinding UpdateMemberListBinding(MemberListBinding binding, MemberInfo member, 
+            IEnumerable<ElementInit> initializers)
+        {
+            if (binding.Initializers != initializers || binding.Member != member)
+            {
+                Expression.ListBind(member, initializers);
+            }
+            return binding;
+        }
+
+        protected MemberMemberBinding UpdateMemberMemberBinding(MemberMemberBinding binding, MemberInfo member, 
+            IEnumerable<MemberBinding> bindings)
+        {
+            if (binding.Bindings != bindings || binding.Member != member)
+            {
+                return Expression.MemberBind(member, bindings);
+            }
+            return binding;
+        }
+
+        protected MethodCallExpression UpdateMethodCall(MethodCallExpression node, Expression obj, 
+            MethodInfo method, IEnumerable<Expression> args)
+        {
+            if (node.Object != obj || node.Method != method || node.Arguments != args)
+            {
+                return Expression.Call(obj, method, args);
+            }
+            return node;
+        }
+
+        protected NewExpression UpdateNew(NewExpression node, ConstructorInfo constructor, IEnumerable<Expression> args, 
+            IEnumerable<MemberInfo> members)
+        {
+            if (node.Arguments != args || node.Constructor != constructor || node.Members != members)
+            {
+                if (node.Members != null)
+                {
+                    return Expression.New(constructor, args, members);
+                }
+                else
+                {
+                    return Expression.New(constructor, args);
+                }
+            }
+            return node;
+        }
+
+        protected NewArrayExpression UpdateNewArray(NewArrayExpression node, Type arrayType, IEnumerable<Expression> expressions)
+        {
+            if (node.Expressions != expressions || node.Type != arrayType)
+            {
+                if (node.NodeType == ExpressionType.NewArrayInit)
+                {
+                    return Expression.NewArrayInit(arrayType.GetElementType(), expressions);
+                }
+                else
+                {
+                    return Expression.NewArrayBounds(arrayType.GetElementType(), expressions);
+                }
+            }
+            return node;
+        }
+
+        protected Expression UpdateTypeBinary(TypeBinaryExpression node, Expression expression, Type typeOperand)
+        {
+            if (node.Expression != expression || node.TypeOperand != typeOperand)
+            {
+                return Expression.TypeIs(expression, typeOperand);
+            }
+            return node;
+        }
+        
+        protected UnaryExpression UpdateUnary(UnaryExpression node, Expression operand, Type resultType, MethodInfo method)
+        {
+            if (node.Operand != operand || node.Type != resultType || node.Method != method)
+            {
+                return Expression.MakeUnary(node.NodeType, operand, resultType, method);
             }
             return node;
         }

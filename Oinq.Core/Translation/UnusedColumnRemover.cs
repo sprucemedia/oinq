@@ -80,7 +80,7 @@ namespace Oinq.Core
             }
 
             Expression take = Visit(node.Take);
-            ReadOnlyCollection<Expression> groupbys = Visit(node.GroupBy);
+            ReadOnlyCollection<Expression> groupbys = VisitExpressionList(node.GroupBy);
             ReadOnlyCollection<OrderExpression> orderbys = VisitOrderBy(node.OrderBy);
             Expression where = Visit(node.Where);
             Expression from = Visit(node.From);

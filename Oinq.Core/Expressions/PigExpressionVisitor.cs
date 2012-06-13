@@ -177,7 +177,7 @@ namespace Oinq.Core
             Expression skip = Visit(node.Skip);
             ReadOnlyCollection<ColumnDeclaration> columns = VisitColumnDeclarations(node.Columns);
             ReadOnlyCollection<OrderExpression> orderBy = VisitOrderBy(node.OrderBy);
-            ReadOnlyCollection<Expression> groupBy = Visit(node.GroupBy);
+            ReadOnlyCollection<Expression> groupBy = VisitExpressionList(node.GroupBy);
             if (from != node.From
                 || where != node.Where
                 || columns != node.Columns
