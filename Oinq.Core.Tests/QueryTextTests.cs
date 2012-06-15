@@ -10,15 +10,15 @@ namespace Oinq.Core.Tests
     {
         private String SOURCE_NAME = "FakeData";
         private const String PATH_NAME = "FakeData";
-        private ISource _source;
+        private IDataFile _source;
         private Query<FakeData> _fakeData;
 
         [SetUp]
         public void Setup()
         {
-            _source = MockRepository.GenerateStub<ISource>();
+            _source = MockRepository.GenerateStub<IDataFile>();
             _source.Stub(s => s.Name).Return(SOURCE_NAME);
-            _source.Stub(s => s.Path).Return(PATH_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
             _fakeData = new Query<FakeData>(new QueryProvider(_source));
         }
 
@@ -186,15 +186,15 @@ namespace Oinq.Core.Tests
     {
         private String SOURCE_NAME = "FakeData";
         private const String PATH_NAME = "FakeData";
-        private ISource _source;
+        private IDataFile _source;
         private Query<FakeData> _fakeData;
 
         [SetUp]
         public void Setup()
         {
-            _source = MockRepository.GenerateStub<ISource>();
+            _source = MockRepository.GenerateStub<IDataFile>();
             _source.Stub(s => s.Name).Return(SOURCE_NAME);
-            _source.Stub(s => s.Path).Return(PATH_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
             _fakeData = new Query<FakeData>(new QueryProvider(_source));
         }
 
@@ -282,15 +282,15 @@ namespace Oinq.Core.Tests
     {
         private String SOURCE_NAME = "FakeData";
         private const String PATH_NAME = "FakeData";
-        private ISource _source;
+        private IDataFile _source;
         private Query<FakeData> _fakeData;
 
         [SetUp]
         public void Setup()
         {
-            _source = MockRepository.GenerateStub<ISource>();
+            _source = MockRepository.GenerateStub<IDataFile>();
             _source.Stub(s => s.Name).Return(SOURCE_NAME);
-            _source.Stub(s => s.Path).Return(PATH_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
             _fakeData = new Query<FakeData>(new QueryProvider(_source));
         }
 
@@ -365,15 +365,15 @@ namespace Oinq.Core.Tests
     {
         private String SOURCE_NAME = "FakeData";
         private const String PATH_NAME = "FakeData";
-        private ISource _source;
+        private IDataFile _source;
         private Query<FakeData> _fakeData;
 
         [SetUp]
         public void Setup()
         {
-            _source = MockRepository.GenerateStub<ISource>();
+            _source = MockRepository.GenerateStub<IDataFile>();
             _source.Stub(s => s.Name).Return(SOURCE_NAME);
-            _source.Stub(s => s.Path).Return(PATH_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
             _fakeData = new Query<FakeData>(new QueryProvider(_source));
         }
 

@@ -78,7 +78,7 @@ namespace Oinq.EdgeSpring.Tests
             var em = new EdgeMart<Object>(esUrl);
 
             // Assert
-            Assert.AreEqual(String.Format("http://{0}:{1}/remote", SERVER_NAME, DEFAULT_PORT.ToString()), em.ServerUrl.ToString());
+            Assert.AreEqual(String.Format("http://{0}:{1}/remote", SERVER_NAME, DEFAULT_PORT.ToString()), em.AbsoluteUri.ToString());
             
         }
     }

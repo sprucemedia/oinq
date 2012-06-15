@@ -8,7 +8,7 @@ namespace Oinq.Core.Tests
         private IList<FakeData> _results;
         private Query<FakeData> _fakeData;
 
-        public FakeQueryProvider(ISource source, IList<FakeData> results)
+        public FakeQueryProvider(IDataFile source, IList<FakeData> results)
             : base(source)
         {
             _results = results;

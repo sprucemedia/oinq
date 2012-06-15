@@ -17,7 +17,7 @@ namespace Oinq.EdgeSpring
             Func<EnumerableDataReader, Object> fnRead)
         {
             Query esQuery = new Query(commandText);
-            QueryResponse response = QueryRequest.SendQuery(Source.ServerUrl, esQuery);
+            QueryResponse response = QueryRequest.SendQuery(((EdgeMart)Source).AbsoluteUri, esQuery);
 
             return fnRead(new EnumerableDataReader(response.Result.Records));
         }

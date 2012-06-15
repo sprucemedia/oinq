@@ -6,7 +6,7 @@ namespace Oinq.EdgeSpring
     /// <summary>
     /// Represents an EdgeSpring EdgeMart and the settings used to access it.
     /// </summary>
-    public abstract class EdgeMart : ISource
+    public abstract class EdgeMart : IDataFile
     {
         // private fields
         private Url _url;
@@ -59,7 +59,7 @@ namespace Oinq.EdgeSpring
         /// <summary>
         /// Gets the path to the EdgeMart.
         /// </summary>
-        public virtual string Path
+        public virtual string AbsolutePath
         {
             get { return _url.EdgeMartName; }
         }
@@ -75,7 +75,7 @@ namespace Oinq.EdgeSpring
         /// <summary>
         /// Gets the Uri for the server hosting the EdgeMart.
         /// </summary>
-        public virtual Uri ServerUrl
+        public virtual Uri AbsoluteUri
         {
             get { return new Uri(String.Format("http://{0}:{1}/remote", Server.Host, Server.Port)); }
         }
@@ -88,7 +88,6 @@ namespace Oinq.EdgeSpring
             get { return _url.ToString(); }
         }
     }
-
 
     /// <summary>
     /// Represents an EdgeMart and the default record type.

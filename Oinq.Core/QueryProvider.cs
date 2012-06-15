@@ -22,14 +22,14 @@ namespace Oinq.Core
     public class QueryProvider : IQueryProvider, IQueryText
     {
         // private fields
-        private ISource _source;
+        private IDataFile _source;
 
         // constructors
         /// <summary>
         /// Initializes a new instance of the QueryProvider class.
         /// </summary>
         /// <param name="source">The data source being queried.</param>
-        public QueryProvider(ISource source)
+        public QueryProvider(IDataFile source)
         {
             if (source == null)
             {
@@ -42,7 +42,7 @@ namespace Oinq.Core
         /// <summary>
         /// Gets the data source.
         /// </summary>
-        public ISource Source
+        public IDataFile Source
         {
             get { return _source; }
         }
