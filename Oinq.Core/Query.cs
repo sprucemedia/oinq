@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 namespace Oinq.Core
 {
     /// <summary>
-    /// An implementation IQueryable{{T}} for querying an EdgeSpring EdgeMart.
+    /// An implementation IQueryable{{T}} for querying a data file.
     /// </summary>
     /// <typeparam name="T">The type of facts being queried.</typeparam>
     public class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable
@@ -18,7 +18,7 @@ namespace Oinq.Core
 
         // constructors
         /// <summary>
-        /// Initializes a new _instance of the Query class.
+        /// Initializes a new instance of the Query class.
         /// </summary>
         /// <param name="provider">The query provider.</param>
         public Query(IQueryProvider provider)
@@ -32,7 +32,7 @@ namespace Oinq.Core
         }
 
         /// <summary>
-        /// Initializes a new _instance of the Query class.
+        /// Initializes a new instance of the Query class.
         /// </summary>
         /// <param name="provider">The query provider.</param>
         /// <param name="expression">The expression.</param>
@@ -56,9 +56,9 @@ namespace Oinq.Core
 
         // public methods
         /// <summary>
-        /// Gets an enumerator for the results of an EdgeSpring LINQ query.
+        /// Gets an enumerator for the results of an Pig LINQ query.
         /// </summary>
-        /// <returns>An enumerator for the results of an EdgeSpring LINQ query.</returns>
+        /// <returns>An enumerator for the results of an Pig LINQ query.</returns>
         public IEnumerator<T> GetEnumerator()
         {
             return ((IEnumerable<T>)_provider.Execute(_expression)).GetEnumerator();

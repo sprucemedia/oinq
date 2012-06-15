@@ -43,6 +43,7 @@
     <Compile Include="Expressions\AggregateExpression.cs" />
     <Compile Include="Expressions\NamedValueExpression.cs" />
     <Compile Include="IDataFile.cs" />
+    <Compile Include="LinqExtensionMethods.cs" />
     <Compile Include="Translation\AggregateRewriter.cs" />
     <Compile Include="Expressions\AggregateSubqueryExpression.cs" />
     <Compile Include="Expressions\AliasedExpression.cs" />

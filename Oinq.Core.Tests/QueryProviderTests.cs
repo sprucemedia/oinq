@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using Rhino.Mocks;
 
@@ -15,7 +16,7 @@ namespace Oinq.Core.Tests
         protected IDataFile Source;
 
         [SetUp]
-        public void Setup()
+        public virtual void Setup()
         {
             Source = MockRepository.GenerateStub<IDataFile>();
             Source.Stub(s => s.Name).Return(SOURCE_NAME);
@@ -56,6 +57,44 @@ namespace Oinq.Core.Tests
 
             // Assert
             Assert.AreSame(Source, provider.Source);
+        }
+    }
+
+    public class When_creating_a_query : QueryProviderTestBase
+    {
+        private Expression _expression;
+        private QueryProvider _provider;
+
+        [SetUp]
+        public override void Setup()
+        {
+            base.Setup();
+            _expression = Source.AsQueryable<FakeData>().Expression;
+            _provider = new QueryProvider(Source);
+        }
+
+        [Test]
+        public void it_can_use_a_generic_method()
+        {
+            // Act
+            var query = _provider.CreateQuery<FakeData>(_expression);
+
+            // Assert
+            Assert.AreSame(typeof(FakeData), query.ElementType);
+            Assert.AreSame(_provider, query.Provider);
+            Assert.AreSame(_expression, query.Expression);
+        }
+
+        [Test]
+        public void it_can_use_a_nongeneric_method()
+        {
+            // Act
+            var query = _provider.CreateQuery(_expression);
+
+            // Assert
+            Assert.AreSame(typeof(FakeData), query.ElementType);
+            Assert.AreSame(_provider, query.Provider);
+            Assert.AreSame(_expression, query.Expression);
         }
     }
 
