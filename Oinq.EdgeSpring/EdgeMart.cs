@@ -6,7 +6,7 @@ namespace Oinq.EdgeSpring
     /// <summary>
     /// Represents an EdgeSpring EdgeMart and the settings used to access it.
     /// </summary>
-    public class EdgeMart : ISource
+    public abstract class EdgeMart : ISource
     {
         // private fields
         private Url _url;
@@ -16,7 +16,7 @@ namespace Oinq.EdgeSpring
         /// Creates a new instance of EdgeMart.
         /// </summary>
         /// <param name="url">Server and EdgeMart settings in the form of a Url.</param>
-        public EdgeMart(Url url)
+        protected EdgeMart(Url url)
         {
             if (url == null)
             {
@@ -33,7 +33,7 @@ namespace Oinq.EdgeSpring
         /// Creates a new instance of EdgeMart.
         /// </summary>
         /// <param name="connectionString">Server and EdgeMart settings in the form of a connection string.</param>
-        public EdgeMart (String connectionString)
+        protected EdgeMart (String connectionString)
             : this(Url.Create(connectionString))
         {
         }
@@ -42,7 +42,7 @@ namespace Oinq.EdgeSpring
         /// Creates a new instance of EdgeMart.
         /// </summary>
         /// <param name="uri">Server and EdgeMart settings in the form of a Uri.</param>
-        public EdgeMart (Uri uri)
+        protected EdgeMart (Uri uri)
             : this (Url.Create(uri.ToString()))
         {
         }
@@ -86,6 +86,41 @@ namespace Oinq.EdgeSpring
         public virtual String UrlString
         {
             get { return _url.ToString(); }
+        }
+    }
+
+
+    /// <summary>
+    /// Represents an EdgeMart and the default record type.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class EdgeMart<T> : EdgeMart
+    {
+        /// <summary>
+        /// Creates a new instance of EdgeMart.
+        /// </summary>
+        /// <param name="url">Server and EdgeMart settings in the form of a Url.</param>
+        public EdgeMart(Url url)
+            : base(url)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of EdgeMart.
+        /// </summary>
+        /// <param name="connectionString">Server and EdgeMart settings in the form of a connection string.</param>
+        public EdgeMart(String connectionString)
+            : base(connectionString)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of EdgeMart.
+        /// </summary>
+        /// <param name="uri">Server and EdgeMart settings in the form of a Uri.</param>
+        public EdgeMart(Uri uri)
+            : base(uri)
+        {
         }
     }
 }

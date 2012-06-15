@@ -16,7 +16,7 @@ namespace Oinq.EdgeSpring.Tests
             var uri = new Uri(String.Format("http://{0}:{1}/remote?edgemart={2}", SERVER_NAME, DEFAULT_PORT.ToString(), EDGEMART_NAME));
 
             // Act
-            var em = new EdgeMart(uri);
+            var em = new EdgeMart<Object>(uri);
 
             // Assert
             Assert.AreEqual(EDGEMART_NAME, em.Name);
@@ -31,7 +31,7 @@ namespace Oinq.EdgeSpring.Tests
             var connectionString = String.Format("http://{0}:{1}/remote?edgemart={2}", SERVER_NAME, DEFAULT_PORT.ToString(), EDGEMART_NAME);
 
             // Act
-            var em = new EdgeMart(connectionString);
+            var em = new EdgeMart<Object>(connectionString);
 
             // Assert
             Assert.AreEqual(EDGEMART_NAME, em.Name);
@@ -46,7 +46,7 @@ namespace Oinq.EdgeSpring.Tests
             var esUrl = new Url(String.Format("http://{0}:{1}/remote?edgemart={2}", SERVER_NAME, DEFAULT_PORT.ToString(), EDGEMART_NAME));
 
             // Act
-            var em = new EdgeMart(esUrl);
+            var em = new EdgeMart<Object>(esUrl);
 
             // Assert
             Assert.AreEqual(EDGEMART_NAME, em.Name);
@@ -62,7 +62,7 @@ namespace Oinq.EdgeSpring.Tests
             EdgeMart em;
 
             // Act
-            TestDelegate a = () => em = new EdgeMart(esUrl);
+            TestDelegate a = () => em = new EdgeMart<Object>(esUrl);
 
             // Assert
             Assert.Throws<ArgumentException>(a);
@@ -75,7 +75,7 @@ namespace Oinq.EdgeSpring.Tests
             var esUrl = new Url(String.Format("http://{0}:{1}/remote?edgemart={2}", SERVER_NAME, DEFAULT_PORT.ToString(), EDGEMART_NAME));
 
             // Act
-            var em = new EdgeMart(esUrl);
+            var em = new EdgeMart<Object>(esUrl);
 
             // Assert
             Assert.AreEqual(String.Format("http://{0}:{1}/remote", SERVER_NAME, DEFAULT_PORT.ToString()), em.ServerUrl.ToString());
