@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    internal abstract class PigExpression : Expression
+    public abstract class PigExpression : Expression
     {
         // private fields
         private ExpressionType _nodeType;

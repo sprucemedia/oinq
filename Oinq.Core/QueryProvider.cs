@@ -118,7 +118,7 @@ namespace Oinq.Core
             }
 
             // translate query into component pieces
-            ProjectionExpression projection = Translate(expression);
+            ProjectionExpression projection = QueryTranslator.Translate(this, expression);
 
             String commandText = QueryFormatter.Format(projection.Source);
             ReadOnlyCollection<NamedValueExpression> namedValues = NamedValueGatherer.Gather(projection.Source);
@@ -171,26 +171,11 @@ namespace Oinq.Core
             {
                 throw new ArgumentNullException("expression");
             }
-            ProjectionExpression projection = Translate(expression);
+            ProjectionExpression projection = QueryTranslator.Translate(this, expression);
             return QueryFormatter.Format(projection.Source);
-
         }
 
         // protected methods
-        protected Boolean CanBeEvaluatedLocally(Expression expression)
-        {
-            // any operation on a query can't be done locally
-            ConstantExpression cex = expression as ConstantExpression;
-            if (cex != null)
-            {
-                IQueryable query = cex.Value as IQueryable;
-                if (query != null && query.Provider == this)
-                    return false;
-            }
-            return expression.NodeType != ExpressionType.Parameter &&
-                   expression.NodeType != ExpressionType.Lambda;
-        }
-
         // create a lambda function that will convert a DbDataReader into a projected (and possibly aggregated) result
         protected static LambdaExpression GetReader(LambdaExpression fnProjector, LambdaExpression fnAggregator, Boolean boxReturn)
         {
@@ -205,16 +190,6 @@ namespace Oinq.Core
                 body = Expression.Convert(body, typeof(Object));
             }
             return Expression.Lambda(body, reader);
-        }
-
-        private ProjectionExpression Translate(Expression expression)
-        {
-            expression = PartialEvaluator.Evaluate(expression, CanBeEvaluatedLocally);
-            expression = QueryBinder.Bind(this, expression);
-            expression = AggregateRewriter.Rewrite(expression);
-            expression = UnusedColumnRemover.Remove(expression);
-            expression = RedundantSubqueryRemover.Remove(expression);
-            return (ProjectionExpression)expression;
         }
 
         /// <summary>

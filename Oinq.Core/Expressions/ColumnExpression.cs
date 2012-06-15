@@ -5,10 +5,10 @@ namespace Oinq.Core
     /// <summary>
     /// A custom expression node that represents a reference to a column in a query.
     /// </summary>
-    internal class ColumnExpression : PigExpression
+    public class ColumnExpression : PigExpression
     {
         // constructors
-        internal ColumnExpression(Type type, SourceAlias alias, String name)
+        public ColumnExpression(Type type, SourceAlias alias, String name)
             : base(PigExpressionType.Column, type)
         {
             if (name == null)
@@ -17,8 +17,8 @@ namespace Oinq.Core
             Name = name;
         }
 
-        // internal properties
-        internal SourceAlias Alias { get; private set; }
-        internal String Name { get; private set; }
+        // public properties
+        public SourceAlias Alias { get; private set; }
+        public String Name { get; private set; }
     }
 }

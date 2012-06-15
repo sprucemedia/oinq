@@ -3,16 +3,16 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    internal class IsNullExpression : PigExpression
+    public class IsNullExpression : PigExpression
     {
         // constructors
-        internal IsNullExpression(Expression expression)
+        public IsNullExpression(Expression expression)
             : base(PigExpressionType.IsNull, typeof(Boolean))
         {
             Expression = expression;
         }
 
-        // internal properties
-        internal Expression Expression { get; private set; }
+        // public properties
+        public Expression Expression { get; private set; }
     }
 }

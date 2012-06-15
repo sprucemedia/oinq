@@ -6,10 +6,10 @@ namespace Oinq.Core
     /// <summary>
     /// Represents a column declaration in a column projection.
     /// </summary>
-    internal class ColumnDeclaration
+    public class ColumnDeclaration
     {
         // constructors
-        internal ColumnDeclaration(String name, Expression expression)
+        public ColumnDeclaration(String name, Expression expression)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
@@ -19,8 +19,8 @@ namespace Oinq.Core
             Name = name;
         }
 
-        // internal properties
-        internal Expression Expression { get; private set; }
-        internal String Name { get; private set; }
+        // public properties
+        public Expression Expression { get; private set; }
+        public String Name { get; private set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Oinq.Core
     /// A custom expression representing the construction of one or more result objects from a 
     /// select expression.
     /// </summary>
-    internal class ProjectionExpression : PigExpression
+    public class ProjectionExpression : PigExpression
     {
         // private fields
         private LambdaExpression _aggregator;
@@ -16,12 +16,12 @@ namespace Oinq.Core
         private SelectExpression _source;
 
         // constructors
-        internal ProjectionExpression(SelectExpression source, Expression projector)
+        public ProjectionExpression(SelectExpression source, Expression projector)
             : this(source, projector, null)
         {
         }
 
-        internal ProjectionExpression(SelectExpression source, Expression projector, LambdaExpression aggregator)
+        public ProjectionExpression(SelectExpression source, Expression projector, LambdaExpression aggregator)
             : base(PigExpressionType.Projection, aggregator != null ? aggregator.Body.Type : typeof(IEnumerable<>).MakeGenericType(projector.Type))
         {
             _source = source;
@@ -29,18 +29,18 @@ namespace Oinq.Core
             _aggregator = aggregator;
         }
 
-        // internal fields
-        internal LambdaExpression Aggregator
+        // public fields
+        public LambdaExpression Aggregator
         {
             get { return _aggregator; }
         }
 
-        internal Expression Projector
+        public Expression Projector
         {
             get { return _projector; }
         }
 
-        internal SelectExpression Source
+        public SelectExpression Source
         {
             get { return _source; }
         }

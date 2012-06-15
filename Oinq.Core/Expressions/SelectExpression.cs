@@ -8,10 +8,10 @@ namespace Oinq.Core
     /// <summary>
     /// Represents a select expression.
     /// </summary>
-    internal class SelectExpression : AliasedExpression
+    public class SelectExpression : AliasedExpression
     {       
         // constructors
-        internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
+        public SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
             Expression from, Expression where, IEnumerable<OrderExpression> orderBy, IEnumerable<Expression> groupBy,
             Boolean isDistinct, Expression skip, Expression take, Boolean reverse)
             : base(PigExpressionType.Select, typeof(void), alias)
@@ -39,25 +39,25 @@ namespace Oinq.Core
         }
 
 
-        internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns, 
+        public SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns, 
             Expression from, Expression where, IEnumerable<OrderExpression> orderBy, IEnumerable<Expression> groupBy)
             : this(alias, columns, from, where, orderBy, groupBy, false, null, null, false)
         {
         }
 
-        internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
+        public SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
             Expression from, Expression where)
             : this(alias, columns, from, where, null, null)
         {
         }
 
-        // internal properties
-        internal ReadOnlyCollection<ColumnDeclaration> Columns { get; private set; }
-        internal Expression From { get; private set; }
-        internal ReadOnlyCollection<Expression> GroupBy { get; private set; }
-        internal ReadOnlyCollection<OrderExpression> OrderBy { get; private set; }
-        internal Expression Skip { get; private set; }
-        internal Expression Take { get; private set; }
-        internal Expression Where { get; private set; }
+        // public properties
+        public ReadOnlyCollection<ColumnDeclaration> Columns { get; private set; }
+        public Expression From { get; private set; }
+        public ReadOnlyCollection<Expression> GroupBy { get; private set; }
+        public ReadOnlyCollection<OrderExpression> OrderBy { get; private set; }
+        public Expression Skip { get; private set; }
+        public Expression Take { get; private set; }
+        public Expression Where { get; private set; }
     }
 }

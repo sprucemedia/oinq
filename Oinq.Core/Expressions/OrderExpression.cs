@@ -6,10 +6,10 @@ namespace Oinq.Core
     /// <summary>
     /// A pairing of an expression and an order type for use in anOrder By clause
     /// </summary>
-    internal class OrderExpression
+    public class OrderExpression
     {
         // construtors
-        internal OrderExpression(OrderType orderType, Expression expression)
+        public OrderExpression(OrderType orderType, Expression expression)
         {
             if (expression == null)
                 throw new ArgumentNullException("expression");
@@ -17,8 +17,8 @@ namespace Oinq.Core
             Expression = expression;
         }
 
-        // internal properties
-        internal OrderType OrderType { get; private set; }
-        internal Expression Expression { get; private set; }
+        // public properties
+        public OrderType OrderType { get; private set; }
+        public Expression Expression { get; private set; }
     }
 }

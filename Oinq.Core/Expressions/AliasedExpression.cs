@@ -2,7 +2,7 @@
 
 namespace Oinq.Core
 {
-    internal abstract class AliasedExpression : PigExpression
+    public abstract class AliasedExpression : PigExpression
     {
         // constructors
         protected AliasedExpression(PigExpressionType nodeType, Type type, SourceAlias alias)
@@ -12,13 +12,13 @@ namespace Oinq.Core
         }
 
         // public properties
-        internal SourceAlias Alias { get; private set; }
+        public SourceAlias Alias { get; private set; }
     }
 
-    internal class SourceAlias
+    public class SourceAlias
     {
         // constructors
-        internal SourceAlias()
+        public SourceAlias()
         {
         }
 

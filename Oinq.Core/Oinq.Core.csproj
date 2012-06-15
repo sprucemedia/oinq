@@ -71,6 +71,7 @@
     <Compile Include="Translation\QueryBinder.cs" />
     <Compile Include="Language\QueryFormatter.cs" />
     <Compile Include="QueryProvider.cs" />
+    <Compile Include="Translation\QueryTranslator.cs" />
     <Compile Include="Translation\RedundantSubqueryRemover.cs" />
     <Compile Include="Expressions\ScalarExpression.cs" />
     <Compile Include="Expressions\SelectExpression.cs" />

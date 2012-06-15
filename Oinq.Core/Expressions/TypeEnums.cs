@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    internal enum PigExpressionType
+    public enum PigExpressionType
     {
         Source = 1000, // make sure these don't overlap with ExpressionType
         Column,
@@ -19,22 +19,22 @@ namespace Oinq.Core
         NamedValue
     }
 
-    internal static class PigExpressionExtensions
+    public static class PigExpressionExtensions
     {
-        internal static Boolean IsPigExpression(this ExpressionType et)
+        public static Boolean IsPigExpression(this ExpressionType et)
         {
             return ((Int32)et) >= 1000;
         }
     }
 
-    internal enum JoinType
+    public enum JoinType
     {
         CrossJoin,
         InnerJoin,
         CrossApply,
     }
 
-    internal enum OrderType
+    public enum OrderType
     {
         Ascending,
         Descending
