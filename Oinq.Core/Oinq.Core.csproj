@@ -81,6 +81,7 @@
     <Compile Include="Translation\SubqueryRemover.cs" />
     <Compile Include="Expressions\TypeEnums.cs" />
     <Compile Include="Language\TypeHelper.cs" />
+    <Compile Include="Translation\SubtreeEvaluator.cs" />
     <Compile Include="Translation\UnusedColumnRemover.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
