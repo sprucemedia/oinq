@@ -9,7 +9,7 @@ namespace Oinq.Core
     /// <summary>
     /// Represents an Pig-specific implementation of ExpressionVisitor.
     /// </summary>
-    internal class PigExpressionVisitor : ExpressionVisitor
+    public class PigExpressionVisitor : ExpressionVisitor
     {
         // protected override methods
         protected override Expression Visit(Expression node)
@@ -26,11 +26,10 @@ namespace Oinq.Core
                     return VisitColumn((ColumnExpression)node);
                 case PigExpressionType.Select:
                     return VisitSelect((SelectExpression)node);
-                case PigExpressionType.Join:
-                    return VisitJoin((JoinExpression)node);
                 case PigExpressionType.Aggregate:
                     return VisitAggregate((AggregateExpression)node);
                 case PigExpressionType.Subquery:
+                case PigExpressionType.Scalar:
                     return VisitSubquery((SubqueryExpression)node);
                 case PigExpressionType.AggregateSubquery:
                     return VisitAggregateSubquery((AggregateSubqueryExpression)node);
@@ -38,8 +37,6 @@ namespace Oinq.Core
                     return VisitIsNull((IsNullExpression)node);
                 case PigExpressionType.Projection:
                     return VisitProjection((ProjectionExpression)node);
-                case PigExpressionType.NamedValue:
-                    return this.VisitNamedValue((NamedValueExpression)node);
                 default:
                     return base.Visit(node);
             }
@@ -105,31 +102,14 @@ namespace Oinq.Core
             return node;
         }
 
-        protected virtual Expression VisitJoin(JoinExpression node)
-        {
-            Expression left = VisitSource(node.Left);
-            Expression right = VisitSource(node.Right);
-            Expression condition = Visit(node.Condition);
-            if (left != node.Left || right != node.Right || condition != node.Condition)
-            {
-                return new JoinExpression(node.Join, left, right, condition);
-            }
-            return node;
-        }
-
-        protected virtual Expression VisitNamedValue(NamedValueExpression node)
-        {
-            return node;
-        }
-
-        protected ReadOnlyCollection<OrderExpression> VisitOrderBy(ReadOnlyCollection<OrderExpression> nodes)
+        protected ReadOnlyCollection<OrderByExpression> VisitOrderBy(ReadOnlyCollection<OrderByExpression> nodes)
         {
             if (nodes != null)
             {
-                List<OrderExpression> alternate = null;
+                List<OrderByExpression> alternate = null;
                 for (int i = 0, n = nodes.Count; i < n; i++)
                 {
-                    OrderExpression expr = nodes[i];
+                    OrderByExpression expr = nodes[i];
                     Expression e = Visit(expr.Expression);
                     if (alternate == null && e != expr.Expression)
                     {
@@ -137,7 +117,7 @@ namespace Oinq.Core
                     }
                     if (alternate != null)
                     {
-                        alternate.Add(new OrderExpression(expr.OrderType, e));
+                        alternate.Add(new OrderByExpression(e, expr.Direction));
                     }
                 }
                 if (alternate != null)
@@ -159,34 +139,32 @@ namespace Oinq.Core
             return node;
         }
 
-        protected virtual Expression VisitScalar(ScalarExpression scalar)
+        protected virtual Expression VisitScalar(ScalarExpression node)
         {
-            var select = (SelectExpression)this.Visit(scalar.Select);
-            if (select != scalar.Select)
+            var select = (SelectExpression)this.Visit(node.Select);
+            if (select != node.Select)
             {
-                return new ScalarExpression(scalar.Type, select);
+                return new ScalarExpression(node.Type, select);
             }
-            return scalar;
+            return node;
         }
 
         protected virtual Expression VisitSelect(SelectExpression node)
         {
             Expression from = VisitSource(node.From);
             Expression where = Visit(node.Where);
-            Expression take = Visit(node.Take);
-            Expression skip = Visit(node.Skip);
             ReadOnlyCollection<ColumnDeclaration> columns = VisitColumnDeclarations(node.Columns);
-            ReadOnlyCollection<OrderExpression> orderBy = VisitOrderBy(node.OrderBy);
+            ReadOnlyCollection<OrderByExpression> orderBy = VisitOrderBy(node.OrderBy);
             ReadOnlyCollection<Expression> groupBy = VisitExpressionList(node.GroupBy);
+            Expression take = Visit(node.Take);
             if (from != node.From
                 || where != node.Where
                 || columns != node.Columns
                 || orderBy != node.OrderBy
                 || groupBy != node.GroupBy
-                || take != node.Take
-                || skip != node.Skip)
+                || take != node.Take)
             {
-                return new SelectExpression(node.Alias, columns, from, where, orderBy, groupBy, false, skip, take, false);
+                return new SelectExpression(node.Alias, columns, from, where, orderBy, groupBy, take);
             }
             return node;
         }

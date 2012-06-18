@@ -8,19 +8,26 @@ namespace Oinq.Core
     /// </summary>
     public class ColumnDeclaration
     {
+        // private fields
+        private Expression _expression;
+        private String _name;
+
         // constructors
         public ColumnDeclaration(String name, Expression expression)
         {
-            if (name == null)
-                throw new ArgumentNullException("name");
-            if (expression == null)
-                throw new ArgumentNullException("expression");
-            Expression = expression;
-            Name = name;
+            _expression = expression;
+            _name = name;
         }
 
         // public properties
-        public Expression Expression { get; private set; }
-        public String Name { get; private set; }
+        public Expression Expression
+        {
+            get { return _expression; }
+        }
+
+        public String Name
+        {
+            get { return _name; }
+        }
     }
 }

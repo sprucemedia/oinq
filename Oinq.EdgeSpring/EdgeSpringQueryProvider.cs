@@ -13,13 +13,12 @@ namespace Oinq.EdgeSpring
         {          
         }
 
-        public override Object Execute(String commandText, String[] paramNames, Object[] paramValues, 
-            Func<EnumerableDataReader, Object> fnRead)
+        protected override Object Execute(TranslatedQuery translatedQuery)
         {
-            Query esQuery = new Query(commandText);
+            Query esQuery = new Query("abc");
             QueryResponse response = QueryRequest.SendQuery(((EdgeMart)Source).AbsoluteUri, esQuery);
 
-            return fnRead(new EnumerableDataReader(response.Result.Records));
+            return response.Result.Records;
         }
     }
 }

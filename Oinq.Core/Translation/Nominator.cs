@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 namespace Oinq.Core
 {
     /// <summary>
-    /// Nominator is a class that walks an expression tree bottom-up, determining the set of 
+    /// Nominator is a class that walks an expression tree bottom-up, determining the set of
     /// candidate expressions that are possible columns of a select expression.
     /// </summary>
     internal class Nominator : PigExpressionVisitor
@@ -38,10 +38,7 @@ namespace Oinq.Core
             {
                 Boolean wasBlocked = _isBlocked;
                 _isBlocked = false;
-                if (expression.NodeType != (ExpressionType)PigExpressionType.Subquery)
-                {
-                    base.Visit(expression);
-                }
+                base.Visit(expression);
                 if (!_isBlocked)
                 {
                     if (_canBeColumn(expression))

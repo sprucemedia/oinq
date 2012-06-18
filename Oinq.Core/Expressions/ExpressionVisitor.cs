@@ -9,7 +9,7 @@ namespace Oinq.Core
     /// <summary>
     /// An abstract base class for an Expression visitor.
     /// </summary>
-    internal abstract class ExpressionVisitor
+    public abstract class ExpressionVisitor
     {
         // constructors
         /// <summary>

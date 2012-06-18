@@ -59,7 +59,7 @@ namespace Oinq.Core
                 }
                 else
                 {
-                    decl = null;  // null means it gets omitted
+                    decl = null; // null means it gets omitted
                 }
                 if (decl != node.Columns[i] && alternate == null)
                 {
@@ -81,7 +81,7 @@ namespace Oinq.Core
 
             Expression take = Visit(node.Take);
             ReadOnlyCollection<Expression> groupbys = VisitExpressionList(node.GroupBy);
-            ReadOnlyCollection<OrderExpression> orderbys = VisitOrderBy(node.OrderBy);
+            ReadOnlyCollection<OrderByExpression> orderbys = VisitOrderBy(node.OrderBy);
             Expression where = Visit(node.Where);
             Expression from = Visit(node.From);
 
@@ -94,7 +94,7 @@ namespace Oinq.Core
                 || where != node.Where
                 || from != node.From)
             {
-                node = new SelectExpression(node.Alias, columns, from, where, orderbys, groupbys, false, null, take, false);
+                node = new SelectExpression(node.Alias, columns, from, where, orderbys, groupbys, take);
             }
 
             return node;
@@ -108,19 +108,6 @@ namespace Oinq.Core
             if (projector != node.Projector || source != node.Source)
             {
                 return new ProjectionExpression(source, projector, node.Aggregator);
-            }
-            return node;
-        }
-
-        protected override Expression VisitJoin(JoinExpression node)
-        {
-            // visit join in reverse order
-            Expression condition = Visit(node.Condition);
-            Expression right = VisitSource(node.Right);
-            Expression left = VisitSource(node.Left);
-            if (left != node.Left || right != node.Right || condition != node.Condition)
-            {
-                return new JoinExpression(node.Join, left, right, condition);
             }
             return node;
         }

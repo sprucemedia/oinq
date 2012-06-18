@@ -15,10 +15,9 @@ namespace Oinq.Core.Tests
             _fakeData = new Query<FakeData>(this);
         }
 
-        public override Object Execute(String commandText, String[] paramNames, Object[] paramValues, 
-            Func<EnumerableDataReader,Object> fnRead)
+        protected override Object Execute(TranslatedQuery translatedQuery)
         {
-            return fnRead(new EnumerableDataReader(_results));
+            return _results;
         }
 
         public Query<FakeData> FakeData

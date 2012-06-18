@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 namespace Oinq.Core
 {
     /// <summary>
-    /// Projector is a visitor that splits an expression representing the result of a query into 
+    /// Projector is a visitor that splits an expression representing the result of a query into
     /// two parts, a list of column declarations of expressions that must be evaluated on the server
     /// and a projector expression that describes how to combine the columns back into the result object.
     /// </summary>
@@ -56,7 +56,6 @@ namespace Oinq.Core
                     }
                     if (_existingAliases.Contains(column.Alias))
                     {
-                        Int32 ordinal = _columns.Count;
                         String columnName = GetUniqueColumnName(column.Name);
                         _columns.Add(new ColumnDeclaration(columnName, column));
                         mapped = new ColumnExpression(column.Type, _newAlias, columnName);
@@ -100,6 +99,6 @@ namespace Oinq.Core
         private Boolean IsColumnNameInUse(String name)
         {
             return _columnNames.Contains(name);
-        }  
+        }
     }
 }

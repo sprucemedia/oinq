@@ -7,7 +7,7 @@ using System.Reflection;
 namespace Oinq.Core
 {
     /// <summary>
-    /// QueryBinder is a visitor that converts method calls to LINQ operations into 
+    /// QueryBinder is a visitor that converts method calls to LINQ operations into
     /// custom PigExpression nodes and references to class members into references to columns.
     /// </summary>
     internal class QueryBinder : ExpressionVisitor
@@ -15,10 +15,10 @@ namespace Oinq.Core
         // private fields
         private Dictionary<ParameterExpression, Expression> _map;
         private IQueryProvider _provider;
-        private Dictionary<Expression, GroupByInfo> _groupByMap;
         private Expression _root;
+        private List<OrderByExpression> _thenBys;
+        private Dictionary<Expression, GroupByInfo> _groupByMap;
         private Expression _currentGroupElement;
-        private List<OrderExpression> _thenBys;
 
         // constructors
         private QueryBinder(IQueryProvider provider, Expression root)
@@ -73,13 +73,6 @@ namespace Oinq.Core
                             }
                         }
                     }
-                    else if (nex.Type.IsGenericType && nex.Type.GetGenericTypeDefinition() == typeof(Grouping<,>))
-                    {
-                        if (node.Member.Name == "Key")
-                        {
-                            return nex.Arguments[0];
-                        }
-                    }
                     break;
             }
             if (source == node.Expression)
@@ -99,26 +92,24 @@ namespace Oinq.Core
                         return BindWhere(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]));
                     case "Select":
                         return BindSelect(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]));
-                    case "SelectMany":
+                    case "OrderBy":
+                        return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), 
+                            OrderByDirection.Ascending);
+                    case "OrderByDescending":
+                        return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]),
+                            OrderByDirection.Descending);
+                    case "ThenBy":
+                        return BindThenBy(node.Arguments[0], GetLambda(node.Arguments[1]),
+                            OrderByDirection.Ascending);
+                    case "ThenByDescending":
+                        return BindThenBy(node.Arguments[0], GetLambda(node.Arguments[1]),
+                            OrderByDirection.Descending);
+                    case "Take":
                         if (node.Arguments.Count == 2)
                         {
-                            return BindSelectMany(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), null);
-                        }
-                        else if (node.Arguments.Count == 3)
-                        {
-                            return BindSelectMany(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), GetLambda(node.Arguments[2]));
+                            return BindTake(node.Arguments[0], node.Arguments[1]);
                         }
                         break;
-                    case "Join":
-                        break;
-                    case "OrderBy":
-                        return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), OrderType.Ascending);
-                    case "OrderByDescending":
-                        return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), OrderType.Descending);
-                    case "ThenBy":
-                        return BindThenBy(node.Arguments[0], (LambdaExpression)StripQuotes(node.Arguments[1]), OrderType.Ascending);
-                    case "ThenByDescending":
-                        return BindThenBy(node.Arguments[0], (LambdaExpression)StripQuotes(node.Arguments[1]), OrderType.Descending);
                     case "GroupBy":
                         if (node.Arguments.Count == 2)
                         {
@@ -145,12 +136,6 @@ namespace Oinq.Core
                                 GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]));
                         }
                         break;
-                    case "Take":
-                        if (node.Arguments.Count == 2)
-                        {
-                            return BindTake(node.Arguments[0], node.Arguments[1]);
-                        }
-                        break;
                     case "Count":
                     case "Min":
                     case "Max":
@@ -162,7 +147,7 @@ namespace Oinq.Core
                         }
                         else if (node.Arguments.Count == 2)
                         {
-                            LambdaExpression selector = (LambdaExpression)StripQuotes(node.Arguments[1]);
+                            LambdaExpression selector = GetLambda(node.Arguments[1]);
                             return BindAggregate(node.Arguments[0], node.Method.Name, node.Method, selector, node == _root);
                         }
                         break;
@@ -255,7 +240,7 @@ namespace Oinq.Core
                 }
                 aggExpr = new AggregateExpression(returnType, aggName, argExpr, isDistinct);
 
-                // check for easy to optimize case.  If the projection that our node is based on is really the 'group' argument from
+                // check for easy to optimize case. If the projection that our node is based on is really the 'group' argument from
                 // the query.GroupBy(xxx, (key, group) => yyy) method then whatever expression we return here will automatically
                 // become part of the select expression that has the group-by clause, so just return the simple node expression.
                 if (projection == _currentGroupElement)
@@ -351,24 +336,25 @@ namespace Oinq.Core
                 );
         }
 
-        private Expression BindOrderBy(Type resultType, Expression source, LambdaExpression orderSelector, OrderType orderType)
+        private Expression BindOrderBy(Type resultType, Expression source, LambdaExpression orderSelector, 
+            OrderByDirection orderType)
         {
-            List<OrderExpression> myThenBys = _thenBys;
+            List<OrderByExpression> myThenBys = _thenBys;
             _thenBys = null;
             ProjectionExpression projection = VisitSequence(source);
 
             _map[orderSelector.Parameters[0]] = projection.Projector;
-            List<OrderExpression> orderings = new List<OrderExpression>();
-            orderings.Add(new OrderExpression(orderType, Visit(orderSelector.Body)));
+            List<OrderByExpression> orderings = new List<OrderByExpression>();
+            orderings.Add(new OrderByExpression(Visit(orderSelector.Body), orderType));
 
             if (myThenBys != null)
             {
                 for (Int32 i = myThenBys.Count - 1; i >= 0; i--)
                 {
-                    OrderExpression tb = myThenBys[i];
+                    OrderByExpression tb = myThenBys[i];
                     LambdaExpression lambda = (LambdaExpression)tb.Expression;
                     _map[lambda.Parameters[0]] = projection.Projector;
-                    orderings.Add(new OrderExpression(tb.OrderType, Visit(lambda.Body)));
+                    orderings.Add(new OrderByExpression(Visit(lambda.Body), tb.Direction));
                 }
             }
 
@@ -392,32 +378,6 @@ namespace Oinq.Core
                 pc.Projector);
         }
 
-        private Expression BindSelectMany(Type resultType, Expression source, LambdaExpression collectionSelector, LambdaExpression resultSelector)
-        {
-            ProjectionExpression projection = VisitSequence(source);
-            _map[collectionSelector.Parameters[0]] = projection.Projector;
-            ProjectionExpression collectionProjection = (ProjectionExpression)Visit(collectionSelector.Body);
-            JoinType joinType = IsTable(collectionSelector.Body) ? JoinType.CrossJoin : JoinType.CrossApply;
-            JoinExpression join = new JoinExpression(joinType, projection.Source, collectionProjection.Source, null);
-            var alias = GetNextAlias();
-            ProjectedColumns pc;
-            if (resultSelector == null)
-            {
-                pc = ProjectColumns(collectionProjection.Projector, alias, projection.Source.Alias, collectionProjection.Source.Alias);
-            }
-            else
-            {
-                _map[resultSelector.Parameters[0]] = projection.Projector;
-                _map[resultSelector.Parameters[1]] = collectionProjection.Projector;
-                Expression result = VisitSequence(resultSelector.Body);
-                pc = ProjectColumns(result, alias, projection.Source.Alias, collectionProjection.Source.Alias);
-            }
-            return new ProjectionExpression(
-                new SelectExpression(alias, pc.Columns, join, null),
-                pc.Projector
-                );
-        }
-
         private Expression BindTake(Expression source, Expression take)
         {
             ProjectionExpression projection = VisitSequence(source);
@@ -426,20 +386,22 @@ namespace Oinq.Core
             var alias = GetNextAlias();
             ProjectedColumns pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
             return new ProjectionExpression(
-                new SelectExpression(alias, pc.Columns, projection.Source, null, null, null, false, null, take, false),
+                new SelectExpression(alias, pc.Columns, projection.Source, null, null, null, take),
                 pc.Projector
                 );
         }
 
-        private Expression BindThenBy(Expression source, LambdaExpression orderSelector, OrderType orderType)
+        private Expression BindThenBy(Expression source, LambdaExpression orderSelector, OrderByDirection orderType)
         {
             if (_thenBys == null)
             {
-                _thenBys = new List<OrderExpression>();
+                _thenBys = new List<OrderByExpression>();
             }
-            _thenBys.Add(new OrderExpression(orderType, orderSelector));
+            _thenBys.Add(new OrderByExpression(orderSelector, orderType));
             return Visit(source);
         }
+
+
 
         private Expression BindWhere(Type resultType, Expression source, LambdaExpression predicate)
         {
@@ -475,9 +437,6 @@ namespace Oinq.Core
             switch (node.NodeType)
             {
                 case (ExpressionType)PigExpressionType.Column:
-                case (ExpressionType)PigExpressionType.Subquery:
-                case (ExpressionType)PigExpressionType.AggregateSubquery:
-                case (ExpressionType)PigExpressionType.Aggregate:
                     return true;
                 default:
                     return false;
@@ -492,7 +451,7 @@ namespace Oinq.Core
                     return (ProjectionExpression)node;
                 case ExpressionType.New:
                     NewExpression nex = (NewExpression)node;
-                    if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(Grouping<,>))
+                    if (node.Type.IsGenericType)
                     {
                         return (ProjectionExpression)nex.Arguments[1];
                     }
@@ -565,7 +524,7 @@ namespace Oinq.Core
 
         private Boolean IsTable(Expression expression)
         {
-            return expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Query<>);  
+            return expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Query<>);
         }
 
         private Expression MakeMember(Expression source, MemberInfo mi)
@@ -608,19 +567,6 @@ namespace Oinq.Core
         }
 
         // private static methods
-        private static SourceAlias GetExistingAlias(Expression source)
-        {
-            switch ((PigExpressionType)source.NodeType)
-            {
-                case PigExpressionType.Select:
-                    return ((SelectExpression)source).Alias;
-                case PigExpressionType.Source:
-                    return ((SourceExpression)source).Alias;
-                default:
-                    throw new InvalidOperationException(String.Format("Invalid source node type '{0}'", source.NodeType));
-            }
-        }
-
         private static LambdaExpression GetLambda(Expression e)
         {
             while (e.NodeType == ExpressionType.Quote)
@@ -632,15 +578,6 @@ namespace Oinq.Core
                 return ((ConstantExpression)e).Value as LambdaExpression;
             }
             return e as LambdaExpression;
-        }
-
-        private static Expression StripQuotes(Expression node)
-        {
-            while (node.NodeType == ExpressionType.Quote)
-            {
-                node = ((UnaryExpression)node).Operand;
-            }
-            return node;
         }
     }
 }

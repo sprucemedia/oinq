@@ -12,15 +12,15 @@ namespace Oinq.Core
         private HashSet<Expression> _candidates;
 
         // constructors
-        private SubtreeEvaluator(HashSet<Expression> candidates)
+        internal SubtreeEvaluator(HashSet<Expression> candidates)
         {
             _candidates = candidates;
         }
 
         // internal methods
-        internal static Expression Evaluate(HashSet<Expression> candidates, Expression exp)
+        internal Expression Evaluate(Expression exp)
         {
-            return new SubtreeEvaluator(candidates).Visit(exp);
+            return Visit(exp);
         }
 
         // protected override methods

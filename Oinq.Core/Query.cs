@@ -6,11 +6,16 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
+    public interface IPigQueryable
+    {
+        String GetPigQuery();
+    }
+
     /// <summary>
     /// An implementation IQueryable{{T}} for querying a data file.
     /// </summary>
     /// <typeparam name="T">The type of facts being queried.</typeparam>
-    public class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable
+    public class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IPigQueryable
     {
         // private fields
         private IQueryProvider _provider;
@@ -56,6 +61,15 @@ namespace Oinq.Core
 
         // public methods
         /// <summary>
+        /// Gets the Pig query that will be sent to the server when this LINQ query is executed.
+        /// </summary>
+        /// <returns>The Pig query.</returns>
+        public String GetPigQuery()
+        {
+            return ((QueryProvider)_provider).BuildQueryText(this);
+        }
+
+        /// <summary>
         /// Gets an enumerator for the results of an Pig LINQ query.
         /// </summary>
         /// <returns>An enumerator for the results of an Pig LINQ query.</returns>
@@ -85,24 +99,6 @@ namespace Oinq.Core
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)_provider.Execute(_expression)).GetEnumerator();
-        }
-
-        // public properties
-        /// <summary>
-        /// Gets the EdgeSpring query text that will be sent to the server when this LINQ 
-        /// query is executed.
-        /// </summary>
-        public String QueryText
-        {
-            get
-            {
-                IQueryText iqt = _provider as IQueryText;
-                if (iqt != null)
-                {
-                    return iqt.GetQueryText(_expression);
-                }
-                return "";
-            }
         }
 
         // explicit implementation of IQueryable

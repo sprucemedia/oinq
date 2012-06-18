@@ -10,34 +10,59 @@ namespace Oinq.Core
     public static class QueryTranslator
     {
         // public static methods
-        public static ProjectionExpression Translate(IQueryable query)
+        public static TranslatedQuery Translate(IQueryable query)
         {
             return Translate((QueryProvider)query.Provider, query.Expression);
         }
 
-        public static ProjectionExpression Translate(IQueryProvider provider, Expression expression)
+        public static TranslatedQuery Translate(QueryProvider provider, Expression expression)
         {
-            expression = PartialEvaluator.Evaluate(expression, CanBeEvaluatedLocally);
-            expression = QueryBinder.Bind(provider, expression);
-            expression = AggregateRewriter.Rewrite(expression);
-            expression = UnusedColumnRemover.Remove(expression);
-            expression = RedundantSubqueryRemover.Remove(expression);
-            return (ProjectionExpression)expression;
+            var sourceType = GetSourceType(expression);
+
+            ProjectionExpression projection = expression as ProjectionExpression;
+            if (projection == null)
+            {
+                expression = PartialEvaluator.Evaluate(expression);
+                expression = QueryBinder.Bind(provider, expression);
+                expression = AggregateRewriter.Rewrite(expression);
+                expression = OrderByRewriter.Rewrite(expression);
+                expression = UnusedColumnRemover.Remove(expression);
+                expression = RedundantSubqueryRemover.Remove(expression);
+                projection = (ProjectionExpression)expression;
+            }
+            
+            // assume for now it is a SelectQuery       
+            var selectQuery = new SelectQuery(provider.Source, sourceType);
+            selectQuery.Translate(projection);
+            return selectQuery;
         }
 
-        // private methods
-        private static Boolean CanBeEvaluatedLocally(Expression expression)
+        // private static methods
+        private static Type GetSourceType(Expression expression)
         {
-            // any operation on a query can't be done locally
-            ConstantExpression cex = expression as ConstantExpression;
-            if (cex != null)
+            // look for the innermost nested constant of type MongoQueryable<T> and return typeof(T)
+            var constantExpression = expression as ConstantExpression;
+            if (constantExpression != null)
             {
-                IQueryable query = cex.Value as IQueryable;
-                if (query != null)
-                    return false;
+                var constantType = constantExpression.Type;
+                if (constantType.IsGenericType)
+                {
+                    var genericTypeDefinition = constantType.GetGenericTypeDefinition();
+                    if (genericTypeDefinition == typeof(Query<>))
+                    {
+                        return constantType.GetGenericArguments()[0];
+                    }
+                }
             }
-            return expression.NodeType != ExpressionType.Parameter &&
-                   expression.NodeType != ExpressionType.Lambda;
+
+            var methodCallExpression = expression as MethodCallExpression;
+            if (methodCallExpression != null && methodCallExpression.Arguments.Count != 0)
+            {
+                return GetSourceType(methodCallExpression.Arguments[0]);
+            }
+
+            var message = string.Format("Unable to find document type of expression: {0}.", expression.NodeType.ToString());
+            throw new ArgumentOutOfRangeException(message);
         }
     }
 }

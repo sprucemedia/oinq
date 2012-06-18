@@ -8,14 +8,20 @@ namespace Oinq.Core
     /// </summary>
     public class SourceExpression : AliasedExpression
     {
+        // private fields
+        private String _name;
+
         // constructors
         public SourceExpression(SourceAlias alias, String name)
             : base(PigExpressionType.Source, typeof(void), alias)
         {
-            Name = name;
+            _name = name;
         }
 
         // public properties
-        public String Name { get; private set; }
+        public String Name
+        {
+            get { return _name; }
+        }
     }
 }

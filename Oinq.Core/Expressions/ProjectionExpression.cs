@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 namespace Oinq.Core
 {
     /// <summary>
-    /// A custom expression representing the construction of one or more result objects from a 
+    /// A custom expression representing the construction of one or more result objects from a
     /// select expression.
     /// </summary>
     public class ProjectionExpression : PigExpression

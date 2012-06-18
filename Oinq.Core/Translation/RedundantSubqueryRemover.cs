@@ -4,15 +4,15 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    internal class RedundantSubqueryRemover : PigExpressionVisitor
+    public class RedundantSubqueryRemover : PigExpressionVisitor
     {
         // constructors
-        private RedundantSubqueryRemover() 
+        private RedundantSubqueryRemover()
         {
         }
 
-        // internal static methods
-        internal static Expression Remove(Expression expression)
+        // public static methods
+        public static Expression Remove(Expression expression)
         {
             return new RedundantSubqueryRemover().Visit(expression);
         }
@@ -33,28 +33,28 @@ namespace Oinq.Core
             // logic except for the existence of a where clause
             //while (CanMergeWithFrom(node))
             //{
-            //    SelectExpression fromSelect = (SelectExpression)node.From;
+            // SelectExpression fromSelect = (SelectExpression)node.From;
 
-            //    // remove the redundant subquery
-            //    node = SubqueryRemover.Remove(node, fromSelect);
+            // // remove the redundant subquery
+            // node = SubqueryRemover.Remove(node, fromSelect);
 
-            //    // merge where expressions 
-            //    Expression where = node.Where;
-            //    if (fromSelect.Where != null)
-            //    {
-            //        if (where != null)
-            //        {
-            //            where = Expression.And(fromSelect.Where, where);
-            //        }
-            //        else
-            //        {
-            //            where = fromSelect.Where;
-            //        }
-            //    }
-            //    if (where != node.Where)
-            //    {
-            //        node = new SelectExpression(node.Type, node.Alias, node.Columns, node.From, where, node.OrderBy, node.GroupBy);
-            //    }
+            // // merge where expressions
+            // Expression where = node.Where;
+            // if (fromSelect.Where != null)
+            // {
+            // if (where != null)
+            // {
+            // where = Expression.And(fromSelect.Where, where);
+            // }
+            // else
+            // {
+            // where = fromSelect.Where;
+            // }
+            // }
+            // if (where != node.Where)
+            // {
+            // node = new SelectExpression(node.Type, node.Alias, node.Columns, node.From, where, node.OrderBy, node.GroupBy);
+            // }
             //}
             return node;
         }
@@ -67,9 +67,10 @@ namespace Oinq.Core
         protected override Expression VisitProjection(ProjectionExpression node)
         {
             node = (ProjectionExpression)base.VisitProjection(node);
-            if (node.Source.From is SelectExpression) {
+            if (node.Source.From is SelectExpression)
+            {
                 List<SelectExpression> redundant = RedundantSubqueryGatherer.Gather(node.Source);
-                if (redundant != null) 
+                if (redundant != null)
                 {
                     node = SubqueryRemover.Remove(node, redundant);
                 }
@@ -126,8 +127,8 @@ namespace Oinq.Core
             {
             }
 
-            // internal static methods
-            internal static List<SelectExpression> Gather(Expression source)
+            // public static methods
+            public static List<SelectExpression> Gather(Expression source)
             {
                 RedundantSubqueryGatherer gatherer = new RedundantSubqueryGatherer();
                 gatherer.Visit(source);

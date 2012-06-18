@@ -97,28 +97,4 @@ namespace Oinq.Core.Tests
             Assert.AreSame(_expression, query.Expression);
         }
     }
-
-    public class When_executing_a_query : QueryProviderTestBase
-    {
-        [Test]
-        public void it_can_return_IEnumerable()
-        {
-            // Arrange
-            IList<FakeData> raw = new List<FakeData>();
-            raw.Add(new FakeData { Dim1 = "UA", Mea1 = 5 });
-            raw.Add(new FakeData { Dim1 = "EA", Mea1 = 15 });
-            raw.Add(new FakeData { Dim1 = "UA", Mea1 = 10 });
-            raw.Add(new FakeData { Dim1 = "US", Mea1 = 20 });
-
-            var provider = new FakeQueryProvider(Source, raw.ToList<FakeData>());
-            var query = provider.FakeData.Where(f => f.Dim1 == "Fake");
-
-            // Act
-            var results = provider.Execute<IEnumerable<FakeData>>(query.Expression);
-
-            // Assert
-            Assert.IsNotNull(results);
-            Assert.AreEqual(4, results.Count());
-        }
-    }
 }

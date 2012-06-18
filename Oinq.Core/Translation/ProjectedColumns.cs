@@ -3,20 +3,28 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    /// <summary>
-    /// Represents a collection of projected columns.
-    /// </summary>
     internal sealed class ProjectedColumns
     {
+        // private fields
+        private Expression _projector;
+        private ReadOnlyCollection<ColumnDeclaration> _columns;
+
         // constructors
         internal ProjectedColumns(Expression projector, ReadOnlyCollection<ColumnDeclaration> columns)
         {
-            Projector = projector;
-            Columns = columns;
+            _projector = projector;
+            _columns = columns;
         }
 
         // internal properties
-        internal Expression Projector { get; private set; }
-        internal ReadOnlyCollection<ColumnDeclaration> Columns { get; private set; }
+        internal Expression Projector
+        {
+            get { return _projector; }
+        }
+
+        internal ReadOnlyCollection<ColumnDeclaration> Columns
+        {
+            get { return _columns; }
+        }
     }
 }

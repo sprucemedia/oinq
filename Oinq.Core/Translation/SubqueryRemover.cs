@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    internal class SubqueryRemover : PigExpressionVisitor
+    public class SubqueryRemover : PigExpressionVisitor
     {
         // private fields
         private HashSet<SelectExpression> _selectsToRemove;
@@ -18,23 +18,23 @@ namespace Oinq.Core
             _map = _selectsToRemove.ToDictionary(d => d.Alias, d => d.Columns.ToDictionary(d2 => d2.Name, d2 => d2.Expression));
         }
 
-        // internal static methods
-        internal static SelectExpression Remove(SelectExpression outerSelect, params SelectExpression[] selectsToRemove)
+        // public static methods
+        public static SelectExpression Remove(SelectExpression outerSelect, params SelectExpression[] selectsToRemove)
         {
             return Remove(outerSelect, (IEnumerable<SelectExpression>)selectsToRemove);
         }
 
-        internal static SelectExpression Remove(SelectExpression outerSelect, IEnumerable<SelectExpression> selectsToRemove)
+        public static SelectExpression Remove(SelectExpression outerSelect, IEnumerable<SelectExpression> selectsToRemove)
         {
             return (SelectExpression)new SubqueryRemover(selectsToRemove).Visit(outerSelect);
         }
 
-        internal static ProjectionExpression Remove(ProjectionExpression projection, params SelectExpression[] selectsToRemove)
+        public static ProjectionExpression Remove(ProjectionExpression projection, params SelectExpression[] selectsToRemove)
         {
             return Remove(projection, (IEnumerable<SelectExpression>)selectsToRemove);
         }
 
-        internal static ProjectionExpression Remove(ProjectionExpression projection, IEnumerable<SelectExpression> selectsToRemove)
+        public static ProjectionExpression Remove(ProjectionExpression projection, IEnumerable<SelectExpression> selectsToRemove)
         {
             return (ProjectionExpression)new SubqueryRemover(selectsToRemove).Visit(projection);
         }
