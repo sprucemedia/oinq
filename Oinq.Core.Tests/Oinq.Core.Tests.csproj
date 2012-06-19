@@ -48,9 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fakes\AttributedFakeData.cs" />
     <Compile Include="Fakes\FakeData.cs" />
     <Compile Include="Fakes\FakeDataSource.cs" />
     <Compile Include="Fakes\FakeQueryProvider.cs" />
+    <Compile Include="Pig\PigMappingTests.cs" />
     <Compile Include="Pig\PigTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryProviderTests.cs" />

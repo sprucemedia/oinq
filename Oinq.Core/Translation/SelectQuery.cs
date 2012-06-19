@@ -22,10 +22,10 @@ namespace Oinq.Core
         /// <summary>
         /// Initializes a new instance of the SelectQuery class.
         /// </summary>
-        /// <param name="collection">The data _source being queried.</param>
-        /// <param name="documentType">The document type.</param>
-        public SelectQuery(IDataFile source, Type documentType)
-            : base(source, documentType)
+        /// <param name="collection">The data source being queried.</param>
+        /// <param name="sourceType">The source type.</param>
+        public SelectQuery(IDataFile source, Type sourceType)
+            : base(source, sourceType)
         {
             _commandStack = new Stack();
             _columns = new List<ColumnDeclaration>();

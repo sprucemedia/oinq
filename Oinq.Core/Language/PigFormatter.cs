@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Text;
+using System.Reflection;
 
 namespace Oinq.Core
 {
@@ -14,6 +15,7 @@ namespace Oinq.Core
         // private fields
         private StringBuilder _sb;
         private Int32 _aliasCount;
+        private Dictionary<String, String> _mappings;
 
         // constructors
         private PigFormatter()
@@ -25,6 +27,7 @@ namespace Oinq.Core
         internal static String Format(SelectQuery query)
         {
             PigFormatter formatter = new PigFormatter();
+            formatter._mappings = formatter.GetMappings(query.SourceType);
             formatter.WriteLoad(query.Source);
             foreach (SelectExpression ex in query.CommandStack)
             {
@@ -238,7 +241,15 @@ namespace Oinq.Core
 
         protected void WriteColumnName(String columnName)
         {
-            Write(columnName);
+            String mappedName;
+            if (_mappings.TryGetValue(columnName, out mappedName))
+            {
+                Write(mappedName);
+            }
+            else
+            {
+                Write(columnName);
+            }
         }
 
         protected void WriteFilter(Expression where)
@@ -528,6 +539,24 @@ namespace Oinq.Core
                     throw new NotSupportedException(String.Format("The unary operator '{0}' is not supported", node.NodeType));
             }
             return node;
+        }
+
+        // private methods
+        private Dictionary<String, String> GetMappings(Type sourceType)
+        {
+            // Get all properties that are in the source type.
+            PropertyInfo[] sourceProperties = sourceType.GetProperties();
+            Dictionary<String, String> mappings = new Dictionary<String, String>();
+
+            foreach (PropertyInfo property in sourceProperties)
+            {
+                Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigMapping), true);
+                foreach (Object attribute in mappingAttributes)
+                {
+                    mappings.Add(property.Name, ((PigMapping)attribute).Name);
+                }
+            }
+            return mappings;
         }
     }
 }
