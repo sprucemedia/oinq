@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
-using System.Text;
 using System.Reflection;
+using System.Text;
 
 namespace Oinq.Core
 {
@@ -86,35 +86,35 @@ namespace Oinq.Core
             {
                 case ExpressionType.And:
                 case ExpressionType.AndAlso:
-                    return (IsBoolean(b.Left.Type)) ? "AND" : "&";
+                    return (IsBoolean(b.Left.Type)) ? " AND " : " & ";
                 case ExpressionType.Or:
                 case ExpressionType.OrElse:
-                    return (IsBoolean(b.Left.Type)) ? "OR" : "|";
+                    return (IsBoolean(b.Left.Type)) ? " OR " : " | ";
                 case ExpressionType.Equal:
-                    return "==";
+                    return " == ";
                 case ExpressionType.NotEqual:
-                    return "!=";
+                    return " != ";
                 case ExpressionType.LessThan:
-                    return "<";
+                    return " < ";
                 case ExpressionType.LessThanOrEqual:
-                    return "<=";
+                    return " <= ";
                 case ExpressionType.GreaterThan:
-                    return ">";
+                    return " > ";
                 case ExpressionType.GreaterThanOrEqual:
-                    return ">=";
+                    return " >= ";
                 case ExpressionType.Add:
                 case ExpressionType.AddChecked:
-                    return "+";
+                    return " + ";
                 case ExpressionType.Subtract:
                 case ExpressionType.SubtractChecked:
-                    return "-";
+                    return " - ";
                 case ExpressionType.Multiply:
                 case ExpressionType.MultiplyChecked:
-                    return "*";
+                    return " * ";
                 case ExpressionType.Divide:
-                    return "/";
+                    return " / ";
                 case ExpressionType.Modulo:
-                    return "%";
+                    return " % ";
                 default:
                     return "";
             }
@@ -123,11 +123,6 @@ namespace Oinq.Core
         protected virtual Boolean IsBoolean(Type type)
         {
             return type == typeof(Boolean) || type == typeof(Boolean?);
-        }
-
-        protected virtual Boolean IsInteger(Type type)
-        {
-            return TypeHelper.IsInteger(type);
         }
 
         protected virtual Boolean IsPredicate(Expression expr)
@@ -165,24 +160,9 @@ namespace Oinq.Core
             return node;
         }
 
-        /// <summary>
-        /// Visits a ParameterExpression.
-        /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
-        /// <returns>The ParameterExpression.</returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            _sb.Append(node.Name);
-            return node;
-        }
-
-        protected virtual Expression VisitPredicate(Expression node)
-        {
-            Visit(node);
-            if (!IsPredicate(node))
-            {
-                Write(" <> 0");
-            }
+            Write(node.Name);
             return node;
         }
 
@@ -207,11 +187,6 @@ namespace Oinq.Core
                     this.Write(aggregateName.ToLower());
                     break;
             }
-        }
-
-        protected void WriteAliasName(String aliasName)
-        {
-            Write(aliasName);
         }
 
         protected void WriteAsColumnName(String columnName)
@@ -402,11 +377,6 @@ namespace Oinq.Core
             return node;
         }
 
-        /// <summary>
-        /// Visits a BinaryExpression.
-        /// </summary>
-        /// <param name="node">The BinaryExpression.</param>
-        /// <returns>The BinaryExpression.</returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
             if (node.NodeType == ExpressionType.ArrayIndex)
@@ -420,31 +390,7 @@ namespace Oinq.Core
 
             _sb.Append("(");
             Visit(node.Left);
-            switch (node.NodeType)
-            {
-                case ExpressionType.Add: _sb.Append(" + "); break;
-                case ExpressionType.And: _sb.Append(" AND "); break;
-                case ExpressionType.AndAlso: _sb.Append(" AND "); break;
-                case ExpressionType.Coalesce: _sb.Append(" ?? "); break;
-                case ExpressionType.Divide: _sb.Append(" / "); break;
-                case ExpressionType.Equal: _sb.Append(" == "); break;
-                case ExpressionType.ExclusiveOr: _sb.Append(" ^ "); break;
-                case ExpressionType.GreaterThan: _sb.Append(" > "); break;
-                case ExpressionType.GreaterThanOrEqual: _sb.Append(" >= "); break;
-                case ExpressionType.LeftShift: _sb.Append(" << "); break;
-                case ExpressionType.LessThan: _sb.Append(" < "); break;
-                case ExpressionType.LessThanOrEqual: _sb.Append(" <= "); break;
-                case ExpressionType.Modulo: _sb.Append(" % "); break;
-                case ExpressionType.Multiply: _sb.Append(" * "); break;
-                case ExpressionType.NotEqual: _sb.Append(" != "); break;
-                case ExpressionType.Or: _sb.Append(" OR "); break;
-                case ExpressionType.OrElse: _sb.Append(" OR "); break;
-                case ExpressionType.RightShift: _sb.Append(" >> "); break;
-                case ExpressionType.Subtract: _sb.Append(" - "); break;
-                case ExpressionType.TypeAs: _sb.Append(" as "); break;
-                case ExpressionType.TypeIs: _sb.Append(" is "); break;
-                default: _sb.AppendFormat(" <{0}> ", node.NodeType); break;
-            }
+            Write(GetOperator(node));
             Visit(node.Right);
             _sb.Append(")");
             return node;
@@ -528,7 +474,7 @@ namespace Oinq.Core
 
         protected override NewExpression VisitNew(NewExpression node)
         {
-            throw new NotSupportedException(String.Format("The construtor for '{0}' is not supported", node.Constructor.DeclaringType));
+            throw new NotSupportedException(String.Format("The constructor for '{0}' is not supported", node.Constructor.DeclaringType));
         }
 
         protected override Expression VisitUnary(UnaryExpression node)

@@ -56,9 +56,9 @@
     <Compile Include="Expressions\SelectExpression.cs" />
     <Compile Include="Expressions\SubqueryExpression.cs" />
     <Compile Include="IDataFile.cs" />
-    <Compile Include="Language\PigFormatter.cs" />
-    <Compile Include="Language\PigIgnoreAttribute.cs" />
-    <Compile Include="Language\PigMappingAttribute.cs" />
+    <Compile Include="Pig\PigFormatter.cs" />
+    <Compile Include="Pig\PigIgnoreAttribute.cs" />
+    <Compile Include="Pig\PigMappingAttribute.cs" />
     <Compile Include="LinqExtensionMethods.cs" />
     <Compile Include="Expressions\ExpressionVisitor.cs" />
     <Compile Include="Translation\AggregateRewriter.cs" />
@@ -82,7 +82,7 @@
     <Compile Include="Translation\QueryTranslator.cs" />
     <Compile Include="Translation\RedundantSubqueryRemover.cs" />
     <Compile Include="Translation\SelectQuery.cs" />
-    <Compile Include="Language\TypeHelper.cs" />
+    <Compile Include="Pig\TypeHelper.cs" />
     <Compile Include="Translation\SubqueryRemover.cs" />
     <Compile Include="Translation\SubtreeEvaluator.cs" />
     <Compile Include="Translation\TranslatedQuery.cs" />

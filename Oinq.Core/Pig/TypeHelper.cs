@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
 namespace Oinq.Core
 {
     /// <summary>
     /// Type-related helper methods
     /// </summary>
-    public static class TypeHelper
+    internal static class TypeHelper
     {
-        public static Type FindIEnumerable(Type seqType)
+        internal static Type FindIEnumerable(Type seqType)
         {
             if (seqType == null || seqType == typeof(String))
                 return null;
@@ -45,29 +43,29 @@ namespace Oinq.Core
             return null;
         }
 
-        public static Type GetSequenceType(Type elementType)
+        internal static Type GetSequenceType(Type elementType)
         {
             return typeof(IEnumerable<>).MakeGenericType(elementType);
         }
 
-        public static Type GetElementType(Type seqType)
+        internal static Type GetElementType(Type seqType)
         {
             Type ienum = FindIEnumerable(seqType);
             if (ienum == null) return seqType;
             return ienum.GetGenericArguments()[0];
         }
 
-        public static Boolean IsNullableType(Type type)
+        internal static Boolean IsNullableType(Type type)
         {
             return type != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
-        public static Boolean IsNullAssignable(Type type)
+        internal static Boolean IsNullAssignable(Type type)
         {
             return !type.IsValueType || IsNullableType(type);
         }
 
-        public static Type GetNonNullableType(Type type)
+        internal static Type GetNonNullableType(Type type)
         {
             if (IsNullableType(type))
             {
@@ -76,7 +74,7 @@ namespace Oinq.Core
             return type;
         }
 
-        public static Type GetNullAssignableType(Type type)
+        internal static Type GetNullAssignableType(Type type)
         {
             if (!IsNullAssignable(type))
             {
@@ -85,12 +83,12 @@ namespace Oinq.Core
             return type;
         }
 
-        public static ConstantExpression GetNullConstant(Type type)
+        internal static ConstantExpression GetNullConstant(Type type)
         {
             return Expression.Constant(null, GetNullAssignableType(type));
         }
 
-        public static Type GetMemberType(MemberInfo mi)
+        internal static Type GetMemberType(MemberInfo mi)
         {
             FieldInfo fi = mi as FieldInfo;
             if (fi != null) return fi.FieldType;
@@ -103,7 +101,7 @@ namespace Oinq.Core
             return null;
         }
 
-        public static Object GetDefault(Type type)
+        internal static Object GetDefault(Type type)
         {
             Boolean isNullable = !type.IsValueType || TypeHelper.IsNullableType(type);
             if (!isNullable)
@@ -111,7 +109,7 @@ namespace Oinq.Core
             return null;
         }
 
-        public static Boolean IsReadOnly(MemberInfo member)
+        internal static Boolean IsReadOnly(MemberInfo member)
         {
             switch (member.MemberType)
             {
@@ -125,7 +123,7 @@ namespace Oinq.Core
             }
         }
 
-        public static Boolean IsInteger(Type type)
+        internal static Boolean IsInteger(Type type)
         {
             Type nnType = GetNonNullableType(type);
             switch (Type.GetTypeCode(type))
