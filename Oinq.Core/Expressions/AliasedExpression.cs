@@ -34,7 +34,7 @@ namespace Oinq.Core
         }
 
         // internal properties
-        public override string ToString()
+        public override String ToString()
         {
             return "A:" + GetHashCode();
         }

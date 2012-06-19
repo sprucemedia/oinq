@@ -444,13 +444,13 @@ namespace Oinq.Core
                         return node;
                 }
             }
-            else if (node.Method.Name == "ToString" && node.Object.Type == typeof(string))
+            else if (node.Method.Name == "ToString" && node.Object.Type == typeof(String))
             {
                 return Visit(node.Object);  // no op
             }
             else if (node.Method.Name == "Equals")
             {
-                if (node.Method.IsStatic && node.Method.DeclaringType == typeof(object))
+                if (node.Method.IsStatic && node.Method.DeclaringType == typeof(Object))
                 {
                     Write("(");
                     Visit(node.Arguments[0]);

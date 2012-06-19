@@ -85,7 +85,7 @@ namespace Oinq.Core
             try
             {
                 var queryableType = typeof(Query<>).MakeGenericType(elementType);
-                return (IQueryable)Activator.CreateInstance(queryableType, new object[] { this, expression });
+                return (IQueryable)Activator.CreateInstance(queryableType, new Object[] { this, expression });
             }
             catch (TargetInvocationException ex)
             {
@@ -124,7 +124,7 @@ namespace Oinq.Core
             return Activator.CreateInstance(
                 typeof(ProjectionReader<>).MakeGenericType(elementType),
                 BindingFlags.Instance | BindingFlags.NonPublic, null,
-                new object[] { reader, projector },
+                new Object[] { reader, projector },
                 null
                 );
         }

@@ -61,7 +61,7 @@ namespace Oinq.Core
                 return GetSourceType(methodCallExpression.Arguments[0]);
             }
 
-            var message = string.Format("Unable to find document type of expression: {0}.", expression.NodeType.ToString());
+            var message = String.Format("Unable to find document type of expression: {0}.", expression.NodeType.ToString());
             throw new ArgumentOutOfRangeException(message);
         }
     }

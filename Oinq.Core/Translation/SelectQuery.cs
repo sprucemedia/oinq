@@ -158,7 +158,7 @@ namespace Oinq.Core
                 return;
             }
 
-            var message = string.Format("Don't know how to translate expression: {0}.", expression.NodeType.ToString());
+            var message = String.Format("Don't know how to translate expression: {0}.", expression.NodeType.ToString());
             throw new NotSupportedException(message);
         }
     }

@@ -107,7 +107,7 @@ namespace Oinq.Core
             if (nodes != null)
             {
                 List<OrderByExpression> alternate = null;
-                for (int i = 0, n = nodes.Count; i < n; i++)
+                for (Int32 i = 0, n = nodes.Count; i < n; i++)
                 {
                     OrderByExpression expr = nodes[i];
                     Expression e = Visit(expr.Expression);

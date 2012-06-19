@@ -27,16 +27,16 @@ namespace Oinq.Core
 
         protected override Expression VisitSelect(SelectExpression select)
         {
-            bool saveIsOuterMostSelect = _isOuterMostSelect;
+            Boolean saveIsOuterMostSelect = _isOuterMostSelect;
             try
             {
                 _isOuterMostSelect = false;
                 select = (SelectExpression)base.VisitSelect(select);
 
-                bool hasOrderBy = select.OrderBy != null && select.OrderBy.Count > 0;
-                bool hasGroupBy = select.GroupBy != null && select.GroupBy.Count > 0;
-                bool canHaveOrderBy = saveIsOuterMostSelect || select.Take != null;
-                bool canReceiveOrderings = canHaveOrderBy && !hasGroupBy;
+                Boolean hasOrderBy = select.OrderBy != null && select.OrderBy.Count > 0;
+                Boolean hasGroupBy = select.GroupBy != null && select.GroupBy.Count > 0;
+                Boolean canHaveOrderBy = saveIsOuterMostSelect || select.Take != null;
+                Boolean canReceiveOrderings = canHaveOrderBy && !hasGroupBy;
 
                 if (hasOrderBy)
                 {
@@ -52,7 +52,7 @@ namespace Oinq.Core
                 {
                     orderings = select.OrderBy;
                 }
-                bool canPassOnOrderings = !saveIsOuterMostSelect && !hasGroupBy;
+                Boolean canPassOnOrderings = !saveIsOuterMostSelect && !hasGroupBy;
                 ReadOnlyCollection<ColumnDeclaration> columns = select.Columns;
                 if (_gatheredOrderings != null)
                 {
@@ -103,15 +103,15 @@ namespace Oinq.Core
                 if (_gatheredOrderings == null)
                 {
                     _gatheredOrderings = new List<OrderByExpression>();
-                    _uniqueColumns = new HashSet<string>();
+                    _uniqueColumns = new HashSet<String>();
                 }
-                for (int i = newOrderings.Count - 1; i >= 0; i--)
+                for (Int32 i = newOrderings.Count - 1; i >= 0; i--)
                 {
                     var ordering = newOrderings[i];
                     ColumnExpression column = ordering.Expression as ColumnExpression;
                     if (column != null)
                     {
-                        string hash = column.Alias + ":" + column.Name;
+                        String hash = column.Alias + ":" + column.Name;
                         if (!_uniqueColumns.Contains(hash))
                         {
                             _gatheredOrderings.Insert(0, ordering);
@@ -168,7 +168,7 @@ namespace Oinq.Core
                 if (column == null || (existingAliases != null && existingAliases.Contains(column.Alias)))
                 {
                     // check to see if a declared column already contains a similar expression
-                    int iOrdinal = 0;
+                    Int32 iOrdinal = 0;
                     foreach (ColumnDeclaration decl in existingColumns)
                     {
                         ColumnExpression declColumn = decl.Expression as ColumnExpression;
@@ -189,7 +189,7 @@ namespace Oinq.Core
                             newColumns = new List<ColumnDeclaration>(existingColumns);
                             existingColumns = newColumns;
                         }
-                        string colName = column != null ? column.Name : "c" + iOrdinal;
+                        String colName = column != null ? column.Name : "c" + iOrdinal;
                         newColumns.Add(new ColumnDeclaration(colName, ordering.Expression));
                         expr = new ColumnExpression(expr.Type, alias, colName);
                     }

@@ -48,7 +48,7 @@ namespace Oinq.Core
             }
 
             // public methods
-            public override object GetValue(Int32 index)
+            public override Object GetValue(Int32 index)
             {
                 if (index >= 0)
                 {
@@ -72,12 +72,12 @@ namespace Oinq.Core
                 }
             }
 
-            object IEnumerator.Current
+            Object IEnumerator.Current
             {
                 get { return Current; }
             }
 
-            public bool MoveNext()
+            public Boolean MoveNext()
             {
                 _currentIndex++;
                 return (_currentIndex < _reader.Count);

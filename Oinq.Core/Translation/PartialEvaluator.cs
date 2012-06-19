@@ -34,7 +34,7 @@ namespace Oinq.Core
         }
 
         // private static methods
-        private static bool CanBeEvaluatedLocally(Expression expression, IQueryProvider queryProvider)
+        private static Boolean CanBeEvaluatedLocally(Expression expression, IQueryProvider queryProvider)
         {
             // any operation on a query can't be done locally
             var constantExpression = expression as ConstantExpression;

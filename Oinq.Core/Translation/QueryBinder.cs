@@ -52,7 +52,7 @@ namespace Oinq.Core
             {
                 case ExpressionType.MemberInit:
                     MemberInitExpression min = (MemberInitExpression)source;
-                    for (int i = 0, n = min.Bindings.Count; i < n; i++)
+                    for (Int32 i = 0, n = min.Bindings.Count; i < n; i++)
                     {
                         MemberAssignment assign = min.Bindings[i] as MemberAssignment;
                         if (assign != null && MembersMatch(assign.Member, node.Member))
@@ -65,7 +65,7 @@ namespace Oinq.Core
                     NewExpression nex = (NewExpression)source;
                     if (nex.Members != null)
                     {
-                        for (int i = 0, n = nex.Members.Count; i < n; i++)
+                        for (Int32 i = 0, n = nex.Members.Count; i < n; i++)
                         {
                             if (MembersMatch(nex.Members[i], node.Member))
                             {
@@ -455,7 +455,7 @@ namespace Oinq.Core
                     }
                     goto default;
                 default:
-                    throw new Exception(string.Format("The expression of type '{0}' is not a sequence", node.Type));
+                    throw new Exception(String.Format("The expression of type '{0}' is not a sequence", node.Type));
             }
         }
 
