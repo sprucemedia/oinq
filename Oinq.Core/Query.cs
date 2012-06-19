@@ -58,16 +58,8 @@ namespace Oinq.Core
             _provider = provider;
             _expression = expression;
         }
-
         // public methods
-        /// <summary>
-        /// Gets the Pig query that will be sent to the server when this LINQ query is executed.
-        /// </summary>
-        /// <returns>The Pig query.</returns>
-        public String GetPigQuery()
-        {
-            return ((QueryProvider)_provider).BuildQueryText(this);
-        }
+        
 
         /// <summary>
         /// Gets an enumerator for the results of an Pig LINQ query.
@@ -79,7 +71,16 @@ namespace Oinq.Core
         }
 
         /// <summary>
-        /// Returns a textual representation of the Oinq.Query.
+        /// Gets the Pig query that will be sent to the server when this LINQ query is executed.
+        /// </summary>
+        /// <returns>The Pig query.</returns>
+        public String GetPigQuery()
+        {
+            return ((QueryProvider)_provider).BuildQueryText(this);
+        }
+
+        /// <summary>
+        /// Returns a textual representation of the Query.
         /// </summary>
         /// <returns>The String.</returns>
         public override String ToString()

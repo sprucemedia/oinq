@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Collections;
 
 namespace Oinq.Core
 {
     /// <summary>
-    /// An implementation of IQueryProvider for querying a Pig data _source.
+    /// An implementation of IQueryProvider for querying a Pig data source.
     /// </summary>
     public class QueryProvider : IQueryProvider
     {
@@ -30,7 +30,7 @@ namespace Oinq.Core
 
         // public properties
         /// <summary>
-        /// Gets the data _source.
+        /// Gets the data source.
         /// </summary>
         public IDataFile Source
         {

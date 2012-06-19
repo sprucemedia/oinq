@@ -11,11 +11,11 @@ namespace Oinq.Core
         /// Returns an isntance of IQueryable{{T}} for an IDataFile.
         /// </summary>
         /// <typeparam name="T">The type of records in an IDataFile.</typeparam>
-        /// <param name="edgeMart">The IDataFile.</param>
+        /// <param name="dataFile">The IDataFile.</param>
         /// <returns>An instance of IQueryable{{T}} for an IDataFile.</returns>
-        public static IQueryable<T> AsQueryable<T>(this IDataFile edgeMart)
+        public static IQueryable<T> AsQueryable<T>(this IDataFile dataFile)
         {
-            var provider = new QueryProvider(edgeMart);
+            var provider = new QueryProvider(dataFile);
             return new Query<T>(provider);
         }
     }

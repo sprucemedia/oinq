@@ -46,7 +46,6 @@
     <Compile Include="Expressions\AliasedExpression.cs" />
     <Compile Include="Expressions\ColumnDeclaration.cs" />
     <Compile Include="Expressions\ColumnExpression.cs" />
-    <Compile Include="Expressions\ExpressionParameterReplacer.cs" />
     <Compile Include="Expressions\IsNullExpression.cs" />
     <Compile Include="Expressions\SourceExpression.cs" />
     <Compile Include="Expressions\PigExpression.cs" />
