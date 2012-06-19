@@ -141,7 +141,7 @@ namespace Oinq.Core
 
         protected virtual Expression VisitScalar(ScalarExpression node)
         {
-            var select = (SelectExpression)this.Visit(node.Select);
+            var select = (SelectExpression)Visit(node.Select);
             if (select != node.Select)
             {
                 return new ScalarExpression(node.Type, select);
@@ -179,7 +179,7 @@ namespace Oinq.Core
             SelectExpression select = (SelectExpression)Visit(node.Select);
             if (select != node.Select)
             {
-                return this.VisitScalar((ScalarExpression)node);
+                return VisitScalar((ScalarExpression)node);
             }
             return node;
         }

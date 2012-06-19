@@ -181,10 +181,10 @@ namespace Oinq.Core
             switch (aggregateName)
             {
                 case "Average":
-                    this.Write("AVG");
+                    Write("AVG");
                     break;
                 default:
-                    this.Write(aggregateName.ToLower());
+                    Write(aggregateName.ToLower());
                     break;
             }
         }
@@ -211,7 +211,7 @@ namespace Oinq.Core
                         ColumnExpression c = VisitValue(column.Expression) as ColumnExpression;
                         if (!String.IsNullOrEmpty(column.Name))
                         {
-                            this.WriteAsColumnName(column.Name);
+                            WriteAsColumnName(column.Name);
                         }
                     }
                 }
@@ -324,23 +324,23 @@ namespace Oinq.Core
         {
             if (value == null)
             {
-                this.Write("NULL");
+                Write("NULL");
             }
             else if (value.GetType().IsEnum)
             {
-                this.Write(Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())));
+                Write(Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())));
             }
             else
             {
                 switch (Type.GetTypeCode(value.GetType()))
                 {
                     case TypeCode.Boolean:
-                        this.Write(((Boolean)value) ? 1 : 0);
+                        Write(((Boolean)value) ? 1 : 0);
                         break;
                     case TypeCode.String:
-                        this.Write("'");
-                        this.Write(value);
-                        this.Write("'");
+                        Write("'");
+                        Write(value);
+                        Write("'");
                         break;
                     case TypeCode.Object:
                         throw new NotSupportedException(String.Format("The constant for '{0}' is not supported", value));
@@ -351,10 +351,10 @@ namespace Oinq.Core
                         {
                             str += ".0";
                         }
-                        this.Write(str);
+                        Write(str);
                         break;
                     default:
-                        this.Write(value);
+                        Write(value);
                         break;
                 }
             }
@@ -371,7 +371,7 @@ namespace Oinq.Core
             }
             else if (RequiresAsteriskWhenNoArgument(node.AggregateName))
             {
-                this.Write("*");
+                Write("*");
             }
             Write(")");
             return node;
@@ -419,21 +419,21 @@ namespace Oinq.Core
                     case "Multiply":
                     case "Divide":
                     case "Remainder":
-                        this.Write("(");
-                        this.VisitValue(node.Arguments[0]);
-                        this.Write(" ");
-                        this.Write(GetOperator(node.Method.Name));
-                        this.Write(" ");
-                        this.VisitValue(node.Arguments[1]);
-                        this.Write(")");
+                        Write("(");
+                        VisitValue(node.Arguments[0]);
+                        Write(" ");
+                        Write(GetOperator(node.Method.Name));
+                        Write(" ");
+                        VisitValue(node.Arguments[1]);
+                        Write(")");
                         return node;
                     case "Negate":
-                        this.Write("-");
-                        this.Visit(node.Arguments[0]);
-                        this.Write("");
+                        Write("-");
+                        Visit(node.Arguments[0]);
+                        Write("");
                         return node;
                     case "Compare":
-                        this.Visit(Expression.Condition(
+                        Visit(Expression.Condition(
                             Expression.Equal(node.Arguments[0], node.Arguments[1]),
                             Expression.Constant(0),
                             Expression.Condition(
@@ -446,26 +446,26 @@ namespace Oinq.Core
             }
             else if (node.Method.Name == "ToString" && node.Object.Type == typeof(string))
             {
-                return this.Visit(node.Object);  // no op
+                return Visit(node.Object);  // no op
             }
             else if (node.Method.Name == "Equals")
             {
                 if (node.Method.IsStatic && node.Method.DeclaringType == typeof(object))
                 {
-                    this.Write("(");
-                    this.Visit(node.Arguments[0]);
-                    this.Write(" = ");
-                    this.Visit(node.Arguments[1]);
-                    this.Write(")");
+                    Write("(");
+                    Visit(node.Arguments[0]);
+                    Write(" = ");
+                    Visit(node.Arguments[1]);
+                    Write(")");
                     return node;
                 }
                 else if (!node.Method.IsStatic && node.Arguments.Count == 1 && node.Arguments[0].Type == node.Object.Type)
                 {
-                    this.Write("(");
-                    this.Visit(node.Object);
-                    this.Write(" = ");
-                    this.Visit(node.Arguments[0]);
-                    this.Write(")");
+                    Write("(");
+                    Visit(node.Object);
+                    Write(" = ");
+                    Visit(node.Arguments[0]);
+                    Write(")");
                     return node;
                 }
             }

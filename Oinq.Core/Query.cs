@@ -62,9 +62,9 @@ namespace Oinq.Core
         
 
         /// <summary>
-        /// Gets an enumerator for the results of an Pig LINQ query.
+        /// Gets an _enumerator for the results of an Pig LINQ query.
         /// </summary>
-        /// <returns>An enumerator for the results of an Pig LINQ query.</returns>
+        /// <returns>An _enumerator for the results of an Pig LINQ query.</returns>
         public IEnumerator<T> GetEnumerator()
         {
             return ((IEnumerable<T>)_provider.Execute(_expression)).GetEnumerator();

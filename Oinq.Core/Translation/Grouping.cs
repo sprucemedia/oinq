@@ -38,7 +38,7 @@ namespace Oinq.Core
 
         // public methods
         /// <summary>
-        /// Gets an enumerator of elements.
+        /// Gets an _enumerator of elements.
         /// </summary>
         /// <returns></returns>
         public IEnumerator<TElement> GetEnumerator()

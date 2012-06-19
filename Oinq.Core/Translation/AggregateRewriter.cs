@@ -49,11 +49,11 @@ namespace Oinq.Core
         protected override Expression VisitAggregateSubquery(AggregateSubqueryExpression node)
         {
             Expression mapped;
-            if (this._map.TryGetValue(node, out mapped))
+            if (_map.TryGetValue(node, out mapped))
             {
                 return mapped;
             }
-            return this.Visit(node.AggregateAsSubquery);
+            return Visit(node.AggregateAsSubquery);
         }
 
         class AggregateGatherer : PigExpressionVisitor

@@ -4,34 +4,38 @@ using System.Linq.Expressions;
 namespace Oinq.Core
 {
     /// <summary>
-    /// Returns the set of all aliases produced by a query source
+    /// Returns the set of all _aliases produced by a query source
     /// </summary>
     internal class AliasesProduced : PigExpressionVisitor
     {
-        HashSet<SourceAlias> aliases;
+        // private fields
+        private HashSet<SourceAlias> _aliases;
 
+        // constructors
         private AliasesProduced()
         {
-            this.aliases = new HashSet<SourceAlias>();
+            _aliases = new HashSet<SourceAlias>();
         }
 
+        // internal static methods
         internal static HashSet<SourceAlias> Gather(Expression source)
         {
             AliasesProduced produced = new AliasesProduced();
             produced.Visit(source);
-            return produced.aliases;
+            return produced._aliases;
         }
 
+        // protected methods
         protected override Expression VisitSelect(SelectExpression select)
         {
-            this.aliases.Add(select.Alias);
+            _aliases.Add(select.Alias);
             return select;
         }
 
         protected override Expression VisitSource(Expression node)
         {
             var file = node as SourceExpression;
-            this.aliases.Add(file.Alias);
+            _aliases.Add(file.Alias);
             return node;
         }
     }

@@ -57,7 +57,7 @@ namespace Oinq.Core
 
         protected override Expression VisitSelect(SelectExpression node)
         {
-            if (this._selectsToRemove.Contains(node))
+            if (_selectsToRemove.Contains(node))
             {
                 return Visit(node.From);
             }

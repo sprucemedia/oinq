@@ -139,7 +139,7 @@ namespace Oinq.Core
 
         private void ClearColumnsUsed(SourceAlias alias)
         {
-            this._allColumnsUsed[alias] = new HashSet<String>();
+            _allColumnsUsed[alias] = new HashSet<String>();
         }
     }
 }
