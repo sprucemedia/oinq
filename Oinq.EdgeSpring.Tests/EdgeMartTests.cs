@@ -81,5 +81,19 @@ namespace Oinq.EdgeSpring.Tests
             Assert.AreEqual(String.Format("http://{0}:{1}/remote", SERVER_NAME, DEFAULT_PORT.ToString()), em.AbsoluteUri.ToString());
             
         }
+
+        [Test]
+        public void it_can_handle_a_path_to_the_edgemart()
+        {
+            // Arrange
+            var edgeMartPath = "folder/mart";
+            var esUrl = new Url(String.Format("http://{0}:{1}/remote?edgemart={2}", SERVER_NAME, DEFAULT_PORT.ToString(), edgeMartPath));
+
+            // Act
+            var em = new EdgeMart<Object>(esUrl);
+
+            // Assert
+            Assert.AreEqual(edgeMartPath, em.AbsolutePath);
+        }
     }
 }

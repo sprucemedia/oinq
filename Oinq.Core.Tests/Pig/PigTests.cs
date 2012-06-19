@@ -244,8 +244,6 @@ namespace Oinq.Core.Tests
             // Assert
             Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FILTER t1 BY (sum(Mea1) > 5); t3 = FOREACH t2 GENERATE Dim1 AS Dimension, sum(Mea1) AS Total; dump t3; ", queryText);
         }
-
-
     }
 
     [TestFixture]
