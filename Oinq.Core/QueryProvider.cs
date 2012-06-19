@@ -123,7 +123,7 @@ namespace Oinq.Core
             Type elementType = TypeHelper.GetElementType(expression.Type);
             return Activator.CreateInstance(
                 typeof(ProjectionReader<>).MakeGenericType(elementType),
-                BindingFlags.CreateInstance, null,
+                BindingFlags.Instance | BindingFlags.NonPublic, null,
                 new object[] { reader, projector },
                 null
                 );

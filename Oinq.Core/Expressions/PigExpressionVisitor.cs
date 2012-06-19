@@ -9,7 +9,7 @@ namespace Oinq.Core
     /// <summary>
     /// Represents an Pig-specific implementation of ExpressionVisitor.
     /// </summary>
-    public class PigExpressionVisitor : ExpressionVisitor
+    internal class PigExpressionVisitor : ExpressionVisitor
     {
         // protected override methods
         protected override Expression Visit(Expression node)

@@ -5,7 +5,7 @@ namespace Oinq.Core
     /// <summary>
     /// Represents an order by clause.
     /// </summary>
-    public class OrderByExpression
+    internal class OrderByExpression
     {
         // private fields
         private Expression _key;
@@ -17,17 +17,17 @@ namespace Oinq.Core
         /// </summary>
         /// <param name="key">An expression identifying the key of the order by clause.</param>
         /// <param name="direction">The direction of the order by clause.</param>
-        public OrderByExpression(Expression key, OrderByDirection direction)
+        internal OrderByExpression(Expression key, OrderByDirection direction)
         {
             _key = key;
             _direction = direction;
         }
 
-        // public properties
+        // internal properties
         /// <summary>
         /// Gets the expression identifying the key of the order by clause.
         /// </summary>
-        public Expression Expression
+        internal Expression Expression
         {
             get { return _key; }
         }
@@ -35,7 +35,7 @@ namespace Oinq.Core
         /// <summary>
         /// Gets the direction of the order by clause.
         /// </summary>
-        public OrderByDirection Direction
+        internal OrderByDirection Direction
         {
             get { return _direction; }
         }

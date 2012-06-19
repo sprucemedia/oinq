@@ -1,6 +1,6 @@
 ﻿namespace Oinq.Core.Expressions
 {
-    public enum AggregateType
+    internal enum AggregateType
     {
         Count,
         Min,

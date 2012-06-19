@@ -4,15 +4,15 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    public class RedundantSubqueryRemover : PigExpressionVisitor
+    internal class RedundantSubqueryRemover : PigExpressionVisitor
     {
         // constructors
         private RedundantSubqueryRemover()
         {
         }
 
-        // public static methods
-        public static Expression Remove(Expression expression)
+        // internal static methods
+        internal static Expression Remove(Expression expression)
         {
             return new RedundantSubqueryRemover().Visit(expression);
         }
@@ -127,8 +127,8 @@ namespace Oinq.Core
             {
             }
 
-            // public static methods
-            public static List<SelectExpression> Gather(Expression source)
+            // internal static methods
+            internal static List<SelectExpression> Gather(Expression source)
             {
                 RedundantSubqueryGatherer gatherer = new RedundantSubqueryGatherer();
                 gatherer.Visit(source);

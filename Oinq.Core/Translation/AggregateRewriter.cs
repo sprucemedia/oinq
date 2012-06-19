@@ -8,7 +8,7 @@ namespace Oinq.Core
     /// <summary>
     /// Rewrite node expressions, moving them into same select expression that has the group-by clause.
     /// </summary>
-    public class AggregateRewriter : PigExpressionVisitor
+    internal class AggregateRewriter : PigExpressionVisitor
     {
         // private fields
         private ILookup<SourceAlias, AggregateSubqueryExpression> _lookup;
@@ -21,8 +21,8 @@ namespace Oinq.Core
             _lookup = AggregateGatherer.Gather(expression).ToLookup(a => a.GroupByAlias);
         }
 
-        // public static fields
-        public static Expression Rewrite(Expression expression)
+        // internal static fields
+        internal static Expression Rewrite(Expression expression)
         {
             return new AggregateRewriter(expression).Visit(expression);
         }
@@ -66,8 +66,8 @@ namespace Oinq.Core
             {
             }
 
-            // public static fields
-            public static List<AggregateSubqueryExpression> Gather(Expression expression)
+            // internal static fields
+            internal static List<AggregateSubqueryExpression> Gather(Expression expression)
             {
                 AggregateGatherer gatherer = new AggregateGatherer();
                 gatherer.Visit(expression);

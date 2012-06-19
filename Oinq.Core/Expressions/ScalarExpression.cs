@@ -2,9 +2,9 @@
 
 namespace Oinq.Core
 {
-    public class ScalarExpression : SubqueryExpression
+    internal class ScalarExpression : SubqueryExpression
     {
-        public ScalarExpression(Type type, SelectExpression select)
+        internal ScalarExpression(Type type, SelectExpression select)
             : base(PigExpressionType.Scalar, type, select)
         {
         }

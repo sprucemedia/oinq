@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Collections.Generic;
 
 namespace Oinq.Core
 {
@@ -32,22 +32,23 @@ namespace Oinq.Core
         }
 
         // public properties
-        public ReadOnlyCollection<ColumnDeclaration> Columns
-        {
-            get { return _columns.AsReadOnly(); }
-        }
-
         public String CommandText
         {
             get { return PigFormatter.Format(this); }
         }
 
-        public Stack CommandStack
+        // internal properties
+        internal ReadOnlyCollection<ColumnDeclaration> Columns
+        {
+            get { return _columns.AsReadOnly(); }
+        }
+
+        internal Stack CommandStack
         {
             get { return _commandStack; }
         }
 
-        public ReadOnlyCollection<Expression> GroupBy
+        internal ReadOnlyCollection<Expression> GroupBy
         {
             get { return _groupBy; }
         }
@@ -55,7 +56,7 @@ namespace Oinq.Core
         /// <summary>
         /// Gets a list of Expressions that defines the sort order (or null if not specified).
         /// </summary>
-        public ReadOnlyCollection<OrderByExpression> OrderBy
+        internal ReadOnlyCollection<OrderByExpression> OrderBy
         {
             get { return _orderBy; }
         }
@@ -63,7 +64,7 @@ namespace Oinq.Core
         /// <summary>
         /// Gets the Expression that defines the projection (or null if not specified).
         /// </summary>
-        public LambdaExpression Projection
+        internal LambdaExpression Projection
         {
             get { return _projection; }
         }
@@ -71,7 +72,7 @@ namespace Oinq.Core
         /// <summary>
         /// Gets the Expression that defines how many documents to take (or null if not specified);
         /// </summary>
-        public Expression Take
+        internal Expression Take
         {
             get { return _take; }
         }
@@ -79,7 +80,7 @@ namespace Oinq.Core
         /// <summary>
         /// Gets the Expression that defines the where clause (or null if not specified).
         /// </summary>
-        public Expression Where
+        internal Expression Where
         {
             get { return _where; }
         }
@@ -88,7 +89,7 @@ namespace Oinq.Core
         /// Translates a LINQ query expression tree.
         /// </summary>
         /// <param name="expression">The LINQ query expression tree.</param>
-        public void Translate(Expression expression)
+        internal void Translate(Expression expression)
         {
             // when we reach the original Query<T>, we're done
             var sourceExpression = expression as SourceExpression;
@@ -159,29 +160,6 @@ namespace Oinq.Core
 
             var message = string.Format("Don't know how to translate expression: {0}.", expression.NodeType.ToString());
             throw new NotSupportedException(message);
-        }
-
-        private Int32 ToInt32(Expression expression)
-        {
-            if (expression.Type != typeof(int))
-            {
-                throw new ArgumentOutOfRangeException("expression", "Expected an Expression of Type Int32.");
-            }
-            var constantExpression = expression as ConstantExpression;
-            if (constantExpression == null)
-            {
-                throw new ArgumentOutOfRangeException("expression", "Expected a ConstantExpression.");
-            }
-            return (Int32)constantExpression.Value;
-        }
-
-        private static Expression StripQuote(Expression node)
-        {
-            while (node.NodeType == ExpressionType.Quote)
-            {
-                node = ((UnaryExpression)node).Operand;
-            }
-            return node;
         }
     }
 }

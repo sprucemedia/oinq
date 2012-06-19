@@ -2,7 +2,10 @@
 
 namespace Oinq.Core
 {
-    public abstract class AliasedExpression : PigExpression
+    /// <summary>
+    /// Abstract type representing a Pig expression with an alias.
+    /// </summary>
+    internal abstract class AliasedExpression : PigExpression
     {
         private SourceAlias _alias;
 
@@ -13,20 +16,24 @@ namespace Oinq.Core
             _alias = alias;
         }
 
-        // public properties
-        public SourceAlias Alias
+        // internal properties
+        internal SourceAlias Alias
         {
             get { return _alias; }
         }
     }
 
-    public class SourceAlias
+    /// <summary>
+    /// Represents an alias on the data source.
+    /// </summary>
+    internal class SourceAlias
     {
         // constructors
-        public SourceAlias()
+        internal SourceAlias()
         {
         }
 
+        // internal properties
         public override string ToString()
         {
             return "A:" + GetHashCode();

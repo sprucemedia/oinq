@@ -3,7 +3,10 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    public class AggregateExpression : PigExpression
+    /// <summary>
+    /// Represents an aggregate expression.
+    /// </summary>
+    internal class AggregateExpression : PigExpression
     {
         // private fields
         private String _aggregateName;
@@ -11,7 +14,7 @@ namespace Oinq.Core
         private Boolean _isDistinct;
 
         // constructors
-        public AggregateExpression(Type type, String aggregateName, Expression argument, Boolean isDistinct)
+        internal AggregateExpression(Type type, String aggregateName, Expression argument, Boolean isDistinct)
             : base(PigExpressionType.Aggregate, type)
         {
             _aggregateName = aggregateName;
@@ -19,18 +22,18 @@ namespace Oinq.Core
             _isDistinct = isDistinct;
         }
 
-        // public properties
-        public String AggregateName
+        // internal properties
+        internal String AggregateName
         {
             get { return _aggregateName; }
         }
 
-        public Expression Argument
+        internal Expression Argument
         {
             get { return _argument; }
         }
 
-        public Boolean IsDistinct
+        internal Boolean IsDistinct
         {
             get { return _isDistinct; }
         }

@@ -3,7 +3,10 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    public class AggregateSubqueryExpression : PigExpression
+    /// <summary>
+    /// Represents an aggregate subquery expression.
+    /// </summary>
+    internal class AggregateSubqueryExpression : PigExpression
     {
         // private fields
         private SubqueryExpression _aggregateAsSubquery;
@@ -11,7 +14,7 @@ namespace Oinq.Core
         private SourceAlias _groupByAlias;
 
         // constructor
-        public AggregateSubqueryExpression(SourceAlias groupByAlias, Expression aggregateInGroupSelect, ScalarExpression aggregateAsSubquery)
+        internal AggregateSubqueryExpression(SourceAlias groupByAlias, Expression aggregateInGroupSelect, ScalarExpression aggregateAsSubquery)
             : base(PigExpressionType.AggregateSubquery, aggregateAsSubquery.Type)
         {
             _aggregateInGroupSelect = aggregateInGroupSelect;
@@ -19,18 +22,18 @@ namespace Oinq.Core
             _aggregateAsSubquery = aggregateAsSubquery;
         }
 
-        // public properties
-        public SourceAlias GroupByAlias
+        // internal properties
+        internal SourceAlias GroupByAlias
         {
             get { return _groupByAlias; }
         }
 
-        public Expression AggregateInGroupSelect
+        internal Expression AggregateInGroupSelect
         {
             get { return _aggregateInGroupSelect; }
         }
 
-        public SubqueryExpression AggregateAsSubquery
+        internal SubqueryExpression AggregateAsSubquery
         {
             get { return _aggregateAsSubquery; }
         }

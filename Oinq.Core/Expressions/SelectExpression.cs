@@ -4,7 +4,10 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    public class SelectExpression : AliasedExpression
+    /// <summary>
+    /// Represents a select Pig query.
+    /// </summary>
+    internal class SelectExpression : AliasedExpression
     {
         // private fields
         private ReadOnlyCollection<ColumnDeclaration> _columns;
@@ -15,20 +18,20 @@ namespace Oinq.Core
         private Expression _where;
 
         // constructors
-        public SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
+        internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
             Expression from, Expression where)
             : this(alias, columns, from, where, null, null)
         {
         }
 
-        public SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
+        internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
             Expression from, Expression where, IEnumerable<OrderByExpression> orderBy, 
             IEnumerable<Expression> groupBy)
             : this(alias, columns, from, where, orderBy, groupBy, null)
         {
         }
 
-        public SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
+        internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
             Expression from, Expression where, IEnumerable<OrderByExpression> orderBy,
             IEnumerable<Expression> groupBy, Expression take)
             : base(PigExpressionType.Select, typeof(void), alias)
@@ -53,33 +56,33 @@ namespace Oinq.Core
             _where = where;
         }
 
-        // public properties
-        public ReadOnlyCollection<ColumnDeclaration> Columns
+        // internal properties
+        internal ReadOnlyCollection<ColumnDeclaration> Columns
         {
             get { return _columns; }
         }
 
-        public Expression From
+        internal Expression From
         {
             get { return _from; }
         }
 
-        public ReadOnlyCollection<Expression> GroupBy
+        internal ReadOnlyCollection<Expression> GroupBy
         {
             get { return _groupBy; }
         }
 
-        public ReadOnlyCollection<OrderByExpression> OrderBy
+        internal ReadOnlyCollection<OrderByExpression> OrderBy
         {
             get { return _orderBy; }
         }
 
-        public Expression Take
+        internal Expression Take
         {
             get { return _take; }
         }
 
-        public Expression Where
+        internal Expression Where
         {
             get { return _where; }
         }

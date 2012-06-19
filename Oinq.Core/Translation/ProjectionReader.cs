@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Oinq.Core
 {
-    public class ProjectionReader<T> : IEnumerable<T>, IEnumerable
+    internal class ProjectionReader<T> : IEnumerable<T>, IEnumerable
     {
         Enumerator enumerator;
 
-        public ProjectionReader(IList reader, Func<ProjectionRow, T> projector)
+        internal ProjectionReader(IList reader, Func<ProjectionRow, T> projector)
         {
             this.enumerator = new Enumerator(reader, projector);
         }
@@ -38,7 +36,7 @@ namespace Oinq.Core
             Int32 _currentIndex;
             Func<ProjectionRow, T> _projector;
 
-            public Enumerator(IList reader, Func<ProjectionRow, T> projector)
+            internal Enumerator(IList reader, Func<ProjectionRow, T> projector)
             {
                 this._reader = reader;
                 this._projector = projector;

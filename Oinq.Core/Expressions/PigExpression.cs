@@ -3,7 +3,10 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
-    public abstract class PigExpression : Expression
+    /// <summary>
+    /// Abstract class representing a Pig query.
+    /// </summary>
+    internal abstract class PigExpression : Expression
     {
         // private fields
         private ExpressionType _nodeType;
@@ -17,7 +20,7 @@ namespace Oinq.Core
             _type = type;
         }
 
-        // public override properties
+        // internal override properties
         public override ExpressionType NodeType
         {
             get { return _nodeType; }

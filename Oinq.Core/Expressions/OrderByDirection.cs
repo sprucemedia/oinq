@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the direction of an order by clause.
     /// </summary>
-    public enum OrderByDirection
+    internal enum OrderByDirection
     {
         /// <summary>
         /// Ascending order.
