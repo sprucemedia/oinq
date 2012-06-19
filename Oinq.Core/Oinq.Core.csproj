@@ -68,6 +68,7 @@
     <Compile Include="Translation\Grouping.cs" />
     <Compile Include="Translation\OrderByRewriter.cs" />
     <Compile Include="Translation\ProjectionBuilder.cs" />
+    <Compile Include="Translation\ProjectionReader.cs" />
     <Compile Include="Translation\ProjectionRow.cs" />
     <Compile Include="Translation\Projector.cs" />
     <Compile Include="Translation\Nominator.cs" />

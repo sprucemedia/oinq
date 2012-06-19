@@ -97,4 +97,68 @@ namespace Oinq.Core.Tests
             Assert.AreSame(_expression, query.Expression);
         }
     }
+
+    public class When_projecting_query_results : QueryProviderTestBase
+    {
+        private Expression _expression;
+        private QueryProvider _provider;
+        private IEnumerable<Object> _fakeResults;
+
+        [TestFixtureSetUp]
+        public void FixtureSetup()
+        {
+            var fakeResults = new List<Object>();
+            fakeResults.Add(new AttributedFakeData { Dim1 = "Test", Mea1 = 5 });
+            fakeResults.Add(new AttributedFakeData { Dim1 = "Test", Mea1 = 15 });
+            fakeResults.Add(new AttributedFakeData { Dim1 = "Test 2", Mea1 = 25 });
+            fakeResults.Add(new AttributedFakeData { Dim1 = "Test 3", Mea1 = 10 });
+            fakeResults.Add(new AttributedFakeData { Dim1 = "Test 4", Mea1 = 20 });
+            fakeResults.Add(new AttributedFakeData { Dim1 = "Test 5", Mea1 = 30 });
+            _fakeResults = (IEnumerable<Object>)fakeResults;
+        }
+
+        [SetUp]
+        public override void Setup()
+        {
+            base.Setup();
+            _expression = Source.AsQueryable<AttributedFakeData>().Expression;
+            _provider = new FakeQueryProvider(Source, _fakeResults);
+        }
+
+        [Test]
+        public void it_can_project_to_a_generic_collection_of_source_type()
+        {
+            // Act
+            var results = (IEnumerable<AttributedFakeData>)_provider.Execute(_expression);
+
+            // Assert
+            Assert.IsNotNull(results);
+            Assert.IsInstanceOf<IEnumerable<AttributedFakeData>>(results);
+        }
+
+        [Test]
+        public void it_can_project_to_a_collection_of_source_type()
+        {
+            // Act
+            var results = (IEnumerable)_provider.Execute(_expression);
+
+            // Assert
+            Assert.IsNotNull(results);
+            Assert.IsInstanceOf<IEnumerable>(results);
+        }
+
+        [Test]
+        public void it_can_project_to_a_collection_of_anonymous_type()
+        {
+            // Arrange
+            var expression = Source.AsQueryable<AttributedFakeData>().Select(f => new { Dim = f.Dim1, Mea = f.Mea1 });
+
+            // Act
+            var results = (IEnumerable)_provider.Execute(expression.Expression);
+
+            // Assert
+            Assert.IsNotNull(results);
+            Assert.IsInstanceOf<IEnumerable>(results);
+        }
+    }
 }

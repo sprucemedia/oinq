@@ -37,7 +37,6 @@ namespace Oinq.Core
             get { return _columns.AsReadOnly(); }
         }
 
-
         public String CommandText
         {
             get { return PigFormatter.Format(this); }

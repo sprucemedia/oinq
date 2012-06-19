@@ -401,8 +401,6 @@ namespace Oinq.Core
             return Visit(source);
         }
 
-
-
         private Expression BindWhere(Type resultType, Expression source, LambdaExpression predicate)
         {
             ProjectionExpression projection = (ProjectionExpression)Visit(source);

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Collections;
 
 namespace Oinq.Core
 {
@@ -115,7 +116,17 @@ namespace Oinq.Core
                 throw new ArgumentNullException("expression");
             }
             var translatedQuery = QueryTranslator.Translate(this, expression);
-            return Execute(translatedQuery);
+            Delegate projector = ((SelectQuery)translatedQuery).Projection.Compile();
+
+            var reader = (IList)Execute(translatedQuery);
+
+            Type elementType = TypeHelper.GetElementType(expression.Type);
+            return Activator.CreateInstance(
+                typeof(ProjectionReader<>).MakeGenericType(elementType),
+                BindingFlags.CreateInstance, null,
+                new object[] { reader, projector },
+                null
+                );
         }
 
         // protected methods

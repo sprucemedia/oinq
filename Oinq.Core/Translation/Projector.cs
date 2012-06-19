@@ -8,7 +8,7 @@ namespace Oinq.Core
     /// <summary>
     /// Projector is a visitor that splits an expression representing the result of a query into
     /// two parts, a list of column declarations of expressions that must be evaluated on the server
-    /// and a projector expression that describes how to combine the columns back into the result object.
+    /// and a _projector expression that describes how to combine the columns back into the result object.
     /// </summary>
     internal class Projector : PigExpressionVisitor
     {
