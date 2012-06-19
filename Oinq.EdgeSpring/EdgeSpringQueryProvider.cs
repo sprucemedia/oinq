@@ -15,7 +15,7 @@ namespace Oinq.EdgeSpring
 
         protected override Object Execute(TranslatedQuery translatedQuery)
         {
-            Query esQuery = new Query("abc");
+            Query esQuery = new Query(((SelectQuery)translatedQuery).CommandText);
             QueryResponse response = QueryRequest.SendQuery(((EdgeMart)Source).AbsoluteUri, esQuery);
 
             return response.Result.Records;
