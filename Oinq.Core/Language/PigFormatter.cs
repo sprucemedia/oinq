@@ -16,6 +16,7 @@ namespace Oinq.Core
         private StringBuilder _sb;
         private Int32 _aliasCount;
         private Dictionary<String, String> _mappings;
+        private List<String> _ignores;
 
         // constructors
         private PigFormatter()
@@ -27,7 +28,7 @@ namespace Oinq.Core
         internal static String Format(SelectQuery query)
         {
             PigFormatter formatter = new PigFormatter();
-            formatter._mappings = formatter.GetMappings(query.SourceType);
+            formatter.SetAttributes(query.SourceType);
             formatter.WriteLoad(query.Source);
             foreach (SelectExpression ex in query.CommandStack)
             {
@@ -226,14 +227,17 @@ namespace Oinq.Core
                 for (Int32 i = 0, n = columns.Count; i < n; i++)
                 {
                     ColumnDeclaration column = columns[i];
-                    if (i > 0)
+                    if (!_ignores.Contains(column.Name))
                     {
-                        Write(", ");
-                    }
-                    ColumnExpression c = VisitValue(column.Expression) as ColumnExpression;
-                    if (!String.IsNullOrEmpty(column.Name))
-                    {
-                        this.WriteAsColumnName(column.Name);
+                        if (i > 0)
+                        {
+                            Write(", ");
+                        }
+                        ColumnExpression c = VisitValue(column.Expression) as ColumnExpression;
+                        if (!String.IsNullOrEmpty(column.Name))
+                        {
+                            this.WriteAsColumnName(column.Name);
+                        }
                     }
                 }
             }
@@ -542,21 +546,40 @@ namespace Oinq.Core
         }
 
         // private methods
-        private Dictionary<String, String> GetMappings(Type sourceType)
+        private void SetAttributes(Type sourceType)
         {
             // Get all properties that are in the source type.
             PropertyInfo[] sourceProperties = sourceType.GetProperties();
-            Dictionary<String, String> mappings = new Dictionary<String, String>();
+            SetMappings(sourceProperties);
+            SetIgnores(sourceProperties);
+        }
+
+        private void SetMappings(PropertyInfo[] sourceProperties)
+        {
+            _mappings = new Dictionary<String, String>();
 
             foreach (PropertyInfo property in sourceProperties)
             {
                 Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigMapping), true);
                 foreach (Object attribute in mappingAttributes)
                 {
-                    mappings.Add(property.Name, ((PigMapping)attribute).Name);
+                    _mappings.Add(property.Name, ((PigMapping)attribute).Name);
                 }
             }
-            return mappings;
+        }
+
+        private void SetIgnores(PropertyInfo[] sourceProperties)
+        {
+            _ignores = new List<String>();
+
+            foreach (PropertyInfo property in sourceProperties)
+            {
+                Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigIgnore), true);
+                foreach (Object attribute in mappingAttributes)
+                {
+                    _ignores.Add(property.Name);
+                }
+            }
         }
     }
 }

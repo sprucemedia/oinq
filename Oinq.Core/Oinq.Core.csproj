@@ -58,6 +58,7 @@
     <Compile Include="Expressions\SubqueryExpression.cs" />
     <Compile Include="IDataFile.cs" />
     <Compile Include="Language\PigFormatter.cs" />
+    <Compile Include="Language\PigIgnoreAttribute.cs" />
     <Compile Include="Language\PigMappingAttribute.cs" />
     <Compile Include="LinqExtensionMethods.cs" />
     <Compile Include="Expressions\ExpressionVisitor.cs" />

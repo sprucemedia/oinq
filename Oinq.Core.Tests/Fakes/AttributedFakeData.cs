@@ -11,5 +11,11 @@ namespace Oinq.Core.Tests
         public String Dim1 { get; set; }
         [PigMapping("measure")]
         public Int32 Mea1 { get; set; }
+        [PigIgnore()]
+        public Int32 Calc
+        {
+            get { return Mea1 * 2; }
+            private set { }
+        }
     }
 }
