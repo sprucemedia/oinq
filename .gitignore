@@ -1,20 +1,31 @@
-# Visual Studio artifacts
-bin
-obj
 *.obj
-*.exe
 *.pdb
 *.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
 *.suo
-
-# NUnit artifacts
-TestResult.xml
-
-# Nuget package repositories
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+ClientBin
+[Bb]in
+[Dd]ebug*/
+*.lib
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+Examples*/
+SerializerTest*/
+*.csproj.user
+*.resharper*
+Download/
 packages
-
-# Resharper artifacts
-_ReSharper.*
-
-# Nupkg artifacts
-*.nupkg

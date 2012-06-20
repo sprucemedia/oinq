@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oinq.Core", "Oinq.Core\Oinq
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D89CC65F-7D04-418D-8211-D3E8322BA3C5}"
 	ProjectSection(SolutionItems) = preProject
-		NuGet.Config = NuGet.Config
+		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
@@ -25,7 +25,6 @@ Global
 		{EC368E29-EA75-4540-9486-7761AA40DBD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EC368E29-EA75-4540-9486-7761AA40DBD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC368E29-EA75-4540-9486-7761AA40DBD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC368E29-EA75-4540-9486-7761AA40DBD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
