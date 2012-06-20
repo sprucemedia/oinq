@@ -6,8 +6,15 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
+    /// <summary>
+    /// Interface for accessing Pig query text.
+    /// </summary>
     public interface IPigQueryable
     {
+        /// <summary>
+        /// Gets the Pig query text.
+        /// </summary>
+        /// <returns></returns>
         String GetPigQuery();
     }
 

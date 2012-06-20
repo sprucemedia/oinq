@@ -129,28 +129,29 @@ namespace Oinq.Core
 
         protected class BindResult
         {
-            ReadOnlyCollection<ColumnDeclaration> columns;
-            ReadOnlyCollection<OrderByExpression> orderings;
+            private ReadOnlyCollection<ColumnDeclaration> _columns;
+            private ReadOnlyCollection<OrderByExpression> _orderings;
+
             public BindResult(IEnumerable<ColumnDeclaration> columns, IEnumerable<OrderByExpression> orderings)
             {
-                columns = columns as ReadOnlyCollection<ColumnDeclaration>;
-                if (columns == null)
+                _columns = columns as ReadOnlyCollection<ColumnDeclaration>;
+                if (_columns == null)
                 {
-                    columns = new List<ColumnDeclaration>(columns).AsReadOnly();
+                    _columns = new List<ColumnDeclaration>(columns).AsReadOnly();
                 }
-                orderings = orderings as ReadOnlyCollection<OrderByExpression>;
-                if (orderings == null)
+                _orderings = orderings as ReadOnlyCollection<OrderByExpression>;
+                if (_orderings == null)
                 {
-                    orderings = new List<OrderByExpression>(orderings).AsReadOnly();
+                    _orderings = new List<OrderByExpression>(orderings).AsReadOnly();
                 }
             }
             public ReadOnlyCollection<ColumnDeclaration> Columns
             {
-                get { return columns; }
+                get { return _columns; }
             }
             public ReadOnlyCollection<OrderByExpression> Orderings
             {
-                get { return orderings; }
+                get { return _orderings; }
             }
         }
 

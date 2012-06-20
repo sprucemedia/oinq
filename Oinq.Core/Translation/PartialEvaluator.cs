@@ -24,7 +24,7 @@ namespace Oinq.Core
         /// Performs evaluation and replacement of independent sub-trees.
         /// </summary>
         /// <param name="expression">The root of the expression tree.</param>
-        /// <param name="canBeEvaluated">Whether the expression can be evaluated locally.</param>
+        /// <param name="queryProvider">The query provider.</param>
         /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         internal static Expression Evaluate(Expression expression, IQueryProvider queryProvider)
         {

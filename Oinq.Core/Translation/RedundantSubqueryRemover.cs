@@ -106,7 +106,7 @@ namespace Oinq.Core
             SelectExpression fromSelect = select.From as SelectExpression;
             if (fromSelect == null || select.Columns.Count != fromSelect.Columns.Count)
                 return false;
-            // test that all columns in 'select' are refering to columns in the same position
+            // test that all _columns in 'select' are refering to _columns in the same position
             // in 'fromSelect'.
             for (Int32 i = 0, n = select.Columns.Count; i < n; i++)
             {

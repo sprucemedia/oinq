@@ -18,7 +18,7 @@ namespace Oinq.Core
         /// <summary>
         /// Initializes a new instance of the QueryProvider class.
         /// </summary>
-        /// <param name="_source">The data _source being queried.</param>
+        /// <param name="source">The data source being queried.</param>
         public QueryProvider(IDataFile source)
         {
             if (source == null)
@@ -131,6 +131,11 @@ namespace Oinq.Core
 
         // protected methods
         // Overridden in subclasses
+        /// <summary>
+        /// Executes a query.
+        /// </summary>
+        /// <param name="translatedQuery">The TranslatedQuery.</param>
+        /// <returns>The query result.</returns>
         protected virtual Object Execute(TranslatedQuery translatedQuery)
         {
             throw new NotImplementedException();

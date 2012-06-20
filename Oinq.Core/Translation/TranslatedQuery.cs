@@ -15,7 +15,7 @@ namespace Oinq.Core
         /// <summary>
         /// Initializes a new instance of the TranslatedQuery class.
         /// </summary>
-        /// <param name="_source">The data _source being queried.</param>
+        /// <param name="source">The data _source being queried.</param>
         /// <param name="sourceType">The _source type being queried.</param>
         protected TranslatedQuery(IDataFile source, Type sourceType)
         {

@@ -7,6 +7,9 @@ using System.Linq.Expressions;
 
 namespace Oinq.Core
 {
+    /// <summary>
+    /// Represents a LINQ select-style query that has been translated to a Pig query.
+    /// </summary>
     public class SelectQuery : TranslatedQuery
     {
         private LambdaExpression _aggregator;
@@ -22,7 +25,7 @@ namespace Oinq.Core
         /// <summary>
         /// Initializes a new instance of the SelectQuery class.
         /// </summary>
-        /// <param name="collection">The data source being queried.</param>
+        /// <param name="source">The data source being queried.</param>
         /// <param name="sourceType">The source type.</param>
         public SelectQuery(IDataFile source, Type sourceType)
             : base(source, sourceType)
@@ -32,6 +35,9 @@ namespace Oinq.Core
         }
 
         // public properties
+        /// <summary>
+        /// Pig-based command text for the query.
+        /// </summary>
         public String CommandText
         {
             get { return PigFormatter.Format(this); }

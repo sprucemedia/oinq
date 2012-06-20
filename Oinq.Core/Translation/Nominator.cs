@@ -6,7 +6,7 @@ namespace Oinq.Core
 {
     /// <summary>
     /// Nominator is a class that walks an expression tree bottom-up, determining the set of
-    /// candidate expressions that are possible columns of a select expression.
+    /// candidate expressions that are possible _columns of a select expression.
     /// </summary>
     internal class Nominator : PigExpressionVisitor
     {

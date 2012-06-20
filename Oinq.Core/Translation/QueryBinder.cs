@@ -8,7 +8,7 @@ namespace Oinq.Core
 {
     /// <summary>
     /// QueryBinder is a visitor that converts method calls to LINQ operations into
-    /// custom PigExpression nodes and references to class members into references to columns.
+    /// custom PigExpression nodes and references to class members into references to _columns.
     /// </summary>
     internal class QueryBinder : ExpressionVisitor
     {
@@ -228,7 +228,7 @@ namespace Oinq.Core
             if (!argumentWasPredicate && _groupByMap.TryGetValue(projection, out info))
             {
                 // use the element expression from the group-by info to rebind the argument so the resulting expression is one that
-                // would be legal to add to the columns in the select expression that has the corresponding group-by clause.
+                // would be legal to add to the _columns in the select expression that has the corresponding group-by clause.
                 if (argument != null)
                 {
                     _map[argument.Parameters[0]] = info.Element;
@@ -273,7 +273,7 @@ namespace Oinq.Core
             // make duplicate of source query as basis of element subquery by visiting the source again
             ProjectionExpression subqueryBasis = VisitSequence(source);
 
-            // recompute key columns for group expressions relative to subquery (need these for doing the correlation predicate)
+            // recompute key _columns for group expressions relative to subquery (need these for doing the correlation predicate)
             _map[keySelector.Parameters[0]] = subqueryBasis.Projector;
             Expression subqueryKey = Visit(keySelector.Body);
 

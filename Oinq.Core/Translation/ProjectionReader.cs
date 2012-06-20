@@ -36,7 +36,6 @@ namespace Oinq.Core
         {
             // private fields
             private IList _reader;
-            private T _current;
             private Int32 _currentIndex;
             private Func<ProjectionRow, T> _projector;
 
