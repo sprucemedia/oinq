@@ -8,8 +8,8 @@
     <ProjectGuid>{0E6AB5DD-CAE7-45AC-A0ED-46A8D4566684}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Oinq.Core</RootNamespace>
-    <AssemblyName>Oinq.Core</AssemblyName>
+    <RootNamespace>Oinq</RootNamespace>
+    <AssemblyName>Oinq</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -29,7 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Oinq.Core.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\Oinq.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
