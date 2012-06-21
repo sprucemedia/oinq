@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Returns the set of all _aliases produced by a query source

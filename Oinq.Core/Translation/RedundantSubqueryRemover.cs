@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     internal class RedundantSubqueryRemover : PigExpressionVisitor
     {

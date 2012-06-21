@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Represents an order by clause.

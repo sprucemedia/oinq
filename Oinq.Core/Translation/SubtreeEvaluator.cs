@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Evaluates and replaces sub-trees when first candidate is reached (top-down)

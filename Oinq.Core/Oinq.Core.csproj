@@ -66,6 +66,7 @@
     <Compile Include="Translation\AliasesProduced.cs" />
     <Compile Include="Translation\GroupByInfo.cs" />
     <Compile Include="Translation\Grouping.cs" />
+    <Compile Include="Translation\ITranslatedQuery.cs" />
     <Compile Include="Translation\OrderByRewriter.cs" />
     <Compile Include="Translation\ProjectionBuilder.cs" />
     <Compile Include="Translation\ProjectionReader.cs" />

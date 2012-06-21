@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Formats the query text for consumption by Pig.
@@ -25,28 +25,34 @@ namespace Oinq.Core
         }
 
         // internal methods
-        internal static String Format(SelectQuery query)
+        internal static String Format(TranslatedQuery query)
         {
+            SelectQuery selectQuery = query as SelectQuery;
+            if (selectQuery == null)
+            {
+                throw new ArgumentException("The query parameter must be assignable to SelectQuery.", "query");
+            }
+
             PigFormatter formatter = new PigFormatter();
             formatter.SetAttributes(query.SourceType);
             formatter.WriteLoad(query.Source);
-            foreach (SelectExpression ex in query.CommandStack)
+            foreach (SelectExpression ex in selectQuery.CommandStack)
             {
                 if (ex.Where != null)
                 {
-                    formatter.WriteFilter(query.Where);
+                    formatter.WriteFilter(selectQuery.Where);
                 }
                 if (ex.GroupBy != null)
                 {
-                    formatter.WriteGroupBy(query.GroupBy);
+                    formatter.WriteGroupBy(selectQuery.GroupBy);
                 }
                 if (ex.OrderBy != null)
                 {
-                    formatter.WriteOrderBy(query.OrderBy);
+                    formatter.WriteOrderBy(selectQuery.OrderBy);
                 }
             }
-            formatter.WriteGenerate(query.Columns);
-            formatter.WriteOutput(query.Take, formatter.GetLastAliasName());
+            formatter.WriteGenerate(selectQuery.Columns);
+            formatter.WriteOutput(selectQuery.Take, formatter.GetLastAliasName());
             return formatter._sb.ToString();
         }
 

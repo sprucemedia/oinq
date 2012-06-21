@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Abstract type representing a Pig expression with an alias.

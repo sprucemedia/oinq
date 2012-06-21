@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Represents a collection of objects that have a common key.

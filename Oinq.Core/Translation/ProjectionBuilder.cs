@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Oinq.Core
+namespace Oinq
 {
     internal class ProjectionBuilder : PigExpressionVisitor
     {

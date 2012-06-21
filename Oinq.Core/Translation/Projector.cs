@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Projector is a visitor that splits an expression representing the result of a query into

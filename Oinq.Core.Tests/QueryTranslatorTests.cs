@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace Oinq.Core.Tests
+namespace Oinq.Tests
 {
     [TestFixture]
     public class When_translating_a_query_with_the_translator

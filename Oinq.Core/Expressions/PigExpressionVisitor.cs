@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Represents an Pig-specific implementation of ExpressionVisitor.

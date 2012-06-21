@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Static class that contains the Pig Linq extension methods.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Type-related helper methods

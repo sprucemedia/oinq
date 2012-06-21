@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using NUnit.Framework;
 using Rhino.Mocks;
 
-namespace Oinq.Core.Tests
+namespace Oinq.Tests
 {
     [TestFixture]
     public class When_creating_a_new_Query_instance

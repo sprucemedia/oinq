@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq.Core.Tests
+namespace Oinq.Tests
 {
     public class FakeData
     {

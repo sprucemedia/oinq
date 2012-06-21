@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Oinq.Core.Tests
+namespace Oinq.Tests
 {
     public class FakeQueryProvider : QueryProvider
     {

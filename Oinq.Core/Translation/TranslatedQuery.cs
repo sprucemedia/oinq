@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Represents a LINQ query that has been translated to a Pig query.
     /// </summary>
-    public abstract class TranslatedQuery
+    public abstract class TranslatedQuery : ITranslatedQuery
     {
         // private fields
         private IDataFile _source;
@@ -24,6 +24,14 @@ namespace Oinq.Core
         }
 
         // public properties
+        /// <summary>
+        /// Pig-based command text for the query.
+        /// </summary>
+        public String CommandText
+        {
+            get { return PigFormatter.Format(this); }
+        }
+
         /// <summary>
         /// Gets the data _source being queried.
         /// </summary>

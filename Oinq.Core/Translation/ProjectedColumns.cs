@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     internal sealed class ProjectedColumns
     {

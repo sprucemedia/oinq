@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Oinq.Core
+namespace Oinq
 {
     internal class ProjectionReader<T> : IEnumerable<T>, IEnumerable
     {

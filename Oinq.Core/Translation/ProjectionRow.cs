@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Represents a row in the query result set.

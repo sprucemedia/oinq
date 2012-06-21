@@ -1,4 +1,4 @@
-﻿namespace Oinq.Core.Expressions
+﻿namespace Oinq.Expressions
 {
     internal enum AggregateType
     {

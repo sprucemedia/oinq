@@ -1,4 +1,4 @@
-﻿namespace Oinq.Core
+﻿namespace Oinq
 {
     internal enum PigExpressionType
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Interface to represent a Pig data source.

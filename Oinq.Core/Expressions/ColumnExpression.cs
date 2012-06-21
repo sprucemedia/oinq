@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// A custom expression node that represents a reference to a column in a query.

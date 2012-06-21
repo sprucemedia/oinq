@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// Represents a LINQ select-style query that has been translated to a Pig query.
@@ -32,15 +32,6 @@ namespace Oinq.Core
         {
             _commandStack = new Stack();
             _columns = new List<ColumnDeclaration>();
-        }
-
-        // public properties
-        /// <summary>
-        /// Pig-based command text for the query.
-        /// </summary>
-        public String CommandText
-        {
-            get { return PigFormatter.Format(this); }
         }
 
         // internal properties

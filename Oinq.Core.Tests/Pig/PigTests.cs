@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Rhino.Mocks;
 
-namespace Oinq.Core.Tests
+namespace Oinq.Tests
 {
     [TestFixture]
     public class When_building_query_command_text

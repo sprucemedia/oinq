@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Rhino.Mocks;
 
-namespace Oinq.Core.Tests.Pig
+namespace Oinq.Tests.Pig
 {
     [TestFixture]
     public class When_building_query_command_text_with_attributed_fields

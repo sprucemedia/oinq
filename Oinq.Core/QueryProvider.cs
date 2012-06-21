@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// An implementation of IQueryProvider for querying a Pig data source.
@@ -136,7 +136,7 @@ namespace Oinq.Core
         /// </summary>
         /// <param name="translatedQuery">The TranslatedQuery.</param>
         /// <returns>The query result.</returns>
-        protected virtual Object Execute(TranslatedQuery translatedQuery)
+        protected virtual Object Execute(ITranslatedQuery translatedQuery)
         {
             throw new NotImplementedException();
         }

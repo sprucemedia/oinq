@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// QueryBinder is a visitor that converts method calls to LINQ operations into

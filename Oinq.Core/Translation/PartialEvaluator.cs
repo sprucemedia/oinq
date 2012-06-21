@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Linq;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// A static class with methods to partially evaluate an Expression.

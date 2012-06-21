@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq.Core
+namespace Oinq
 {
     internal class ScalarExpression : SubqueryExpression
     {

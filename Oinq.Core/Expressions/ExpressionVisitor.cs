@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Oinq.Core
+namespace Oinq
 {
     /// <summary>
     /// An abstract base class for an Expression visitor.
