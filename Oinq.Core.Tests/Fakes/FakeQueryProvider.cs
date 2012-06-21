@@ -13,10 +13,9 @@ namespace Oinq.Tests
             _results = results;
         }
 
-        protected override Object Execute(TranslatedQuery translatedQuery)
+        protected override Object Execute(ITranslatedQuery translatedQuery)
         {
             return _results;
         }
-
     }
 }
