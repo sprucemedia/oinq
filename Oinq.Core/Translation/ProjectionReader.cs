@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Oinq
 {
-    internal class ProjectionReader<T> : IEnumerable<T>, IEnumerable
+    internal class ProjectionReader<T> : IEnumerable<T>, IEnumerable, IDisposable
     {
         // private fields
         private Enumerator _enumerator;
@@ -30,6 +30,14 @@ namespace Oinq
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        /// <summary>
+        /// Disposes of class.
+        /// </summary>
+        public void Dispose()
+        {
+            _enumerator.Dispose();
         }
 
         class Enumerator : ProjectionRow, IEnumerator<T>, IEnumerator, IDisposable

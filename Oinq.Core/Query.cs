@@ -22,7 +22,7 @@ namespace Oinq
     /// An implementation IQueryable{{T}} for querying a data file.
     /// </summary>
     /// <typeparam name="T">The type of facts being queried.</typeparam>
-    public class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IPigQueryable
+    public sealed class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IPigQueryable
     {
         // private fields
         private IQueryProvider _provider;
