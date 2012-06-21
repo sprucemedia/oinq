@@ -12,7 +12,6 @@ namespace Oinq
     /// </summary>
     public class SelectQuery : TranslatedQuery
     {
-        private LambdaExpression _aggregator;
         private Expression _where;
         private ReadOnlyCollection<OrderByExpression> _orderBy;
         private LambdaExpression _projection;
@@ -122,11 +121,9 @@ namespace Oinq
             // try projection
             ProjectionExpression projectionExpression = expression as ProjectionExpression;
             _projection = new ProjectionBuilder().Build(projectionExpression.Projector);
-            _aggregator = projectionExpression.Aggregator;
             if (projectionExpression != null)
             {
                 _projection = new ProjectionBuilder().Build(projectionExpression.Projector);
-                _aggregator = projectionExpression.Aggregator;
                 Translate(projectionExpression.Source);
                 NewExpression anonymous = projectionExpression.Projector as NewExpression;
                 if (anonymous != null && anonymous.Members != null)

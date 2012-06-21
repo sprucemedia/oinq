@@ -14,7 +14,6 @@ namespace Oinq
     {
         // private fields
         private Dictionary<ParameterExpression, Expression> _map;
-        private IQueryProvider _provider;
         private Expression _root;
         private List<OrderByExpression> _thenBys;
         private Dictionary<Expression, GroupByInfo> _groupByMap;
@@ -23,7 +22,6 @@ namespace Oinq
         // constructors
         private QueryBinder(IQueryProvider provider, Expression root)
         {
-            _provider = provider;
             _map = new Dictionary<ParameterExpression, Expression>();
             _groupByMap = new Dictionary<Expression, GroupByInfo>();
             _root = root;
@@ -209,7 +207,6 @@ namespace Oinq
             }
 
             var alias = GetNextAlias();
-            var pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
             Expression aggExpr = new AggregateExpression(returnType, aggName, argExpr, isDistinct);
             SelectExpression select = new SelectExpression(alias, new ColumnDeclaration[] { new ColumnDeclaration("", aggExpr) }, projection.Source, null);
 
@@ -382,7 +379,6 @@ namespace Oinq
         {
             ProjectionExpression projection = VisitSequence(source);
             take = Visit(take);
-            SelectExpression select = projection.Source;
             var alias = GetNextAlias();
             ProjectedColumns pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
             return new ProjectionExpression(
@@ -413,7 +409,7 @@ namespace Oinq
                 pc.Projector);
         }
 
-        private Expression BuildPredicateWithNullsEqual(IEnumerable<Expression> source1, IEnumerable<Expression> source2)
+        private static Expression BuildPredicateWithNullsEqual(IEnumerable<Expression> source1, IEnumerable<Expression> source2)
         {
             IEnumerator<Expression> en1 = source1.GetEnumerator();
             IEnumerator<Expression> en2 = source2.GetEnumerator();
@@ -441,7 +437,7 @@ namespace Oinq
             }
         }
 
-        private ProjectionExpression ConvertToSequence(Expression node)
+        private static ProjectionExpression ConvertToSequence(Expression node)
         {
             switch (node.NodeType)
             {
@@ -459,12 +455,12 @@ namespace Oinq
             }
         }
 
-        private String GetColumnName(MemberInfo member)
+        private static String GetColumnName(MemberInfo member)
         {
             return member.Name;
         }
 
-        private Type GetColumnType(MemberInfo member)
+        private static Type GetColumnType(MemberInfo member)
         {
             FieldInfo fi = member as FieldInfo;
             if (fi != null)
@@ -475,22 +471,22 @@ namespace Oinq
             return pi.PropertyType;
         }
 
-        private IEnumerable<MemberInfo> GetMappedMembers(Type rowType)
+        private static IEnumerable<MemberInfo> GetMappedMembers(Type rowType)
         {
             return rowType.GetProperties().Cast<MemberInfo>();
         }
 
-        private SourceAlias GetNextAlias()
+        private static SourceAlias GetNextAlias()
         {
             return new SourceAlias();
         }
 
-        private String GetTableName(Type rowType)
+        private static String GetTableName(Type rowType)
         {
             return rowType.Name;
         }
 
-        private ProjectionExpression GetTableProjection(Type rowType)
+        private static ProjectionExpression GetTableProjection(Type rowType)
         {
             var sourceAlias = GetNextAlias();
             var selectAlias = GetNextAlias();
@@ -505,7 +501,6 @@ namespace Oinq
             }
 
             Expression projector = Expression.MemberInit(Expression.New(rowType), bindings);
-            Type resultType = typeof(IEnumerable<>).MakeGenericType(rowType);
             return new ProjectionExpression(
                 new SelectExpression(
                     selectAlias,
@@ -515,17 +510,17 @@ namespace Oinq
                 projector);
         }
 
-        private Boolean HasPredicateArg(String aggregateType)
+        private static Boolean HasPredicateArg(String aggregateType)
         {
             return aggregateType == "Count";
         }
 
-        private Boolean IsTable(Expression expression)
+        private static Boolean IsTable(Expression expression)
         {
             return expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Query<>);
         }
 
-        private Expression MakeMember(Expression source, MemberInfo mi)
+        private static Expression MakeMember(Expression source, MemberInfo mi)
         {
             FieldInfo fi = mi as FieldInfo;
             if (fi != null)
@@ -536,7 +531,7 @@ namespace Oinq
             return Expression.Property(source, pi);
         }
 
-        private Boolean MembersMatch(MemberInfo a, MemberInfo b)
+        private static Boolean MembersMatch(MemberInfo a, MemberInfo b)
         {
             if (a == b)
             {

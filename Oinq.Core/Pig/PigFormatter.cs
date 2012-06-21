@@ -214,7 +214,7 @@ namespace Oinq
                         {
                             Write(", ");
                         }
-                        ColumnExpression c = VisitValue(column.Expression) as ColumnExpression;
+                        VisitValue(column.Expression);
                         if (!String.IsNullOrEmpty(column.Name))
                         {
                             WriteAsColumnName(column.Name);
@@ -291,7 +291,7 @@ namespace Oinq
                     {
                         Write(", ");
                     }
-                    ColumnExpression c = VisitValue(orderBy.Expression) as ColumnExpression;
+                    VisitValue(orderBy.Expression);
                     WriteOrderByDirection(orderBy.Direction);
                 }
                 Write("; ");
@@ -527,7 +527,7 @@ namespace Oinq
             foreach (PropertyInfo property in sourceProperties)
             {
                 Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigIgnore), true);
-                foreach (Object attribute in mappingAttributes)
+                if (mappingAttributes != null && mappingAttributes.Length > 0)
                 {
                     _ignores.Add(property.Name);
                 }

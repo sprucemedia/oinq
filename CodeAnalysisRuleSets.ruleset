@@ -1,4 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="CodeAnalysisRuleSets" ToolsVersion="10.0">
   <Include Path="minimumrecommendedrules.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1800" Action="Warning" />
+    <Rule Id="CA1802" Action="Warning" />
+    <Rule Id="CA1804" Action="Warning" />
+    <Rule Id="CA1809" Action="Warning" />
+    <Rule Id="CA1810" Action="Warning" />
+    <Rule Id="CA1811" Action="Warning" />
+    <Rule Id="CA1812" Action="Warning" />
+    <Rule Id="CA1813" Action="Warning" />
+    <Rule Id="CA1814" Action="Warning" />
+    <Rule Id="CA1815" Action="Warning" />
+    <Rule Id="CA1819" Action="Warning" />
+    <Rule Id="CA1820" Action="Warning" />
+    <Rule Id="CA1821" Action="Warning" />
+    <Rule Id="CA1822" Action="Warning" />
+    <Rule Id="CA1823" Action="Warning" />
+    <Rule Id="CA1824" Action="Warning" />
+  </Rules>
 </RuleSet>

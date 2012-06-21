@@ -38,7 +38,7 @@ namespace Oinq
         }
 
         // private methods
-        private Expression EvaluateSubtree(Expression e)
+        private static Expression EvaluateSubtree(Expression e)
         {
             if (e.NodeType == ExpressionType.Constant)
             {

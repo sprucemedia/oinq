@@ -55,7 +55,6 @@ namespace Oinq
         protected virtual Expression VisitAggregateSubquery(AggregateSubqueryExpression node)
         {
             Expression e = Visit(node.AggregateAsSubquery);
-            System.Diagnostics.Debug.Assert(e is ScalarExpression);
             var subquery = (ScalarExpression)e;
             if (subquery != node.AggregateAsSubquery)
             {

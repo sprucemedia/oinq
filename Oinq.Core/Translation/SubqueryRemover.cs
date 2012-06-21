@@ -19,19 +19,9 @@ namespace Oinq
         }
 
         // internal static methods
-        internal static SelectExpression Remove(SelectExpression outerSelect, params SelectExpression[] selectsToRemove)
-        {
-            return Remove(outerSelect, (IEnumerable<SelectExpression>)selectsToRemove);
-        }
-
         internal static SelectExpression Remove(SelectExpression outerSelect, IEnumerable<SelectExpression> selectsToRemove)
         {
             return (SelectExpression)new SubqueryRemover(selectsToRemove).Visit(outerSelect);
-        }
-
-        internal static ProjectionExpression Remove(ProjectionExpression projection, params SelectExpression[] selectsToRemove)
-        {
-            return Remove(projection, (IEnumerable<SelectExpression>)selectsToRemove);
         }
 
         internal static ProjectionExpression Remove(ProjectionExpression projection, IEnumerable<SelectExpression> selectsToRemove)

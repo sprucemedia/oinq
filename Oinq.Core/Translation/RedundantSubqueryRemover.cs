@@ -79,15 +79,6 @@ namespace Oinq
         }
 
         // private static methods
-        private static Boolean CanMergeWithFrom(SelectExpression node)
-        {
-            SelectExpression fromSelect = node.From as SelectExpression;
-            if (fromSelect == null) return false;
-            return (ProjectionIsSimple(fromSelect) || ProjectionIsNameMapOnly(fromSelect))
-                && (fromSelect.OrderBy == null || fromSelect.OrderBy.Count == 0)
-                && (fromSelect.GroupBy == null || fromSelect.GroupBy.Count == 0);
-        }
-
         private static Boolean ProjectionIsSimple(SelectExpression select)
         {
             foreach (ColumnDeclaration decl in select.Columns)

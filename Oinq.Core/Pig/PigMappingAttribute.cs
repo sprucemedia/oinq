@@ -5,7 +5,7 @@ namespace Oinq
     /// <summary>
     /// Attribute used for mapping field names to Pig query field names.
     /// </summary>
-    public class PigMapping : Attribute
+    public sealed class PigMapping : Attribute
     {
         // private fields
         private String _name;

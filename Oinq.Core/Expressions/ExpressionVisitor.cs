@@ -432,7 +432,7 @@ namespace Oinq
         }
 
         // protected methods
-        protected BinaryExpression UpdateBinary(BinaryExpression node, Expression left, Expression right, 
+        protected static BinaryExpression UpdateBinary(BinaryExpression node, Expression left, Expression right, 
             Expression conversion, Boolean isLiftedToNull, MethodInfo method)
         {
             if (node.Left != left || node.Right != right || node.Conversion != conversion || 
@@ -450,7 +450,7 @@ namespace Oinq
             return node;
         }
 
-        protected ConditionalExpression UpdateConditional(ConditionalExpression node, Expression test, 
+        protected static ConditionalExpression UpdateConditional(ConditionalExpression node, Expression test, 
             Expression ifTrue, Expression ifFalse)
         {
             if (node.Test != test || node.IfTrue != ifTrue || node.IfFalse != ifFalse)
@@ -460,7 +460,7 @@ namespace Oinq
             return node;
         }
 
-        protected InvocationExpression UpdateInvocation(InvocationExpression node, Expression expression, IEnumerable<Expression> args)
+        protected static InvocationExpression UpdateInvocation(InvocationExpression node, Expression expression, IEnumerable<Expression> args)
         {
             if (node.Arguments != args || node.Expression != expression)
             {
@@ -469,7 +469,7 @@ namespace Oinq
             return node;
         }
 
-        protected LambdaExpression UpdateLambda(LambdaExpression node, Type delegateType, Expression body, 
+        protected static LambdaExpression UpdateLambda(LambdaExpression node, Type delegateType, Expression body, 
             IEnumerable<ParameterExpression> parameters)
         {
             if (node.Body != body || node.Parameters != parameters || node.Type != delegateType)
@@ -479,7 +479,7 @@ namespace Oinq
             return node;
         }
 
-        protected ListInitExpression UpdateListInit(ListInitExpression node, NewExpression nex, IEnumerable<ElementInit> initializers)
+        protected static ListInitExpression UpdateListInit(ListInitExpression node, NewExpression nex, IEnumerable<ElementInit> initializers)
         {
             if (node.NewExpression != nex || node.Initializers != initializers)
             {
@@ -488,7 +488,7 @@ namespace Oinq
             return node;
         }
 
-        protected Expression UpdateMember(MemberExpression node, Expression expression, MemberInfo member)
+        protected static Expression UpdateMember(MemberExpression node, Expression expression, MemberInfo member)
         {
             if (node.Expression != expression || node.Member != member)
             {
@@ -497,7 +497,7 @@ namespace Oinq
             return node;
         }
 
-        protected MemberAssignment UpdateMemberAssignment(MemberAssignment assignment, MemberInfo member, Expression expression)
+        protected static MemberAssignment UpdateMemberAssignment(MemberAssignment assignment, MemberInfo member, Expression expression)
         {
             if (assignment.Expression != expression || member != assignment.Member)
             {
@@ -506,7 +506,7 @@ namespace Oinq
             return assignment;
         }
 
-        protected MemberInitExpression UpdateMemberInit(MemberInitExpression node, NewExpression nex, 
+        protected static MemberInitExpression UpdateMemberInit(MemberInitExpression node, NewExpression nex, 
             IEnumerable<MemberBinding> bindings)
         {
             if (node.NewExpression != nex || node.Bindings != bindings)
@@ -516,7 +516,7 @@ namespace Oinq
             return node;
         }
 
-        protected MemberListBinding UpdateMemberListBinding(MemberListBinding binding, MemberInfo member, 
+        protected static MemberListBinding UpdateMemberListBinding(MemberListBinding binding, MemberInfo member, 
             IEnumerable<ElementInit> initializers)
         {
             if (binding.Initializers != initializers || binding.Member != member)
@@ -526,7 +526,7 @@ namespace Oinq
             return binding;
         }
 
-        protected MemberMemberBinding UpdateMemberMemberBinding(MemberMemberBinding binding, MemberInfo member, 
+        protected static MemberMemberBinding UpdateMemberMemberBinding(MemberMemberBinding binding, MemberInfo member, 
             IEnumerable<MemberBinding> bindings)
         {
             if (binding.Bindings != bindings || binding.Member != member)
@@ -536,7 +536,7 @@ namespace Oinq
             return binding;
         }
 
-        protected MethodCallExpression UpdateMethodCall(MethodCallExpression node, Expression obj, 
+        protected static MethodCallExpression UpdateMethodCall(MethodCallExpression node, Expression obj, 
             MethodInfo method, IEnumerable<Expression> args)
         {
             if (node.Object != obj || node.Method != method || node.Arguments != args)
@@ -546,7 +546,7 @@ namespace Oinq
             return node;
         }
 
-        protected NewExpression UpdateNew(NewExpression node, ConstructorInfo constructor, IEnumerable<Expression> args, 
+        protected static NewExpression UpdateNew(NewExpression node, ConstructorInfo constructor, IEnumerable<Expression> args, 
             IEnumerable<MemberInfo> members)
         {
             if (node.Arguments != args || node.Constructor != constructor || node.Members != members)
@@ -563,7 +563,7 @@ namespace Oinq
             return node;
         }
 
-        protected NewArrayExpression UpdateNewArray(NewArrayExpression node, Type arrayType, IEnumerable<Expression> expressions)
+        protected static NewArrayExpression UpdateNewArray(NewArrayExpression node, Type arrayType, IEnumerable<Expression> expressions)
         {
             if (node.Expressions != expressions || node.Type != arrayType)
             {
@@ -579,7 +579,7 @@ namespace Oinq
             return node;
         }
 
-        protected Expression UpdateTypeBinary(TypeBinaryExpression node, Expression expression, Type typeOperand)
+        protected static Expression UpdateTypeBinary(TypeBinaryExpression node, Expression expression, Type typeOperand)
         {
             if (node.Expression != expression || node.TypeOperand != typeOperand)
             {
@@ -587,8 +587,8 @@ namespace Oinq
             }
             return node;
         }
-        
-        protected UnaryExpression UpdateUnary(UnaryExpression node, Expression operand, Type resultType, MethodInfo method)
+
+        protected static UnaryExpression UpdateUnary(UnaryExpression node, Expression operand, Type resultType, MethodInfo method)
         {
             if (node.Operand != operand || node.Type != resultType || node.Method != method)
             {
