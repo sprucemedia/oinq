@@ -14,7 +14,7 @@ namespace Oinq
         /// <summary>
         /// Initializes an instance of PigExtension.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="binderName">Name of the binder class.</param>
         public PigExtension(String binderName)
         {
             _name = binderName;
