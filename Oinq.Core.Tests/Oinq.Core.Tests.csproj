@@ -41,6 +41,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Linq.Dynamic">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.0\lib\net40\System.Linq.Dynamic.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,7 +54,9 @@
     <Compile Include="Fakes\AttributedFakeData.cs" />
     <Compile Include="Fakes\FakeData.cs" />
     <Compile Include="Fakes\FakeDataSource.cs" />
+    <Compile Include="Fakes\FakeExtensions.cs" />
     <Compile Include="Fakes\FakeQueryProvider.cs" />
+    <Compile Include="Fakes\IAddable.cs" />
     <Compile Include="Pig\PigMappingTests.cs" />
     <Compile Include="Pig\PigTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -232,6 +232,19 @@ namespace Oinq.Tests
         }
 
         [Test]
+        public void it_can_group_data_with_an_aggregate_calculation()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f.Mea1, (dimension, measure) => new { Dimension = dimension, Total = measure.Sum() + measure.Sum() });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, (sum(Mea1) + sum(Mea1)) AS Total; dump t2; ", queryText);
+        }
+
+        [Test]
         public void it_can_filter_grouped_data()
         {
             // Arrange
@@ -491,6 +504,50 @@ namespace Oinq.Tests
 
             // Assert
             Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 == 5) OR (Dim1 == 'Fake'));"));
+        }
+    }
+
+    [TestFixture]
+    public class When_using_custom_extension_methods
+    {
+        private String SOURCE_NAME = "FakeData";
+        private const String PATH_NAME = "FakeData";
+        private IDataFile _source;
+        private Query<FakeData> _fakeData;
+
+        [SetUp]
+        public void Setup()
+        {
+            _source = MockRepository.GenerateStub<IDataFile>();
+            _source.Stub(s => s.Name).Return(SOURCE_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
+            _fakeData = new Query<FakeData>(new QueryProvider(_source));
+        }
+
+        [Test]
+        public void it_can_translate_an_aggregate()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dimension, data) => new { Dimension = dimension, Total = data.AddUp() });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, sum(Mea1) AS Total; dump t2; ", queryText);
+        }
+
+        [Test]
+        public void it_can_translate_a_complex_aggregate()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dimension, data) => new { Dimension = dimension, Total = data.AggOp() });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, (sum(Mea1) / sum(Mea1)) AS Total; dump t2; ", queryText);
         }
     }
 }

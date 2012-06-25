@@ -120,7 +120,6 @@ namespace Oinq
 
             // try projection
             ProjectionExpression projectionExpression = expression as ProjectionExpression;
-            _projection = new ProjectionBuilder().Build(projectionExpression.Projector);
             if (projectionExpression != null)
             {
                 _projection = new ProjectionBuilder().Build(projectionExpression.Projector);
@@ -134,14 +133,9 @@ namespace Oinq
                         String colName = anonymous.Members[i].Name;
                         switch (expr.NodeType)
                         {
-                            case (ExpressionType)PigExpressionType.Column:
-                                ColumnExpression col = (ColumnExpression)expr;
-                                _columns.Add(new ColumnDeclaration(colName, col));
+                            default:
+                                _columns.Add(new ColumnDeclaration(colName, expr));
                                 break;
-                            case (ExpressionType)PigExpressionType.Aggregate:
-                                AggregateExpression agg = (AggregateExpression)expr;
-                                _columns.Add(new ColumnDeclaration(colName, agg));
-                                break;                      
                         }
                     }
                 }
