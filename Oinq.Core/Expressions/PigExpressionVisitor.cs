@@ -26,6 +26,8 @@ namespace Oinq
                     return VisitColumn((ColumnExpression)node);
                 case PigExpressionType.Select:
                     return VisitSelect((SelectExpression)node);
+                case PigExpressionType.Join:
+                    return VisitJoin((JoinExpression)node);
                 case PigExpressionType.Aggregate:
                     return VisitAggregate((AggregateExpression)node);
                 case PigExpressionType.Subquery:
@@ -97,6 +99,18 @@ namespace Oinq
             if (expr != node.Expression)
             {
                 return new IsNullExpression(expr);
+            }
+            return node;
+        }
+
+        protected virtual Expression VisitJoin(JoinExpression node)
+        {
+            Expression left = VisitSource(node.Left);
+            Expression right = VisitSource(node.Right);
+            Expression condition = Visit(node.Condition);
+            if (node.Left != left || node.Right != right || node.Condition != condition)
+            {
+                return new JoinExpression(node.Type, left, right, condition);
             }
             return node;
         }
