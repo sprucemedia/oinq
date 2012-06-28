@@ -23,7 +23,7 @@ namespace Oinq
         }
 
         // internal properties
-        internal Expression Condition
+        internal new Expression Condition
         {
             get { return _condition; }
         }
