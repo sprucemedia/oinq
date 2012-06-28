@@ -90,6 +90,10 @@ namespace Oinq
                         return BindWhere(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]));
                     case "Select":
                         return BindSelect(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]));
+                    case "Join":
+                        return BindJoin(
+                            node.Type, node.Arguments[0], node.Arguments[1],
+                            GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]), GetLambda(node.Arguments[4]));
                     case "OrderBy":
                         return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), 
                             OrderByDirection.Ascending);
@@ -339,6 +343,28 @@ namespace Oinq
 
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, projection.Source, null, null, groupExprs),
+                pc.Projector
+                );
+        }
+
+        private Expression BindJoin(Type resultType, Expression outerSource, Expression innerSource,
+            LambdaExpression outerKey, LambdaExpression innerKey, LambdaExpression resultSelector)
+        {
+            ProjectionExpression outerProjection = VisitSequence(outerSource);
+            ProjectionExpression innerProjection = VisitSequence(innerSource);
+            _map[outerKey.Parameters[0]] = outerProjection.Projector;
+            Expression outerKeyExpr = Visit(outerKey.Body);
+            _map[innerKey.Parameters[0]] = innerProjection.Projector;
+            Expression innerKeyExpr = this.Visit(innerKey.Body);
+            _map[resultSelector.Parameters[0]] = outerProjection.Projector;
+            _map[resultSelector.Parameters[1]] = innerProjection.Projector;
+            Expression resultExpr = this.Visit(resultSelector.Body);
+            JoinExpression join = new JoinExpression(resultType, outerProjection.Source, innerProjection.Source, 
+                Expression.Equal(outerKeyExpr, innerKeyExpr));
+            SourceAlias alias = GetNextAlias();
+            ProjectedColumns pc = this.ProjectColumns(resultExpr, alias, outerProjection.Source.Alias, innerProjection.Source.Alias);
+            return new ProjectionExpression(
+                new SelectExpression(alias, pc.Columns, join, null),
                 pc.Projector
                 );
         }
