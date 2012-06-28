@@ -6,6 +6,7 @@
         Column,
         Select,
         Projection,
+        Join,
         IsNull,
         Scalar,
         Aggregate,

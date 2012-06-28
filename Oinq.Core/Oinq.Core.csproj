@@ -55,6 +55,7 @@
     <Compile Include="Expressions\ColumnDeclaration.cs" />
     <Compile Include="Expressions\ColumnExpression.cs" />
     <Compile Include="Expressions\IsNullExpression.cs" />
+    <Compile Include="Expressions\JoinExpression.cs" />
     <Compile Include="Expressions\SourceExpression.cs" />
     <Compile Include="Expressions\PigExpression.cs" />
     <Compile Include="Expressions\PigExpressionType.cs" />
