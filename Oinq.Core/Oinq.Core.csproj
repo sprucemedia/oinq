@@ -71,6 +71,7 @@
     <Compile Include="Pig\PigMappingAttribute.cs" />
     <Compile Include="LinqExtensionMethods.cs" />
     <Compile Include="Expressions\ExpressionVisitor.cs" />
+    <Compile Include="Pig\PigSourceMappingAttribute.cs" />
     <Compile Include="Translation\AggregateRewriter.cs" />
     <Compile Include="Translation\AliasesProduced.cs" />
     <Compile Include="Translation\GroupByInfo.cs" />

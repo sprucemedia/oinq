@@ -3,30 +3,30 @@
 namespace Oinq
 {
     /// <summary>
-    /// Attribute used for mapping field names to Pig query field names.
+    /// Attribute used for mapping data sources to Pig query source names.
     /// </summary>
-    public sealed class PigMapping : Attribute
+    public sealed class PigSourceMapping : Attribute
     {
         // private fields
-        private String _name;
+        private String _path;
 
         // constructors
         /// <summary>
         /// Initializes an instance of PigMapping.
         /// </summary>
         /// <param path="path"></param>
-        public PigMapping(String name)
+        public PigSourceMapping(String path)
         {
-            _name = name;
+            _path = path;
         }
 
         // public properties
         /// <summary>
-        /// Gets the path of the field in the data source.
+        /// Gets the path to the data source.
         /// </summary>
-        public String Name
+        public String Path
         {
-            get { return _name; }
+            get { return _path; }
         }
     }
 }

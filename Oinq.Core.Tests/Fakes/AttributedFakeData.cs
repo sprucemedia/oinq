@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Oinq.Tests
 {
+    [PigSourceMapping("FakeData")]
     public class AttributedFakeData
     {
         [PigMapping("dimension")]

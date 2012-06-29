@@ -21,7 +21,7 @@ namespace Oinq
     /// <summary>
     /// An implementation IQueryable{{T}} for querying a data file.
     /// </summary>
-    /// <typeparam name="T">The type of facts being queried.</typeparam>
+    /// <typeparam path="T">The type of facts being queried.</typeparam>
     public sealed class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IPigQueryable
     {
         // private fields
@@ -32,7 +32,7 @@ namespace Oinq
         /// <summary>
         /// Initializes a new instance of the Query class.
         /// </summary>
-        /// <param name="provider">The query provider.</param>
+        /// <param path="provider">The query provider.</param>
         public Query(IQueryProvider provider)
         {
             if (provider == null)
@@ -46,8 +46,8 @@ namespace Oinq
         /// <summary>
         /// Initializes a new instance of the Query class.
         /// </summary>
-        /// <param name="provider">The query provider.</param>
-        /// <param name="expression">The expression.</param>
+        /// <param path="provider">The query provider.</param>
+        /// <param path="expression">The expression.</param>
         public Query(IQueryProvider provider, Expression expression)
         {
             if (provider == null)

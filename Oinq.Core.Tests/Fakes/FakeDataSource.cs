@@ -9,7 +9,7 @@ namespace Oinq.Tests
     {
         public string Name
         {
-            get { throw new NotImplementedException(); }
+            get { return "FakeData"; }
         }
 
         public string AbsolutePath

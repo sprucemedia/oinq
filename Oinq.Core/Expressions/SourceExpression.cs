@@ -12,8 +12,8 @@ namespace Oinq
         private String _name;
 
         // constructors
-        internal SourceExpression(SourceAlias alias, String name)
-            : base(PigExpressionType.Source, typeof(void), alias)
+        internal SourceExpression(Type sourceType, SourceAlias alias, String name)
+            : base(PigExpressionType.Source, sourceType, alias)
         {
             _name = name;
         }

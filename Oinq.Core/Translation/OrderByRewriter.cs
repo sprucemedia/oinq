@@ -95,7 +95,7 @@ namespace Oinq
         /// Add a sequence of order expressions to an accumulated list, prepending so as
         /// to give precedence to the new expressions over any previous expressions
         /// </summary>
-        /// <param name="newOrderings"></param>
+        /// <param path="newOrderings"></param>
         protected void PrependOrderings(IList<OrderByExpression> newOrderings)
         {
             if (newOrderings != null)

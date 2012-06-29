@@ -18,7 +18,7 @@ namespace Oinq
         /// <summary>
         /// Initializes a new instance of the QueryProvider class.
         /// </summary>
-        /// <param name="source">The data source being queried.</param>
+        /// <param path="source">The data source being queried.</param>
         public QueryProvider(IDataFile source)
         {
             if (source == null)
@@ -41,8 +41,8 @@ namespace Oinq
         /// <summary>
         /// Builds the Pig query that will be sent when the LINQ query is executed.
         /// </summary>
-        /// <typeparam name="T">The type of the objects being queried.</typeparam>
-        /// <param name="query">The LINQ query.</param>
+        /// <typeparam path="T">The type of the objects being queried.</typeparam>
+        /// <param path="query">The LINQ query.</param>
         /// <returns>The query text.</returns>
         public String BuildQueryText<T>(Query<T> query)
         {
@@ -53,8 +53,8 @@ namespace Oinq
         /// <summary>
         /// Creates a new instance of Query{{T}} for this provider.
         /// </summary>
-        /// <typeparam name="T">The type of the returned elements.</typeparam>
-        /// <param name="expression">The query expression.</param>
+        /// <typeparam path="T">The type of the returned elements.</typeparam>
+        /// <param path="expression">The query expression.</param>
         /// <returns>A new instance of Query{{T}}.</returns>
         public virtual IQueryable<T> CreateQuery<T>(Expression expression)
         {
@@ -73,7 +73,7 @@ namespace Oinq
         /// Creates a new instance Query{{T}} for this provider. Calls the generic CreateQuery{{T}}
         /// to actually create the new Query{{T}} instance.
         /// </summary>
-        /// <param name="expression">The query expression.</param>
+        /// <param path="expression">The query expression.</param>
         /// <returns>A new instance of Query{{T}}.</returns>
         public virtual IQueryable CreateQuery(Expression expression)
         {
@@ -96,8 +96,8 @@ namespace Oinq
         /// <summary>
         /// Executes a query.
         /// </summary>
-        /// <typeparam name="TResult">The type of the result.</typeparam>
-        /// <param name="expression">The query expression.</param>
+        /// <typeparam path="TResult">The type of the result.</typeparam>
+        /// <param path="expression">The query expression.</param>
         /// <returns>The result of the query.</returns>
         public virtual TResult Execute<TResult>(Expression expression)
         {
@@ -107,7 +107,7 @@ namespace Oinq
         /// <summary>
         /// Executes a query. Calls the generic method Execute{{T}} to actually execute the query.
         /// </summary>
-        /// <param name="expression">The query expression.</param>
+        /// <param path="expression">The query expression.</param>
         /// <returns>The result of the query.</returns>
         public virtual Object Execute(Expression expression)
         {
@@ -134,7 +134,7 @@ namespace Oinq
         /// <summary>
         /// Executes a query.
         /// </summary>
-        /// <param name="translatedQuery">The TranslatedQuery.</param>
+        /// <param path="translatedQuery">The TranslatedQuery.</param>
         /// <returns>The query result.</returns>
         protected virtual Object Execute(ITranslatedQuery translatedQuery)
         {

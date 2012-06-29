@@ -23,7 +23,7 @@ namespace Oinq
         /// <summary>
         /// Visits an Expression.
         /// </summary>
-        /// <param name="node">The Expression.</param>
+        /// <param path="node">The Expression.</param>
         /// <returns>The Expression (posibly modified).</returns>
         protected virtual Expression Visit(Expression node)
         {
@@ -101,7 +101,7 @@ namespace Oinq
         /// <summary>
         /// Visits a BinaryExpression.
         /// </summary>
-        /// <param name="node">The BinaryExpression.</param>
+        /// <param path="node">The BinaryExpression.</param>
         /// <returns>The BinaryExpression (possibly modified).</returns>
         protected virtual Expression VisitBinary(BinaryExpression node)
         {
@@ -114,7 +114,7 @@ namespace Oinq
         /// <summary>
         /// Visits a ConditionalExpression.
         /// </summary>
-        /// <param name="node">The ConditionalExpression.</param>
+        /// <param path="node">The ConditionalExpression.</param>
         /// <returns>The ConditionalExpression (possibly modified).</returns>
         protected virtual Expression VisitConditional(ConditionalExpression node)
         {
@@ -127,7 +127,7 @@ namespace Oinq
         /// <summary>
         /// Visits a ConstantExpression.
         /// </summary>
-        /// <param name="node">The ConstantExpression.</param>
+        /// <param path="node">The ConstantExpression.</param>
         /// <returns>The ConstantExpression (possibly modified).</returns>
         protected virtual Expression VisitConstant(ConstantExpression node)
         {
@@ -137,7 +137,7 @@ namespace Oinq
         /// <summary>
         /// Visits an ElementInit.
         /// </summary>
-        /// <param name="node">The ElementInit.</param>
+        /// <param path="node">The ElementInit.</param>
         /// <returns>The ElementInit (possibly modified).</returns>
         protected virtual ElementInit VisitElementInit(ElementInit node)
         {
@@ -152,7 +152,7 @@ namespace Oinq
         /// <summary>
         /// Visits an ElementInit list.
         /// </summary>
-        /// <param name="nodes">The ElementInit list.</param>
+        /// <param path="nodes">The ElementInit list.</param>
         /// <returns>The ElementInit list (possibly modified).</returns>
         protected virtual IEnumerable<ElementInit> VisitElementInitList(
             ReadOnlyCollection<ElementInit> nodes)
@@ -185,7 +185,7 @@ namespace Oinq
         /// <summary>
         /// Visits an Expression list.
         /// </summary>
-        /// <param name="nodes">The Expression list.</param>
+        /// <param path="nodes">The Expression list.</param>
         /// <returns>The Expression list (possibly modified).</returns>
         protected ReadOnlyCollection<Expression> VisitExpressionList(ReadOnlyCollection<Expression> nodes)
         {
@@ -220,7 +220,7 @@ namespace Oinq
         /// <summary>
         /// Visits an InvocationExpression.
         /// </summary>
-        /// <param name="node">The InvocationExpression.</param>
+        /// <param path="node">The InvocationExpression.</param>
         /// <returns>The InvocationExpression (possibly modified).</returns>
         protected virtual Expression VisitInvocation(InvocationExpression node)
         {
@@ -232,7 +232,7 @@ namespace Oinq
         /// <summary>
         /// Visits a LambdaExpression.
         /// </summary>
-        /// <param name="node">The LambdaExpression.</param>
+        /// <param path="node">The LambdaExpression.</param>
         /// <returns>The LambdaExpression (possibly modified).</returns>
         protected virtual Expression VisitLambda(LambdaExpression node)
         {
@@ -243,7 +243,7 @@ namespace Oinq
         /// <summary>
         /// Visits a ListInitExpression.
         /// </summary>
-        /// <param name="node">The ListInitExpression.</param>
+        /// <param path="node">The ListInitExpression.</param>
         /// <returns>The ListInitExpression (possibly modified).</returns>
         protected virtual Expression VisitListInit(ListInitExpression node)
         {
@@ -255,7 +255,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberExpression.
         /// </summary>
-        /// <param name="node">The MemberExpression.</param>
+        /// <param path="node">The MemberExpression.</param>
         /// <returns>The MemberExpression (possibly modified).</returns>
         protected virtual Expression VisitMember(MemberExpression node)
         {
@@ -266,7 +266,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberAssignment.
         /// </summary>
-        /// <param name="node">The MemberAssignment.</param>
+        /// <param path="node">The MemberAssignment.</param>
         /// <returns>The MemberAssignment (possibly modified).</returns>
         protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment node)
         {
@@ -277,7 +277,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberBinding.
         /// </summary>
-        /// <param name="node">The MemberBinding.</param>
+        /// <param path="node">The MemberBinding.</param>
         /// <returns>The MemberBinding (possibly modified).</returns>
         protected virtual MemberBinding VisitMemberBinding(MemberBinding node)
         {
@@ -297,7 +297,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberBinding list.
         /// </summary>
-        /// <param name="nodes">The MemberBinding list.</param>
+        /// <param path="nodes">The MemberBinding list.</param>
         /// <returns>The MemberBinding list (possibly modified).</returns>
         protected virtual IEnumerable<MemberBinding> VisitMemberBindingList(ReadOnlyCollection<MemberBinding> nodes)
         {
@@ -329,7 +329,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberInitExpression.
         /// </summary>
-        /// <param name="node">The MemberInitExpression.</param>
+        /// <param path="node">The MemberInitExpression.</param>
         /// <returns>The MemberInitExpression (possibly modified).</returns>
         protected virtual Expression VisitMemberInit(MemberInitExpression node)
         {
@@ -341,7 +341,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberListBinding.
         /// </summary>
-        /// <param name="node">The MemberListBinding.</param>
+        /// <param path="node">The MemberListBinding.</param>
         /// <returns>The MemberListBinding (possibly modified).</returns>
         protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding node)
         {
@@ -352,7 +352,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MemberMemberBinding.
         /// </summary>
-        /// <param name="node">The MemberMemberBinding.</param>
+        /// <param path="node">The MemberMemberBinding.</param>
         /// <returns>The MemberMemberBinding (possibly modified).</returns>
         protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
         {
@@ -363,7 +363,7 @@ namespace Oinq
         /// <summary>
         /// Visits a MethodCallExpression.
         /// </summary>
-        /// <param name="node">The MethodCallExpression.</param>
+        /// <param path="node">The MethodCallExpression.</param>
         /// <returns>The MethodCallExpression (possibly modified).</returns>
         protected virtual Expression VisitMethodCall(MethodCallExpression node)
         {
@@ -375,7 +375,7 @@ namespace Oinq
         /// <summary>
         /// Visits a NewExpression.
         /// </summary>
-        /// <param name="node">The NewExpression.</param>
+        /// <param path="node">The NewExpression.</param>
         /// <returns>The NewExpression (possibly modified).</returns>
         protected virtual NewExpression VisitNew(NewExpression node)
         {
@@ -386,7 +386,7 @@ namespace Oinq
         /// <summary>
         /// Visits a NewArrayExpression.
         /// </summary>
-        /// <param name="node">The NewArrayExpression.</param>
+        /// <param path="node">The NewArrayExpression.</param>
         /// <returns>The NewArrayExpression (possibly modified).</returns>
         protected virtual Expression VisitNewArray(NewArrayExpression node)
         {
@@ -397,7 +397,7 @@ namespace Oinq
         /// <summary>
         /// Visits a ParameterExpression.
         /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
+        /// <param path="node">The ParameterExpression.</param>
         /// <returns>The ParameterExpression (possibly modified).</returns>
         protected virtual Expression VisitParameter(ParameterExpression node)
         {
@@ -407,7 +407,7 @@ namespace Oinq
         /// <summary>
         /// Visits a TypeBinaryExpression.
         /// </summary>
-        /// <param name="node">The TypeBinaryExpression.</param>
+        /// <param path="node">The TypeBinaryExpression.</param>
         /// <returns>The TypeBinaryExpression (possibly modified).</returns>
         protected virtual Expression VisitTypeBinary(TypeBinaryExpression node)
         {
@@ -418,7 +418,7 @@ namespace Oinq
         /// <summary>
         /// Visits a UnaryExpression.
         /// </summary>
-        /// <param name="node">The UnaryExpression.</param>
+        /// <param path="node">The UnaryExpression.</param>
         /// <returns>The UnaryExpression (possibly modified).</returns>
         protected virtual Expression VisitUnary(UnaryExpression node)
         {

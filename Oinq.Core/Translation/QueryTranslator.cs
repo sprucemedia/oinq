@@ -13,7 +13,7 @@ namespace Oinq
         /// <summary>
         /// Translates a LINQ expression into an actionable Pig query.
         /// </summary>
-        /// <param name="query">IQueryable.</param>
+        /// <param path="query">IQueryable.</param>
         /// <returns>A TranslatedQuery.</returns>
         public static TranslatedQuery Translate(IQueryable query)
         {
@@ -23,8 +23,8 @@ namespace Oinq
         /// <summary>
         /// Translates a LINQ expression into an actionable Pig query.
         /// </summary>
-        /// <param name="provider">The QueryProvider.</param>
-        /// <param name="expression">The LINQ expression.</param>
+        /// <param path="provider">The QueryProvider.</param>
+        /// <param path="expression">The LINQ expression.</param>
         /// <returns>A TranslatedQuery.</returns>
         public static TranslatedQuery Translate(QueryProvider provider, Expression expression)
         {

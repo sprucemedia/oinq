@@ -13,7 +13,7 @@ namespace Oinq
         /// <summary>
         /// Performs evaluation and replacement of independent sub-trees.
         /// </summary>
-        /// <param name="expression">The root of the expression tree.</param>
+        /// <param path="expression">The root of the expression tree.</param>
         /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         internal static Expression Evaluate(Expression expression)
         {
@@ -23,8 +23,8 @@ namespace Oinq
         /// <summary>
         /// Performs evaluation and replacement of independent sub-trees.
         /// </summary>
-        /// <param name="expression">The root of the expression tree.</param>
-        /// <param name="queryProvider">The query provider.</param>
+        /// <param path="expression">The root of the expression tree.</param>
+        /// <param path="queryProvider">The query provider.</param>
         /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         internal static Expression Evaluate(Expression expression, IQueryProvider queryProvider)
         {

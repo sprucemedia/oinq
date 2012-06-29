@@ -541,7 +541,7 @@ namespace Oinq
                 new SelectExpression(
                     selectAlias,
                     columns,
-                    new SourceExpression(sourceAlias, GetTableName(rowType)),
+                    new SourceExpression(rowType, sourceAlias, GetTableName(rowType)),
                     null),
                 projector);
         }

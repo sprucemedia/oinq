@@ -10,8 +10,8 @@ namespace Oinq
         /// <summary>
         /// Returns an isntance of IQueryable{{T}} for an IDataFile.
         /// </summary>
-        /// <typeparam name="T">The type of records in an IDataFile.</typeparam>
-        /// <param name="dataFile">The IDataFile.</param>
+        /// <typeparam path="T">The type of records in an IDataFile.</typeparam>
+        /// <param path="dataFile">The IDataFile.</param>
         /// <returns>An instance of IQueryable{{T}} for an IDataFile.</returns>
         public static IQueryable<T> AsQueryable<T>(this IDataFile dataFile)
         {

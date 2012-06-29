@@ -7,8 +7,8 @@ namespace Oinq
     /// <summary>
     /// Represents a collection of objects that have a common key.
     /// </summary>
-    /// <typeparam name="TKey">Key.</typeparam>
-    /// <typeparam name="TElement">Element.</typeparam>
+    /// <typeparam path="TKey">Key.</typeparam>
+    /// <typeparam path="TElement">Element.</typeparam>
     public class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
     {
         // private fields
@@ -19,8 +19,8 @@ namespace Oinq
         /// <summary>
         /// Initializes a new _instance of Grouping{{TKey, TElement}}.
         /// </summary>
-        /// <param name="key">TKey.</param>
-        /// <param name="group">TElement.</param>
+        /// <param path="key">TKey.</param>
+        /// <param path="group">TElement.</param>
         public Grouping(TKey key, IEnumerable<TElement> group)
         {
             _key = key;

@@ -17,11 +17,16 @@ namespace Oinq
         private Int32 _aliasCount;
         private Dictionary<String, String> _mappings;
         private List<String> _ignores;
+        private Dictionary<String, String> _sources;
+        private SourceAlias _alias;
+        private Dictionary<SourceAlias, Int32> _aliases;
 
         // constructors
         private PigFormatter()
         {
             _sb = new StringBuilder();
+            _sources = new Dictionary<String, String>();
+            _aliases = new Dictionary<SourceAlias, Int32>();
         }
 
         // internal methods
@@ -34,23 +39,37 @@ namespace Oinq
             }
 
             PigFormatter formatter = new PigFormatter();
-            formatter.SetAttributes(query.SourceType);
-            formatter.WriteLoad(query.Source);
+            formatter.SetSourceMappings(selectQuery.Sources);
+            foreach (SourceExpression s in selectQuery.Sources)
+            {
+                formatter._alias = s.Alias;
+                formatter.AddAlias(s.Alias);
+                formatter.WriteLoad(s.Type);
+            }
+
             foreach (SelectExpression ex in selectQuery.CommandStack)
             {
+                formatter._alias = formatter.FindRootSource(ex.From);
                 if (ex.Where != null)
                 {
                     formatter.WriteFilter(selectQuery.Where);
+                    formatter.AddAlias(formatter._alias, formatter._aliasCount);
+                    formatter.AddAlias();
                 }
                 if (ex.GroupBy != null)
                 {
                     formatter.WriteGroupBy(selectQuery.GroupBy);
+                    formatter.AddAlias(formatter._alias, formatter._aliasCount);
+                    formatter.AddAlias();
                 }
                 if (ex.OrderBy != null)
                 {
                     formatter.WriteOrderBy(selectQuery.OrderBy);
+                    formatter.AddAlias(formatter._alias, formatter._aliasCount);
+                    formatter.AddAlias();
                 }
             }
+            formatter.WriteJoins(selectQuery.Joins);
             formatter.WriteGenerate(selectQuery.Columns);
             formatter.WriteOutput(selectQuery.Take, formatter.GetLastAliasName());
             return formatter._sb.ToString();
@@ -62,8 +81,45 @@ namespace Oinq
             _aliasCount += 1;
         }
 
+        protected virtual void AddAlias(SourceAlias alias)
+        {
+            Int32 value;
+            if (_aliases.TryGetValue(alias, out value))
+            {
+                _aliases[alias] = value += 1;
+            }
+            else
+            {
+                _aliases.Add(alias, _aliasCount);
+            }
+            AddAlias();
+        }
+
+        protected virtual void AddAlias(SourceAlias alias, Int32 aliasNumber)
+        {
+            Int32 value;
+            if (_aliases.TryGetValue(alias, out value))
+            {
+                _aliases[alias] = aliasNumber;
+            }
+            else
+            {
+                AddAlias(alias);
+            }
+        }
+
         protected virtual String GetLastAliasName()
         {
+            return "t" + (_aliasCount - 1);
+        }
+
+        protected virtual String GetLastAliasName(SourceAlias alias)
+        {
+            Int32 value;
+            if (_aliases.TryGetValue(alias, out value))
+            {
+                return "t" + value;
+            }
             return "t" + (_aliasCount - 1);
         }
 
@@ -239,15 +295,14 @@ namespace Oinq
 
         protected void WriteFilter(Expression where)
         {
-            Write(String.Format("{0} = FILTER {1} BY ", GetNextAliasName(), GetLastAliasName()));
+            Write(String.Format("{0} = FILTER {1} BY ", GetNextAliasName(), GetLastAliasName(_alias)));
             Visit(where);
             Write("; ");
-            AddAlias();
         }
 
         protected void WriteGenerate(ReadOnlyCollection<ColumnDeclaration> columns)
         {
-            Write(String.Format("{0} = FOREACH {1} GENERATE ", GetNextAliasName(), GetLastAliasName()));
+            Write(String.Format("{0} = FOREACH {1} GENERATE ", GetNextAliasName(), GetLastAliasName(_alias)));
             WriteColumns(columns);
             Write("; ");
             AddAlias();
@@ -257,7 +312,7 @@ namespace Oinq
         {
             if (groupBys.Count > 0)
             {
-                Write(String.Format("{0} = GROUP {1} BY ", GetNextAliasName(), GetLastAliasName()));
+                Write(String.Format("{0} = GROUP {1} BY ", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = groupBys.Count; i < n; i++)
                 {
@@ -268,21 +323,42 @@ namespace Oinq
                     Visit(groupBys[i]);
                 }
                 Write("; ");
-                AddAlias();
             }
         }
 
-        protected void WriteLoad(IDataFile source)
+        protected void WriteJoins(ReadOnlyCollection<JoinExpression> joins)
         {
-            Write(String.Format("{0} = LOAD '{1}'; ", GetNextAliasName(), source.AbsolutePath));
-            AddAlias();
+            if (joins.Count > 0)
+            {
+                for (Int32 i = 0, n = joins.Count; i < n; i++)
+                {
+                    JoinExpression join = joins[i];
+                    BinaryExpression condition = (BinaryExpression)join.Condition;
+                    SourceAlias left = FindRootSource(join.Left);
+                    SourceAlias right = FindRootSource(join.Right);
+                    Write(String.Format("{0} = JOIN {1} BY ", GetNextAliasName(), GetLastAliasName(left)));
+                    Visit(condition.Left);
+                    Write(String.Format(", {0} BY ", GetLastAliasName(right)));
+                    Visit(condition.Right);
+                    Write("; ");
+                    Int32 aliasCount = _aliasCount;
+                    AddAlias(left, aliasCount);
+                    AddAlias(right, aliasCount);
+                    AddAlias();
+                }
+            }
+        }
+
+        protected void WriteLoad(Type sourceType)
+        {
+            Write(String.Format("{0} = LOAD '{1}'; ", GetLastAliasName(_alias), _sources[sourceType.Name]));
         }
 
         protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys)
         {
             if (orderBys.Count > 0)
             {
-                Write(String.Format("{0} = ORDER {1} BY ", GetNextAliasName(), GetLastAliasName()));
+                Write(String.Format("{0} = ORDER {1} BY ", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = orderBys.Count; i < n; i++)
                 {
@@ -295,7 +371,6 @@ namespace Oinq
                     WriteOrderByDirection(orderBy.Direction);
                 }
                 Write("; ");
-                AddAlias();
             }
         }
 
@@ -498,18 +573,21 @@ namespace Oinq
         }
 
         // private methods
-        private void SetAttributes(Type sourceType)
+        private SourceAlias FindRootSource(Expression expression)
         {
-            // Get all properties that are in the source type.
-            PropertyInfo[] sourceProperties = sourceType.GetProperties();
-            SetMappings(sourceProperties);
-            SetIgnores(sourceProperties);
+            switch ((PigExpressionType)expression.NodeType)
+            {
+                case PigExpressionType.Source:
+                    return ((SourceExpression)expression).Alias;
+                case PigExpressionType.Select:
+                    return FindRootSource(((SelectExpression)expression).From);
+                default:
+                    throw new InvalidOperationException("An invalid expression exists in the tree.");
+            }
         }
 
-        private void SetMappings(PropertyInfo[] sourceProperties)
+        private void GetMappings(PropertyInfo[] sourceProperties)
         {
-            _mappings = new Dictionary<String, String>();
-
             foreach (PropertyInfo property in sourceProperties)
             {
                 Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigMapping), true);
@@ -520,10 +598,33 @@ namespace Oinq
             }
         }
 
-        private void SetIgnores(PropertyInfo[] sourceProperties)
+        private void SetSourceMappings(ReadOnlyCollection<SourceExpression> sources)
         {
             _ignores = new List<String>();
+            _mappings = new Dictionary<String, String>();
 
+            foreach (SourceExpression source in sources)
+            {
+                Type sourceType = source.Type;
+                Object[] attributes = sourceType.GetCustomAttributes(typeof(PigSourceMapping), true);
+                if (attributes != null && attributes.Length > 0)
+                {
+                    _sources.Add(source.Name, ((PigSourceMapping)attributes[0]).Path);
+                }
+                else
+                {
+                    _sources.Add(source.Name, source.Name);
+                }
+
+                // Get all properties that are in the source type.
+                PropertyInfo[] sourceProperties = sourceType.GetProperties();
+                GetIgnores(sourceProperties);
+                GetMappings(sourceProperties);
+            }     
+        }
+
+        private void GetIgnores(PropertyInfo[] sourceProperties)
+        {
             foreach (PropertyInfo property in sourceProperties)
             {
                 Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigIgnore), true);

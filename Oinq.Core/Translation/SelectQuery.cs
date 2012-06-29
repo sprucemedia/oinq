@@ -19,18 +19,22 @@ namespace Oinq
         private List<ColumnDeclaration> _columns;
         private ReadOnlyCollection<Expression> _groupBy;
         private Stack _commandStack;
+        private List<SourceExpression> _sources;
+        private List<JoinExpression> _joins;
 
         // constructors
         /// <summary>
         /// Initializes a new instance of the SelectQuery class.
         /// </summary>
-        /// <param name="source">The data source being queried.</param>
-        /// <param name="sourceType">The source type.</param>
+        /// <param path="source">The data source being queried.</param>
+        /// <param path="sourceType">The source type.</param>
         public SelectQuery(IDataFile source, Type sourceType)
             : base(source, sourceType)
         {
             _commandStack = new Stack();
             _columns = new List<ColumnDeclaration>();
+            _sources = new List<SourceExpression>();
+            _joins = new List<JoinExpression>();
         }
 
         // internal properties
@@ -47,6 +51,16 @@ namespace Oinq
         internal ReadOnlyCollection<Expression> GroupBy
         {
             get { return _groupBy; }
+        }
+
+        internal ReadOnlyCollection<JoinExpression> Joins
+        {
+            get { return _joins.AsReadOnly(); }
+        }
+
+        internal ReadOnlyCollection<SourceExpression> Sources
+        {
+            get { return _sources.AsReadOnly(); }
         }
 
         /// <summary>
@@ -84,20 +98,34 @@ namespace Oinq
         /// <summary>
         /// Translates a LINQ query expression tree.
         /// </summary>
-        /// <param name="expression">The LINQ query expression tree.</param>
+        /// <param path="expression">The LINQ query expression tree.</param>
         internal void Translate(Expression expression)
         {
             // when we reach the original Query<T>, we're done
             var sourceExpression = expression as SourceExpression;
             if (sourceExpression != null)
             {
+                _sources.Add(sourceExpression);
+                return;
+            }
+
+            var joinExpression = expression as JoinExpression;
+            if (joinExpression != null)
+            {
+                _joins.Add(joinExpression);
+                Translate(joinExpression.Left);
+                Translate(joinExpression.Right);
                 return;
             }
 
             SelectExpression selectExpression = expression as SelectExpression;
             if (selectExpression != null)
             {
-                _commandStack.Push(selectExpression);
+                AliasedExpression from = selectExpression.From as AliasedExpression;
+                if (from != null)
+                {
+                    _commandStack.Push(selectExpression);
+                }
                 if (selectExpression.Where != null)
                 {
                     _where = selectExpression.Where;
@@ -129,14 +157,7 @@ namespace Oinq
                 {
                     for (Int32 i = 0, n = anonymous.Arguments.Count; i < n; i++)
                     {
-                        Expression expr = anonymous.Arguments[i];
-                        String colName = anonymous.Members[i].Name;
-                        switch (expr.NodeType)
-                        {
-                            default:
-                                _columns.Add(new ColumnDeclaration(colName, expr));
-                                break;
-                        }
+                        _columns.Add(new ColumnDeclaration(anonymous.Members[i].Name, anonymous.Arguments[i]));
                     }
                 }
                 else

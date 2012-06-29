@@ -15,8 +15,8 @@ namespace Oinq
         /// <summary>
         /// Initializes an instance of the OrderByExpression class.
         /// </summary>
-        /// <param name="key">An expression identifying the key of the order by clause.</param>
-        /// <param name="direction">The direction of the order by clause.</param>
+        /// <param path="key">An expression identifying the key of the order by clause.</param>
+        /// <param path="direction">The direction of the order by clause.</param>
         internal OrderByExpression(Expression key, OrderByDirection direction)
         {
             _key = key;

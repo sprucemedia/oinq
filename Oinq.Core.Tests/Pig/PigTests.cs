@@ -550,4 +550,73 @@ namespace Oinq.Tests
             Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, (sum(Mea1) / sum(Mea1)) AS Total; dump t2; ", queryText);
         }
     }
+
+    [TestFixture]
+    public class When_using_the_join_method
+    {
+        private String SOURCE_NAME = "FakeData";
+        private const String PATH_NAME = "FakeData";
+        private const String EXT_SOURCE_NAME = "FakeDataMeta";
+        private const String EXT_PATH_NAME = "FakeDataMeta";
+        private IDataFile _source;
+        private IDataFile _extendedSource;
+        private Query<FakeData> _fakeData;
+        private Query<FakeDataMeta> _fakeDataDim;
+
+        [SetUp]
+        public void Setup()
+        {
+            _source = MockRepository.GenerateStub<IDataFile>();
+            _source.Stub(s => s.Name).Return(SOURCE_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
+            _fakeData = new Query<FakeData>(new QueryProvider(_source));
+
+            _extendedSource = MockRepository.GenerateStub<IDataFile>();
+            _extendedSource.Stub(s => s.Name).Return(EXT_SOURCE_NAME);
+            _extendedSource.Stub(s => s.AbsolutePath).Return(EXT_PATH_NAME);
+            _fakeDataDim = new Query<FakeDataMeta>(new QueryProvider(_extendedSource));
+        }
+
+        [Test]
+        public void it_can_load_the_joined_file()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Join(_extendedSource.AsQueryable<FakeDataMeta>(),
+                fd => fd.Dim1, e => e.Dim1, (fd, e) => new { Key = fd.Dim1, Measure = fd.Mea1, Description = e.DimDesc });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.True(queryText.Contains("t0 = LOAD 'FakeData'; t1 = LOAD 'FakeDataMeta'; "));
+        }
+
+        [Test]
+        public void it_can_join_the_file()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Join(_extendedSource.AsQueryable<FakeDataMeta>(),
+                fd => fd.Dim1, e => e.Dim1, (fd, e) => new { Key = fd.Dim1, Measure = fd.Mea1, Description = e.DimDesc });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = LOAD 'FakeDataMeta'; t2 = JOIN t0 BY Dim1, t1 BY Dim1; t3 = FOREACH t2 GENERATE Dim1 AS Key, Mea1 AS Measure, DimDesc AS Description; dump t3; ", queryText);
+        }
+
+        [Test]
+        public void it_can_join_the_file_after_a_filter()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Where(f => f.Mea1 > 5).Join(_extendedSource.AsQueryable<FakeDataMeta>(),
+                fd => fd.Dim1, e => e.Dim1, (fd, e) => new { Key = fd.Dim1, Measure = fd.Mea1, Description = e.DimDesc });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = LOAD 'FakeDataMeta'; t2 = FILTER t0 BY (Mea1 > 5); t3 = JOIN t2 BY Dim1, t1 BY Dim1; t4 = FOREACH t3 GENERATE Dim1 AS Key, Mea1 AS Measure, DimDesc AS Description; dump t4; ", queryText);
+        }
+    }
 }
