@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Oinq</id>
-    <version>0.9.2</version>
+    <version>0.9.3</version>
     <authors>Brian Knight</authors>
     <owners>Spruce Media</owners>
     <description>A LINQ IQueryable provider that targets translation of LINQ expressions into Pig-like languages.</description>
