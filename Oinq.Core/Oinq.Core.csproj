@@ -78,8 +78,6 @@
     <Compile Include="Translation\Grouping.cs" />
     <Compile Include="Translation\ITranslatedQuery.cs" />
     <Compile Include="Translation\OrderByRewriter.cs" />
-    <Compile Include="Translation\ProjectionBuilder.cs" />
-    <Compile Include="Translation\ProjectionRow.cs" />
     <Compile Include="Translation\Projector.cs" />
     <Compile Include="Translation\Nominator.cs" />
     <Compile Include="Expressions\OrderByExpression.cs" />

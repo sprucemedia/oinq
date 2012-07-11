@@ -72,14 +72,6 @@ namespace Oinq
         }
 
         /// <summary>
-        /// Gets the Expression that defines the projection (or null if not specified).
-        /// </summary>
-        internal LambdaExpression Projection
-        {
-            get { return _projection; }
-        }
-
-        /// <summary>
         /// Gets the Expression that defines how many documents to take (or null if not specified);
         /// </summary>
         internal Expression Take
@@ -150,7 +142,6 @@ namespace Oinq
             ProjectionExpression projectionExpression = expression as ProjectionExpression;
             if (projectionExpression != null)
             {
-                _projection = new ProjectionBuilder().Build(projectionExpression.Projector);
                 Translate(projectionExpression.Source);
                 NewExpression anonymous = projectionExpression.Projector as NewExpression;
                 if (anonymous != null && anonymous.Members != null)
