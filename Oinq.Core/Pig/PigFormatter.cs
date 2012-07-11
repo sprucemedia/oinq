@@ -148,10 +148,10 @@ namespace Oinq
             {
                 case ExpressionType.And:
                 case ExpressionType.AndAlso:
-                    return (IsBoolean(b.Left.Type)) ? " AND " : " & ";
+                    return (IsBoolean(b.Left.Type)) ? " and " : " & ";
                 case ExpressionType.Or:
                 case ExpressionType.OrElse:
-                    return (IsBoolean(b.Left.Type)) ? " OR " : " | ";
+                    return (IsBoolean(b.Left.Type)) ? " or " : " | ";
                 case ExpressionType.Equal:
                     return " == ";
                 case ExpressionType.NotEqual:
@@ -243,7 +243,7 @@ namespace Oinq
             switch (aggregateName)
             {
                 case "Average":
-                    Write("AVG");
+                    Write("avg");
                     break;
                 default:
                     Write(aggregateName.ToLower());
@@ -253,7 +253,7 @@ namespace Oinq
 
         protected void WriteAsColumnName(String columnName)
         {
-            Write(" AS ");
+            Write(" as ");
             Write(columnName);
         }
 
@@ -295,14 +295,14 @@ namespace Oinq
 
         protected void WriteFilter(Expression where)
         {
-            Write(String.Format("{0} = FILTER {1} BY ", GetNextAliasName(), GetLastAliasName(_alias)));
+            Write(String.Format("{0} = filter {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
             Visit(where);
             Write("; ");
         }
 
         protected void WriteGenerate(ReadOnlyCollection<ColumnDeclaration> columns)
         {
-            Write(String.Format("{0} = FOREACH {1} GENERATE ", GetNextAliasName(), GetLastAliasName(_alias)));
+            Write(String.Format("{0} = foreach {1} generate ", GetNextAliasName(), GetLastAliasName(_alias)));
             WriteColumns(columns);
             Write("; ");
             AddAlias();
@@ -312,7 +312,7 @@ namespace Oinq
         {
             if (groupBys.Count > 0)
             {
-                Write(String.Format("{0} = GROUP {1} BY ", GetNextAliasName(), GetLastAliasName(_alias)));
+                Write(String.Format("{0} = group {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = groupBys.Count; i < n; i++)
                 {
@@ -336,9 +336,9 @@ namespace Oinq
                     BinaryExpression condition = (BinaryExpression)join.Condition;
                     SourceAlias left = FindRootSource(join.Left);
                     SourceAlias right = FindRootSource(join.Right);
-                    Write(String.Format("{0} = JOIN {1} BY ", GetNextAliasName(), GetLastAliasName(left)));
+                    Write(String.Format("{0} = join {1} by ", GetNextAliasName(), GetLastAliasName(left)));
                     Visit(condition.Left);
-                    Write(String.Format(", {0} BY ", GetLastAliasName(right)));
+                    Write(String.Format(", {0} by ", GetLastAliasName(right)));
                     Visit(condition.Right);
                     Write("; ");
                     Int32 aliasCount = _aliasCount;
@@ -351,14 +351,14 @@ namespace Oinq
 
         protected void WriteLoad(Type sourceType)
         {
-            Write(String.Format("{0} = LOAD '{1}'; ", GetLastAliasName(_alias), _sources[sourceType.Name]));
+            Write(String.Format("{0} = load '{1}'; ", GetLastAliasName(_alias), _sources[sourceType.Name]));
         }
 
         protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys)
         {
             if (orderBys.Count > 0)
             {
-                Write(String.Format("{0} = ORDER {1} BY ", GetNextAliasName(), GetLastAliasName(_alias)));
+                Write(String.Format("{0} = order {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = orderBys.Count; i < n; i++)
                 {
@@ -379,10 +379,10 @@ namespace Oinq
             switch (direction)
             {
                 case OrderByDirection.Descending:
-                    Write(" DESC");
+                    Write(" desc");
                     break;
                 default:
-                    Write(" ASC");
+                    Write(" asc");
                     break;
             }
         }
@@ -563,7 +563,7 @@ namespace Oinq
             switch (node.NodeType)
             {
                 case ExpressionType.Not:
-                    _sb.Append(" NOT ");
+                    _sb.Append(" not ");
                     Visit(node.Operand);
                     break;
                 default:
