@@ -606,6 +606,20 @@ namespace Oinq.Tests
         }
 
         [Test]
+        public void it_can_join_the_file_with_a_take()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Join(_extendedSource.AsQueryable<FakeDataMeta>(),
+                fd => fd.Dim1, e => e.Dim1, (fd, e) => new { Key = fd.Dim1, Measure = fd.Mea1, Description = e.DimDesc }).Take(10);
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = join t0 by Dim1, t1 by Dim1; t3 = foreach t2 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; limit t3 10; ", queryText);
+        }
+
+        [Test]
         public void it_can_join_the_file_after_a_filter()
         {
             // Arrange

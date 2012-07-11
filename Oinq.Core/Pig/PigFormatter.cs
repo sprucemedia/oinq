@@ -49,24 +49,27 @@ namespace Oinq
 
             foreach (SelectExpression ex in selectQuery.CommandStack)
             {
-                formatter._alias = formatter.FindRootSource(ex.From);
-                if (ex.Where != null)
+                if (ex.Take == null)
                 {
-                    formatter.WriteFilter(selectQuery.Where);
-                    formatter.AddAlias(formatter._alias, formatter._aliasCount);
-                    formatter.AddAlias();
-                }
-                if (ex.GroupBy != null)
-                {
-                    formatter.WriteGroupBy(selectQuery.GroupBy);
-                    formatter.AddAlias(formatter._alias, formatter._aliasCount);
-                    formatter.AddAlias();
-                }
-                if (ex.OrderBy != null)
-                {
-                    formatter.WriteOrderBy(selectQuery.OrderBy);
-                    formatter.AddAlias(formatter._alias, formatter._aliasCount);
-                    formatter.AddAlias();
+                    formatter._alias = formatter.FindRootSource(ex.From);
+                    if (ex.Where != null)
+                    {
+                        formatter.WriteFilter(selectQuery.Where);
+                        formatter.AddAlias(formatter._alias, formatter._aliasCount);
+                        formatter.AddAlias();
+                    }
+                    if (ex.GroupBy != null)
+                    {
+                        formatter.WriteGroupBy(selectQuery.GroupBy);
+                        formatter.AddAlias(formatter._alias, formatter._aliasCount);
+                        formatter.AddAlias();
+                    }
+                    if (ex.OrderBy != null)
+                    {
+                        formatter.WriteOrderBy(selectQuery.OrderBy);
+                        formatter.AddAlias(formatter._alias, formatter._aliasCount);
+                        formatter.AddAlias();
+                    }
                 }
             }
             formatter.WriteJoins(selectQuery.Joins);
