@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -102,19 +101,19 @@ namespace Oinq.Tests
     {
         private Expression _expression;
         private QueryProvider _provider;
-        private IEnumerable<Object> _fakeResults;
+        private IList<AttributedFakeData> _fakeResults;
 
         [TestFixtureSetUp]
         public void FixtureSetup()
         {
-            var fakeResults = new List<Object>();
+            var fakeResults = new List<AttributedFakeData>();
             fakeResults.Add(new AttributedFakeData { Dim1 = "Test", Mea1 = 5 });
             fakeResults.Add(new AttributedFakeData { Dim1 = "Test", Mea1 = 15 });
             fakeResults.Add(new AttributedFakeData { Dim1 = "Test 2", Mea1 = 25 });
             fakeResults.Add(new AttributedFakeData { Dim1 = "Test 3", Mea1 = 10 });
             fakeResults.Add(new AttributedFakeData { Dim1 = "Test 4", Mea1 = 20 });
             fakeResults.Add(new AttributedFakeData { Dim1 = "Test 5", Mea1 = 30 });
-            _fakeResults = (IEnumerable<Object>)fakeResults;
+            _fakeResults = fakeResults;
         }
 
         [SetUp]
@@ -141,20 +140,6 @@ namespace Oinq.Tests
         {
             // Act
             var results = (IEnumerable)_provider.Execute(_expression);
-
-            // Assert
-            Assert.IsNotNull(results);
-            Assert.IsInstanceOf<IEnumerable>(results);
-        }
-
-        [Test]
-        public void it_can_project_to_a_collection_of_anonymous_type()
-        {
-            // Arrange
-            var expression = Source.AsQueryable<AttributedFakeData>().Select(f => new { Dim = f.Dim1, Mea = f.Mea1 });
-
-            // Act
-            var results = (IEnumerable)_provider.Execute(expression.Expression);
 
             // Assert
             Assert.IsNotNull(results);

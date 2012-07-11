@@ -10,7 +10,7 @@ namespace Oinq
         private Enumerator _enumerator;
 
         // constructors
-        internal ProjectionReader(IList reader, Func<ProjectionRow, T> projector)
+        internal ProjectionReader(IList<Object> reader, Func<ProjectionRow, T> projector)
         {
             _enumerator = new Enumerator(reader, projector);
         }
@@ -43,12 +43,12 @@ namespace Oinq
         class Enumerator : ProjectionRow, IEnumerator<T>, IEnumerator, IDisposable
         {
             // private fields
-            private IList _reader;
+            private IList<Object> _reader;
             private Int32 _currentIndex;
             private Func<ProjectionRow, T> _projector;
 
             // constructors
-            internal Enumerator(IList reader, Func<ProjectionRow, T> projector)
+            internal Enumerator(IList<Object> reader, Func<ProjectionRow, T> projector)
             {
                 _reader = reader;
                 _projector = projector;

@@ -32,7 +32,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Dim1 == 'Fake'); t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY ((Dim1 == 'Fake') AND (Mea1 == 5)); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by ((Dim1 == 'Fake') and (Mea1 == 5)); t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Dim1 == 'Fake'); t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Dim1 == 'Fake'); t2 = FOREACH t1 GENERATE Mea1 AS Measure1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Dim1 == 'Fake'); t2 = foreach t1 generate Mea1 as Measure1; dump t2; ", queryText);
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 == 5); t2 = FOREACH t1 GENERATE Mea1 AS Measure1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Mea1 == 5); t2 = foreach t1 generate Mea1 as Measure1; dump t2; ", queryText);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Measure1; dump t1; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Mea1 as Measure1; dump t1; ", queryText);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Mea1 AS Measure1, Dim1 AS Dimension1; dump t1; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Mea1 as Measure1, Dim1 as Dimension1; dump t1; ", queryText);
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = ORDER t0 BY Mea1 ASC; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = ORDER t0 BY Mea1 DESC; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 desc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = ORDER t0 BY Mea1 ASC, Dim1 ASC; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc, Dim1 asc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = ORDER t0 BY Mea1 ASC, Dim1 DESC; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc, Dim1 desc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; dump t2; ", queryText);
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FOREACH t0 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; limit t1 100; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; limit t1 100; ", queryText);
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = ORDER t0 BY Mea1 ASC; t2 = FOREACH t1 GENERATE Dim1 AS Dim1, Mea1 AS Mea1; limit t2 100; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; limit t2 100; ", queryText);
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dim1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by Dim1; t2 = foreach t1 generate Dim1 as Dim1; dump t2; ", queryText);
         }
 
         [Test]
@@ -215,7 +215,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (Mea1 > 5); t2 = GROUP t1 BY Dim1; t3 = FOREACH t2 GENERATE Dim1 AS Dim1; dump t3; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Mea1 > 5); t2 = group t1 by Dim1; t3 = foreach t2 generate Dim1 as Dim1; dump t3; ", queryText);
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, sum(Mea1) AS Total; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by Dim1; t2 = foreach t1 generate Dim1 as Dimension, sum(Mea1) as Total; dump t2; ", queryText);
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, (sum(Mea1) + sum(Mea1)) AS Total; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by Dim1; t2 = foreach t1 generate Dim1 as Dimension, (sum(Mea1) + sum(Mea1)) as Total; dump t2; ", queryText);
         }
 
         [Test]
@@ -255,7 +255,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FILTER t1 BY (sum(Mea1) > 5); t3 = FOREACH t2 GENERATE Dim1 AS Dimension, sum(Mea1) AS Total; dump t3; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by Dim1; t2 = filter t1 by (sum(Mea1) > 5); t3 = foreach t2 generate Dim1 as Dimension, sum(Mea1) as Total; dump t3; ", queryText);
         }
     }
 
@@ -286,7 +286,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY (Mea1 == 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 == 5);"));
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY (Mea1 != 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 != 5);"));
         }
 
         [Test]
@@ -312,7 +312,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY (Mea1 < 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 < 5);"));
         }
 
         [Test]
@@ -325,7 +325,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY (Mea1 > 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 > 5);"));
         }
 
         [Test]
@@ -338,7 +338,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY (Mea1 <= 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 <= 5);"));
         }
 
         [Test]
@@ -351,7 +351,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY (Mea1 >= 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 >= 5);"));
         }
     }
 
@@ -382,7 +382,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 + Mea1) > 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 + Mea1) > 5);"));
         }
 
         [Test]
@@ -395,7 +395,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 - Mea1) > 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 - Mea1) > 5);"));
         }
         [Test]
         public void it_can_implement_multiplication()
@@ -407,7 +407,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 * Mea1) > 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 * Mea1) > 5);"));
         }
 
         [Test]
@@ -420,7 +420,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 / Mea1) > 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 / Mea1) > 5);"));
         }
 
         [Test]
@@ -433,7 +433,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 % Mea1) > 5);"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 % Mea1) > 5);"));
         }
     }
 
@@ -464,7 +464,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 == 5) AND (Dim1 == 'Fake'));"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 == 5) and (Dim1 == 'Fake'));"));
         }
 
         [Test]
@@ -477,7 +477,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 == 5) AND (Dim1 == 'Fake'));"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 == 5) and (Dim1 == 'Fake'));"));
         }
 
         [Test]
@@ -490,7 +490,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 == 5) OR (Dim1 == 'Fake'));"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 == 5) or (Dim1 == 'Fake'));"));
         }
 
         [Test]
@@ -503,7 +503,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t1 = FILTER t0 BY ((Mea1 == 5) OR (Dim1 == 'Fake'));"));
+            Assert.True(queryText.Contains("t1 = filter t0 by ((Mea1 == 5) or (Dim1 == 'Fake'));"));
         }
     }
 
@@ -534,7 +534,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, sum(Mea1) AS Total; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by Dim1; t2 = foreach t1 generate Dim1 as Dimension, sum(Mea1) as Total; dump t2; ", queryText);
         }
 
         [Test]
@@ -547,7 +547,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = GROUP t0 BY Dim1; t2 = FOREACH t1 GENERATE Dim1 AS Dimension, (sum(Mea1) / sum(Mea1)) AS Total; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by Dim1; t2 = foreach t1 generate Dim1 as Dimension, (sum(Mea1) / sum(Mea1)) as Total; dump t2; ", queryText);
         }
     }
 
@@ -588,7 +588,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.True(queryText.Contains("t0 = LOAD 'FakeData'; t1 = LOAD 'FakeDataMeta'; "));
+            Assert.True(queryText.Contains("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; "));
         }
 
         [Test]
@@ -602,7 +602,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = LOAD 'FakeDataMeta'; t2 = JOIN t0 BY Dim1, t1 BY Dim1; t3 = FOREACH t2 GENERATE Dim1 AS Key, Mea1 AS Measure, DimDesc AS Description; dump t3; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = join t0 by Dim1, t1 by Dim1; t3 = foreach t2 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; dump t3; ", queryText);
         }
 
         [Test]
@@ -616,7 +616,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = LOAD 'FakeDataMeta'; t2 = FILTER t0 BY (Mea1 > 5); t3 = JOIN t2 BY Dim1, t1 BY Dim1; t4 = FOREACH t3 GENERATE Dim1 AS Key, Mea1 AS Measure, DimDesc AS Description; dump t4; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t0 by (Mea1 > 5); t3 = join t2 by Dim1, t1 by Dim1; t4 = foreach t3 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; dump t4; ", queryText);
         }
     }
 }

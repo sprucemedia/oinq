@@ -5,17 +5,17 @@ namespace Oinq.Tests
 {
     public class FakeQueryProvider : QueryProvider
     {
-        private IEnumerable<Object> _results;
+        private IList<AttributedFakeData> _results;
 
-        public FakeQueryProvider(IDataFile source, IEnumerable<Object> results)
+        public FakeQueryProvider(IDataFile source, IList<AttributedFakeData> results)
             : base(source)
         {
             _results = results;
         }
 
-        protected override Object Execute(ITranslatedQuery translatedQuery)
+        protected override IList<TResult> Execute<TResult>(ITranslatedQuery translatedQuery)
         {
-            return _results;
+            return (IList<TResult>)_results;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Oinq.Tests.Pig
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = LOAD 'FakeData'; t1 = FILTER t0 BY (dimension == 'Fake'); t2 = FOREACH t1 GENERATE dimension AS Dim1, measure AS Mea1; dump t2; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (dimension == 'Fake'); t2 = foreach t1 generate dimension as Dim1, measure as Mea1; dump t2; ", queryText);
         }
     }
 }

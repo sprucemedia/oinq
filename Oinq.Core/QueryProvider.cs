@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -118,15 +118,9 @@ namespace Oinq
             var translatedQuery = QueryTranslator.Translate(this, expression);
             Delegate projector = ((SelectQuery)translatedQuery).Projection.Compile();
 
-            var reader = (IList)Execute(translatedQuery);
-
-            Type elementType = TypeHelper.GetElementType(expression.Type);
-            return Activator.CreateInstance(
-                typeof(ProjectionReader<>).MakeGenericType(elementType),
-                BindingFlags.Instance | BindingFlags.NonPublic, null,
-                new Object[] { reader, projector },
-                null
-                );
+            MethodInfo mi = this.GetType().GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo gmi = mi.MakeGenericMethod(TypeHelper.GetElementType(expression.Type));
+            return gmi.Invoke(this, new Object[] {translatedQuery});
         }
 
         // protected methods
@@ -136,7 +130,7 @@ namespace Oinq
         /// </summary>
         /// <param path="translatedQuery">The TranslatedQuery.</param>
         /// <returns>The query result.</returns>
-        protected virtual Object Execute(ITranslatedQuery translatedQuery)
+        protected virtual IList<TResult> Execute<TResult>(ITranslatedQuery translatedQuery)
         {
             throw new NotImplementedException();
         }
