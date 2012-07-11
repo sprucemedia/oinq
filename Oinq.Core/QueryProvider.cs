@@ -116,7 +116,6 @@ namespace Oinq
                 throw new ArgumentNullException("expression");
             }
             var translatedQuery = QueryTranslator.Translate(this, expression);
-            Delegate projector = ((SelectQuery)translatedQuery).Projection.Compile();
 
             MethodInfo mi = this.GetType().GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
             MethodInfo gmi = mi.MakeGenericMethod(TypeHelper.GetElementType(expression.Type));
