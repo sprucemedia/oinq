@@ -14,7 +14,6 @@ namespace Oinq
     {
         private Expression _where;
         private ReadOnlyCollection<OrderByExpression> _orderBy;
-        private LambdaExpression _projection;
         private Expression _take;
         private List<ColumnDeclaration> _columns;
         private ReadOnlyCollection<Expression> _groupBy;
