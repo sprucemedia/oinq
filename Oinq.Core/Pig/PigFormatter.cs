@@ -248,6 +248,9 @@ namespace Oinq
                 case "Average":
                     Write("avg");
                     break;
+                case "Count":
+                    Write("COUNT");
+                    break;
                 default:
                     Write(aggregateName.ToLower());
                     break;
