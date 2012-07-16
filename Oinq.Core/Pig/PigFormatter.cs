@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -73,7 +74,7 @@ namespace Oinq
                     }
                 }
             }
-            formatter.WriteJoins(selectQuery.Joins);
+            formatter.WriteJoins(selectQuery.Joins, selectQuery.Columns);
             formatter.WriteGenerate(selectQuery.Columns);
             formatter.WriteOutput(selectQuery.Take);
             return formatter._sb.ToString();
@@ -333,7 +334,7 @@ namespace Oinq
             }
         }
 
-        protected void WriteJoins(ReadOnlyCollection<JoinExpression> joins)
+        protected void WriteJoins(ReadOnlyCollection<JoinExpression> joins, ReadOnlyCollection<ColumnDeclaration> outputColumns)
         {
             if (joins.Count > 0)
             {
@@ -345,19 +346,18 @@ namespace Oinq
                     SourceAlias right = FindRootSource(join.Right);
                     
                     Write(String.Format("{0} = group {1} by (", GetNextAliasName(), GetLastAliasName(right)));
-                    ReadOnlyCollection<ColumnDeclaration> columns = ((SelectExpression)join.Right).Columns;
-                    for (Int32 j = 0, m = columns.Count; j < m; j++)
+                    List<String> columns = ((SelectExpression)join.Right).Columns.Select(s => s.Name).ToList();
+                    List<String> outputNames = outputColumns.Select(o => o.Expression).Cast<ColumnExpression>().Select(e => e.Name).ToList();
+                    Boolean first = true;
+                    foreach(String name in columns)
                     {
-                        ColumnDeclaration column = columns[j];
-                        Boolean first = true;
-
-                        if (column.Name != ((ColumnExpression)condition.Right).Name)
+                        if (name != ((ColumnExpression)condition.Right).Name && outputNames.Contains(name))
                         {
                             if (!first)
                             {
                                 Write(", ");
                             }
-                            WriteColumnName(column.Name);
+                            WriteColumnName(name);
                             first = false;
                         }
                     }

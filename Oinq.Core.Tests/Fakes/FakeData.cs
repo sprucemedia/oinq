@@ -12,5 +12,6 @@ namespace Oinq.Tests
     {
         public String Dim1 { get; set; }
         public String DimDesc { get; set; }
+        public String DimDesc2 { get; set; }
     }
 }
