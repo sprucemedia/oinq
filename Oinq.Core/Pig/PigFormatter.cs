@@ -22,6 +22,7 @@ namespace Oinq
         private SourceAlias _alias;
         private Dictionary<SourceAlias, Int32> _aliases;
         private const Int32 RESULT_LIMIT = 1000;
+        private List<String> _columnNames;
 
         // constructors
         private PigFormatter()
@@ -29,6 +30,7 @@ namespace Oinq
             _sb = new StringBuilder();
             _sources = new Dictionary<String, String>();
             _aliases = new Dictionary<SourceAlias, Int32>();
+            _columnNames = new List<String>();
         }
 
         // internal methods
@@ -320,7 +322,7 @@ namespace Oinq
         {
             if (groupBys.Count > 0)
             {
-                Write(String.Format("{0} = group {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
+                Write(String.Format("{0} = group {1} by (", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = groupBys.Count; i < n; i++)
                 {
@@ -330,7 +332,7 @@ namespace Oinq
                     }
                     Visit(groupBys[i]);
                 }
-                Write("; ");
+                Write("); ");
             }
         }
 
@@ -338,6 +340,10 @@ namespace Oinq
         {
             if (joins.Count > 0)
             {
+                foreach (ColumnDeclaration column in outputColumns)
+                {
+                    FindSourceColumnName(column);
+                }
                 for (Int32 i = 0, n = joins.Count; i < n; i++)
                 {
                     JoinExpression join = joins[i];
@@ -347,11 +353,10 @@ namespace Oinq
                     
                     Write(String.Format("{0} = group {1} by (", GetNextAliasName(), GetLastAliasName(right)));
                     List<String> columns = ((SelectExpression)join.Right).Columns.Select(s => s.Name).ToList();
-                    List<String> outputNames = outputColumns.Select(o => o.Expression).Cast<ColumnExpression>().Select(e => e.Name).ToList();
                     Boolean first = true;
                     foreach(String name in columns)
                     {
-                        if (name != ((ColumnExpression)condition.Right).Name && outputNames.Contains(name))
+                        if (name != ((ColumnExpression)condition.Right).Name && _columnNames.Contains(name))
                         {
                             if (!first)
                             {
@@ -604,6 +609,27 @@ namespace Oinq
         }
 
         // private methods
+        private void FindSourceColumnName(ColumnDeclaration column)
+        {
+            switch ((PigExpressionType)column.Expression.NodeType)
+            {
+                case PigExpressionType.Column:
+                    _columnNames.Add(((ColumnExpression)column.Expression).Name);
+                    break;
+                case PigExpressionType.Aggregate:
+                    var arg = ((AggregateExpression)column.Expression).Argument;
+                    var col = arg as ColumnExpression;
+                    if (col != null)
+                    {
+                        _columnNames.Add(col.Name);
+                        break;
+                    }
+                    break;
+                default:
+                    throw new Exception();
+            }
+        }
+
         private SourceAlias FindRootSource(Expression expression)
         {
             switch ((PigExpressionType)expression.NodeType)
