@@ -343,7 +343,7 @@ namespace Oinq
                     BinaryExpression condition = (BinaryExpression)join.Condition;
                     SourceAlias left = FindRootSource(join.Left);
                     SourceAlias right = FindRootSource(join.Right);
-                    Write(String.Format("{0} = join {1} by ", GetNextAliasName(), GetLastAliasName(left)));
+                    Write(String.Format("{0} = group {1} by ", GetNextAliasName(), GetLastAliasName(left)));
                     Visit(condition.Left);
                     Write(String.Format(", {0} by ", GetLastAliasName(right)));
                     Visit(condition.Right);
