@@ -343,6 +343,28 @@ namespace Oinq
                     BinaryExpression condition = (BinaryExpression)join.Condition;
                     SourceAlias left = FindRootSource(join.Left);
                     SourceAlias right = FindRootSource(join.Right);
+                    
+                    Write(String.Format("{0} = group {1} by (", GetNextAliasName(), GetLastAliasName(right)));
+                    ReadOnlyCollection<ColumnDeclaration> columns = ((SelectExpression)join.Right).Columns;
+                    for (Int32 j = 0, m = columns.Count; j < m; j++)
+                    {
+                        ColumnDeclaration column = columns[j];
+                        Boolean first = true;
+
+                        if (column.Name != ((ColumnExpression)condition.Right).Name)
+                        {
+                            if (!first)
+                            {
+                                Write(", ");
+                            }
+                            WriteColumnName(column.Name);
+                            first = false;
+                        }
+                    }
+                    Write("); ");
+                    AddAlias(right, _aliasCount);
+                    AddAlias();
+                    
                     Write(String.Format("{0} = group {1} by ", GetNextAliasName(), GetLastAliasName(left)));
                     Visit(condition.Left);
                     Write(String.Format(", {0} by ", GetLastAliasName(right)));

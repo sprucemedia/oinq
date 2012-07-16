@@ -602,7 +602,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t0 by Dim1, t1 by Dim1; t3 = foreach t2 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t4 = limit t3 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t5 = limit t4 1000; ", queryText);
         }
 
         [Test]
@@ -616,7 +616,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t0 by Dim1, t1 by Dim1; t3 = foreach t2 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t4 = limit t3 10; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t5 = limit t4 10; ", queryText);
         }
 
         [Test]
@@ -630,7 +630,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t0 by (Mea1 > 5); t3 = group t2 by Dim1, t1 by Dim1; t4 = foreach t3 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t5 = limit t4 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t0 by (Mea1 > 5); t3 = group t1 by (DimDesc); t4 = group t2 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t6 = limit t5 1000; ", queryText);
         }
     }
 }
