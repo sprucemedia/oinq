@@ -250,7 +250,7 @@ namespace Oinq
                     Write("avg");
                     break;
                 case "Count":
-                    Write("COUNT");
+                    Write("count");
                     break;
                 default:
                     Write(aggregateName.ToLower());
