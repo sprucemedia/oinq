@@ -20,6 +20,7 @@ namespace Oinq
         private Dictionary<String, String> _sources;
         private SourceAlias _alias;
         private Dictionary<SourceAlias, Int32> _aliases;
+        private const Int32 RESULT_LIMIT = 1000;
 
         // constructors
         private PigFormatter()
@@ -74,7 +75,7 @@ namespace Oinq
             }
             formatter.WriteJoins(selectQuery.Joins);
             formatter.WriteGenerate(selectQuery.Columns);
-            formatter.WriteOutput(selectQuery.Take, formatter.GetLastAliasName());
+            formatter.WriteOutput(selectQuery.Take);
             return formatter._sb.ToString();
         }
 
@@ -393,17 +394,19 @@ namespace Oinq
             }
         }
 
-        protected void WriteOutput(Expression take, String lastAlias)
+        protected void WriteOutput(Expression take)
         {
+            String nextAlias = GetNextAliasName();
+            String lastAlias = GetLastAliasName();
             if (take != null)
             {
-                Write(String.Format("limit {0} ", lastAlias));
+                Write(String.Format("{0} = limit {1} ", nextAlias, lastAlias));
                 Visit(take);
                 Write("; ");
             }
             else
             {
-                Write(String.Format("dump {0}; ", lastAlias));
+                Write(String.Format("{0} = limit {1} {2}; ", nextAlias, lastAlias, RESULT_LIMIT.ToString()));
             }
         }
 
