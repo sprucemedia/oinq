@@ -626,7 +626,12 @@ namespace Oinq
                     }
                     break;
                 default:
-                    throw new Exception();
+                    BinaryExpression bi = column.Expression as BinaryExpression;
+                    if (bi == null)
+                    {
+                        throw new NotSupportedException("Aggregates must fall on the left side of the join.");
+                    }
+                    break;
             }
         }
 

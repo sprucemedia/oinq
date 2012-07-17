@@ -31,7 +31,7 @@ namespace Oinq.Tests
             ParameterExpression x = source as ParameterExpression;
             String sourceName = x.Name;
             return System.Linq.Dynamic.DynamicExpression.ParseLambda(
-                new ParameterExpression[] { x }, null, String.Format("{0}.Sum(Mea1)/{0}.Sum(Mea1)", sourceName));
+                new ParameterExpression[] { x }, null, String.Format("{0}.Sum(Mea1) + {0}.Sum(Mea1) + {0}.Sum(Mea1)", sourceName));
         }
     }
 }
