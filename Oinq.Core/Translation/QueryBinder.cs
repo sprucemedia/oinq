@@ -509,7 +509,7 @@ namespace Oinq
 
         private static IEnumerable<MemberInfo> GetMappedMembers(Type rowType)
         {
-            return rowType.GetProperties().Cast<MemberInfo>();
+            return rowType.GetProperties().Where(pi => pi.CanWrite).Cast<MemberInfo>();
         }
 
         private static SourceAlias GetNextAlias()
