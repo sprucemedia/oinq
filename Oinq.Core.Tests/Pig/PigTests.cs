@@ -631,7 +631,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)joined).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t0 by (Dim1); t4 = group t2 by (DimDesc); t5 = group t3 by Dim1, t4 by Dim1; t6 = foreach t5 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t7 = limit t6 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = limit t5 1000; ", queryText);
         }
 
         [Test]

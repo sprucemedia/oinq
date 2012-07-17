@@ -62,7 +62,7 @@ namespace Oinq
                         formatter.AddAlias(formatter._alias, formatter._aliasCount);
                         formatter.AddAlias();
                     }
-                    if (ex.GroupBy != null)
+                    if (ex.GroupBy != null && selectQuery.Joins.Count == 0)
                     {
                         formatter.WriteGroupBy(selectQuery.GroupBy);
                         formatter.AddAlias(formatter._alias, formatter._aliasCount);
