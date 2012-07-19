@@ -257,6 +257,20 @@ namespace Oinq.Tests
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = filter t1 by (sum(Mea1) > 5); t3 = foreach t2 generate Dim1 as Dimension, sum(Mea1) as Total; t4 = limit t3 1000; ", queryText);
         }
+
+        //[Test]
+        public void it_can_execute_methods_against_the_projection_locally()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Select(p => new { DimInt = Int32.Parse(p.Dim1) });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as DimInt; t2 = limit t1 1000; ", queryText);
+
+        }
     }
 
     [TestFixture]
@@ -632,6 +646,38 @@ namespace Oinq.Tests
 
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = limit t5 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_join_the_file_with_multiple_output_fields_and_an_aggregate_and_a_sort()
+        {
+            // Arrange
+            var fakeData = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dim1, f) => new { Dim1 = dim1, Measure = f.Sum(x => x.Mea1) });
+            var fakeDataExt = _extendedSource.AsQueryable<FakeDataMeta>().Where(e => e.Dim1 == "5");
+            var joined = fakeData.Join(fakeDataExt, f => f.Dim1, e => e.Dim1, (f, e) => new { Dim = f.Dim1, Description = e.DimDesc, Total = f.Measure })
+                .OrderByDescending(p => p.Dim);
+
+            // Act
+            var queryText = ((IPigQueryable)joined).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = order t5 by Dim desc; t7 = limit t6 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_join_the_file_with_multiple_output_fields_and_a_sorted_aggregate()
+        {
+            // Arrange
+            var fakeData = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dim1, f) => new { Dim1 = dim1, Measure = f.Sum(x => x.Mea1) });
+            var fakeDataExt = _extendedSource.AsQueryable<FakeDataMeta>().Where(e => e.Dim1 == "5");
+            var joined = fakeData.Join(fakeDataExt, f => f.Dim1, e => e.Dim1, (f, e) => new { Dim = f.Dim1, Description = e.DimDesc, Total = f.Measure })
+                .OrderByDescending(p => p.Total);
+
+            // Act
+            var queryText = ((IPigQueryable)joined).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = order t5 by Total desc; t7 = limit t6 1000; ", queryText);
         }
 
         [Test]

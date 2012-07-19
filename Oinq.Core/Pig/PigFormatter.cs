@@ -53,7 +53,7 @@ namespace Oinq
 
             foreach (SelectExpression ex in selectQuery.CommandStack)
             {
-                if (ex.Take == null)
+                if (ex.Take == null && ex.OrderBy == null)
                 {
                     formatter._alias = formatter.FindRootSource(ex.From);
                     if (ex.Where != null)
@@ -72,7 +72,7 @@ namespace Oinq
             }
             formatter.WriteJoins(selectQuery.Joins, selectQuery.Columns);
             formatter.WriteGenerate(selectQuery.Columns);
-            formatter.WriteOrderBy(selectQuery.OrderBy);
+            formatter.WriteOrderBy(selectQuery.OrderBy, selectQuery.Columns);
             formatter.WriteOutput(selectQuery.Take);
             return formatter._sb.ToString();
         }
@@ -384,10 +384,17 @@ namespace Oinq
             Write(String.Format("{0} = load '{1}'; ", GetLastAliasName(_alias), _sources[sourceType.Name]));
         }
 
-        protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys)
+        protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys, ReadOnlyCollection<ColumnDeclaration> outputColumns)
         {
             if (orderBys != null && orderBys.Count > 0)
             {
+                List<ColumnDeclaration> columns = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType == PigExpressionType.Column).ToList();
+                List<ColumnDeclaration> aggs = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType != PigExpressionType.Column).ToList();
+                Dictionary<String, String> columnMaps = new Dictionary<String, String>();
+                foreach (ColumnDeclaration column in columns)
+                {
+                    columnMaps.Add(column.Name, ((ColumnExpression)column.Expression).Name);
+                }
                 Write(String.Format("{0} = order {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = orderBys.Count; i < n; i++)
@@ -397,7 +404,21 @@ namespace Oinq
                     {
                         Write(", ");
                     }
-                    VisitValue(orderBy.Expression);
+
+                    var colExp = orderBy.Expression as ColumnExpression;
+                    if (colExp != null)
+                    {
+                        WriteColumnName(columnMaps.FirstOrDefault(x => x.Value == colExp.Name).Key);
+                    }
+                    var aggExp = orderBy.Expression as AggregateExpression;
+                    if (aggExp != null)
+                    {
+                        if (aggs.Count == 1)
+                        {
+                            WriteColumnName(aggs[0].Name);
+                        }
+                    }
+
                     WriteOrderByDirection(orderBy.Direction);
                 }
                 Write("; ");
