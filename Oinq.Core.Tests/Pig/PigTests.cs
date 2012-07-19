@@ -124,7 +124,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc; t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 desc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 desc; t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc, Dim1 asc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc, Dim1 asc; t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc, Dim1 desc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc, Dim1 desc; t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -180,7 +180,7 @@ namespace Oinq.Tests
         }
 
         [Test]
-        public void it_can_limit_the_numer_of_results_after_ordering()
+        public void it_can_limit_the_number_of_results_after_ordering()
         {
             // Arrange
             var query = _source.AsQueryable<FakeData>().OrderBy(f => f.Mea1).Take(100);
@@ -189,7 +189,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = order t0 by Mea1 asc; t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 100; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc; t3 = limit t2 100; ", queryText);
         }
 
         [Test]

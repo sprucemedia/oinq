@@ -68,16 +68,11 @@ namespace Oinq
                         formatter.AddAlias(formatter._alias, formatter._aliasCount);
                         formatter.AddAlias();
                     }
-                    if (ex.OrderBy != null)
-                    {
-                        formatter.WriteOrderBy(selectQuery.OrderBy);
-                        formatter.AddAlias(formatter._alias, formatter._aliasCount);
-                        formatter.AddAlias();
-                    }
                 }
             }
             formatter.WriteJoins(selectQuery.Joins, selectQuery.Columns);
             formatter.WriteGenerate(selectQuery.Columns);
+            formatter.WriteOrderBy(selectQuery.OrderBy);
             formatter.WriteOutput(selectQuery.Take);
             return formatter._sb.ToString();
         }
@@ -315,6 +310,7 @@ namespace Oinq
             Write(String.Format("{0} = foreach {1} generate ", GetNextAliasName(), GetLastAliasName(_alias)));
             WriteColumns(columns);
             Write("; ");
+            AddAlias(_alias, _aliasCount);
             AddAlias();
         }
 
@@ -390,7 +386,7 @@ namespace Oinq
 
         protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys)
         {
-            if (orderBys.Count > 0)
+            if (orderBys != null && orderBys.Count > 0)
             {
                 Write(String.Format("{0} = order {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
 
@@ -405,6 +401,7 @@ namespace Oinq
                     WriteOrderByDirection(orderBy.Direction);
                 }
                 Write("; ");
+                AddAlias();
             }
         }
 
