@@ -258,6 +258,19 @@ namespace Oinq.Tests
             Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = filter t1 by (sum(Mea1) > 5); t3 = foreach t2 generate Dim1 as Dimension, sum(Mea1) as Total; t4 = limit t3 1000; ", queryText);
         }
 
+        [Test]
+        public void it_can_count_grouped_data()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f.Mea1, (dimension, measure) => new { Dimension = dimension, Total = measure.Count() });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Dimension, count() as Total; t3 = limit t2 1000; ", queryText);
+        }
+
         //[Test]
         public void it_can_execute_methods_against_the_projection_locally()
         {

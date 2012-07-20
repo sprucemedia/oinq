@@ -213,11 +213,6 @@ namespace Oinq
             }
         }
 
-        protected virtual Boolean RequiresAsteriskWhenNoArgument(String aggregateName)
-        {
-            return aggregateName == "Count";
-        }
-
         protected override Expression VisitColumn(ColumnExpression node)
         {
             WriteColumnName(node.Name);
@@ -503,10 +498,6 @@ namespace Oinq
             if (node.Argument != null)
             {
                 VisitValue(node.Argument);
-            }
-            else if (RequiresAsteriskWhenNoArgument(node.AggregateName))
-            {
-                Write("*");
             }
             Write(")");
             return node;
