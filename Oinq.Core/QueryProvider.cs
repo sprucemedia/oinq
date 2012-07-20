@@ -129,7 +129,7 @@ namespace Oinq
         /// </summary>
         /// <param path="translatedQuery">The TranslatedQuery.</param>
         /// <returns>The query result.</returns>
-        protected virtual IList<TResult> Execute<TResult>(ITranslatedQuery translatedQuery)
+        protected virtual Object Execute<TResult>(ITranslatedQuery translatedQuery)
         {
             throw new NotImplementedException();
         }

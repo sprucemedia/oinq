@@ -13,7 +13,7 @@ namespace Oinq.Tests
             _results = results;
         }
 
-        protected override IList<TResult> Execute<TResult>(ITranslatedQuery translatedQuery)
+        protected override Object Execute<TResult>(ITranslatedQuery translatedQuery)
         {
             return (IList<TResult>)_results;
         }
