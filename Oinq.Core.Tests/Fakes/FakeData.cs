@@ -14,4 +14,18 @@ namespace Oinq.Tests
         public String DimDesc { get; set; }
         public String DimDesc2 { get; set; }
     }
+
+    public class FakeProjection
+    {
+        public String Key { get; set; }
+        public Int32 Measure { get; set; }
+        public String Description { get; set; }
+    }
+
+    public class FakeProjectionInt
+    {
+        public Int32 Key { get; set; }
+        public Int32 Measure { get; set; }
+        public String Description { get; set; }
+    }
 }

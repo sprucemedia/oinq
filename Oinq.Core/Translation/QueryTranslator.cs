@@ -36,7 +36,7 @@ namespace Oinq
                 expression = PartialEvaluator.Evaluate(expression);
                 expression = QueryBinder.Bind(provider, expression);
                 expression = AggregateRewriter.Rewrite(expression);
-                expression = OrderByRewriter.Rewrite(expression);
+                //expression = OrderByRewriter.Rewrite(expression);
                 expression = UnusedColumnRemover.Remove(expression);
                 expression = RedundantSubqueryRemover.Remove(expression);
                 projection = (ProjectionExpression)expression;

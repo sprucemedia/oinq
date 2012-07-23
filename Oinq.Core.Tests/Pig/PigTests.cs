@@ -736,4 +736,59 @@ namespace Oinq.Tests
             Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, ((sum(Mea1) + sum(Mea1)) + sum(Mea1)) as Total; t6 = limit t5 1000; ", queryText);
         }
     }
+
+    [TestFixture]
+    public class When_projecting_to_a_strong_type
+    {
+        private String SOURCE_NAME = "FakeData";
+        private const String PATH_NAME = "FakeData";
+        private const String EXT_SOURCE_NAME = "FakeDataMeta";
+        private const String EXT_PATH_NAME = "FakeDataMeta";
+        private IDataFile _source;
+        private IDataFile _extendedSource;
+        private Query<FakeData> _fakeData;
+        private Query<FakeDataMeta> _fakeDataDim;
+
+        [SetUp]
+        public void Setup()
+        {
+            _source = MockRepository.GenerateStub<IDataFile>();
+            _source.Stub(s => s.Name).Return(SOURCE_NAME);
+            _source.Stub(s => s.AbsolutePath).Return(PATH_NAME);
+            _fakeData = new Query<FakeData>(new QueryProvider(_source));
+
+            _extendedSource = MockRepository.GenerateStub<IDataFile>();
+            _extendedSource.Stub(s => s.Name).Return(EXT_SOURCE_NAME);
+            _extendedSource.Stub(s => s.AbsolutePath).Return(EXT_PATH_NAME);
+            _fakeDataDim = new Query<FakeDataMeta>(new QueryProvider(_extendedSource));
+        }
+
+        [Test]
+        public void it_can_project_to_a_class()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Join(_extendedSource.AsQueryable<FakeDataMeta>(),
+                fd => fd.Dim1, e => e.Dim1, (fd, e) => new FakeProjection { Key = fd.Dim1, Measure = fd.Mea1, Description = e.DimDesc });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Dim1, Mea1 as Mea1, DimDesc as DimDesc; t5 = limit t4 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_project_to_a_class_with_a_parse()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().Join(_extendedSource.AsQueryable<FakeDataMeta>(),
+                fd => fd.Dim1, e => e.Dim1, (fd, e) => new FakeProjectionInt { Key = Int32.Parse(fd.Dim1), Measure = fd.Mea1, Description = e.DimDesc });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Dim1, Mea1 as Mea1, DimDesc as DimDesc; t5 = limit t4 1000; ", queryText);
+        }
+    }
 }
