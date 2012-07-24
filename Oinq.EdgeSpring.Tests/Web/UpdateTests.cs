@@ -9,7 +9,8 @@ namespace Oinq.EdgeSpring.Tests
     {
         private readonly Uri _uri = new Uri("http://server.com:8000/remote?edgemart=FakeData");
         private EdgeMart<FakeData> _edgeMart;
-        private FakeData _fake = new FakeData();
+        private FakeData _originalFake = new FakeData();
+        private FakeData _newFake = new FakeData();
 
         [TestFixtureSetUp]
         public void FixtureSetup()
@@ -21,7 +22,7 @@ namespace Oinq.EdgeSpring.Tests
         public void it_can_create_with_a_edgemart_and_object()
         {
             // Act
-            var update = new Update<FakeData>(_edgeMart, _fake);
+            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
 
             // Assert
             Assert.IsNotNull(update);
@@ -34,7 +35,20 @@ namespace Oinq.EdgeSpring.Tests
             EdgeMart<FakeData> nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(nullFake, _fake);
+            TestDelegate a = () => new Update<FakeData>(nullFake, _originalFake, _newFake);
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(a);
+        }
+
+        [Test]
+        public void it_requires_an_original_object()
+        {
+            // Arrange
+            FakeData nullFake = null;
+
+            // Act
+            TestDelegate a = () => new Update<FakeData>(_edgeMart, nullFake, _newFake);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -47,7 +61,7 @@ namespace Oinq.EdgeSpring.Tests
             FakeData nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(_edgeMart, nullFake);
+            TestDelegate a = () => new Update<FakeData>(_edgeMart, _originalFake, nullFake);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -57,7 +71,7 @@ namespace Oinq.EdgeSpring.Tests
         public void it_can_return_the_server_information()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _fake);
+            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
 
             // Act
             var absolute = update.ToUri();
@@ -72,7 +86,7 @@ namespace Oinq.EdgeSpring.Tests
         public void it_can_return_the_action()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _fake);
+            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
 
             // Act
             var absolute = update.ToUri();
@@ -85,7 +99,7 @@ namespace Oinq.EdgeSpring.Tests
         public void it_can_return_the_edgemart()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _fake);
+            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
 
             // Act
             var absolute = update.ToUri();

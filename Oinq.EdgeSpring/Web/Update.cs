@@ -16,11 +16,15 @@ namespace Oinq.EdgeSpring.Web
         private T _modifiedObject;
 
         // constructors
-        public Update(EdgeMart<T> edgemart, T modifiedObject)
+        public Update(EdgeMart<T> edgemart, T originalObject, T modifiedObject)
         {
             if (edgemart == null)
             {
                 throw new ArgumentNullException("edgemart");
+            }
+            if (originalObject == null)
+            {
+                throw new ArgumentNullException("originalObject");
             }
             if (modifiedObject == null)
             {
@@ -37,9 +41,10 @@ namespace Oinq.EdgeSpring.Web
             StringBuilder sb = new StringBuilder(_edgeMart.UrlString);
             sb.Append(String.Format("&action={0}", _action));
 
-            // filter
-            // dims
-            // values
+            // filter = need keys
+            // dims = need old values where different
+            // measures = need old values
+            // values = need new values where different
 
             return new Uri(sb.ToString());
         }
