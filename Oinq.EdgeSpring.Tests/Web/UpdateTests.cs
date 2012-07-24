@@ -1,28 +1,35 @@
 ﻿using System;
 using NUnit.Framework;
 using Oinq.EdgeSpring.Web;
+using Rhino.Mocks;
+using System.Collections.Generic;
 
 namespace Oinq.EdgeSpring.Tests
 {
     [TestFixture]
     public class When_creating_an_update
     {
-        private readonly Uri _uri = new Uri("http://server.com:8000/remote?edgemart=FakeData");
-        private EdgeMart<FakeData> _edgeMart;
-        private FakeData _originalFake = new FakeData();
-        private FakeData _newFake = new FakeData();
+        private readonly String _edgeMartUrl = "http://server.com:8000/remote?edgemart=FakeData";
+        private IUpdateable _originalFake;
+        private IUpdateable _newFake;
+        private IDictionary<String, String> _keys = new Dictionary<String, String>();
 
         [TestFixtureSetUp]
         public void FixtureSetup()
         {
-            _edgeMart = new EdgeMart<FakeData>(_uri);
+            _keys.Add("Key1", "Key1Value");
+            _keys.Add("Key2", "Key2Value");
+            _originalFake = MockRepository.GenerateMock<IUpdateable>();
+            _originalFake.Stub(s => s.GetKeys()).Return(_keys);
+
+            _newFake = MockRepository.GenerateMock<IUpdateable>();
         }
 
         [Test]
         public void it_can_create_with_a_edgemart_and_object()
         {
             // Act
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            var update = new Update(_edgeMartUrl, _originalFake, _newFake);
 
             // Assert
             Assert.IsNotNull(update);
@@ -32,10 +39,10 @@ namespace Oinq.EdgeSpring.Tests
         public void it_requires_an_edgemart()
         {
             // Arrange
-            EdgeMart<FakeData> nullFake = null;
+            String nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(nullFake, _originalFake, _newFake);
+            TestDelegate a = () => new Update(nullFake, _originalFake, _newFake);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -48,7 +55,7 @@ namespace Oinq.EdgeSpring.Tests
             FakeData nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(_edgeMart, nullFake, _newFake);
+            TestDelegate a = () => new Update(_edgeMartUrl, nullFake, _newFake);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -61,7 +68,7 @@ namespace Oinq.EdgeSpring.Tests
             FakeData nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(_edgeMart, _originalFake, nullFake);
+            TestDelegate a = () => new Update(_edgeMartUrl, _originalFake, nullFake);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -70,23 +77,23 @@ namespace Oinq.EdgeSpring.Tests
         [Test]
         public void it_can_return_the_server_information()
         {
-            // Assert
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            // Arrange
+            var update = new Update(_edgeMartUrl, _originalFake, _newFake);
 
             // Act
             var absolute = update.ToUri();
 
             // Assert
-            Assert.AreEqual(_edgeMart.Server.Host, absolute.Host);
-            Assert.AreEqual(_edgeMart.Server.Port, absolute.Port);
-            Assert.AreEqual(_uri.AbsolutePath, absolute.AbsolutePath);
+            Assert.AreEqual("server.com", absolute.Host);
+            Assert.AreEqual(8000, absolute.Port);
+            Assert.AreEqual("/remote", absolute.AbsolutePath);
         }
 
         [Test]
         public void it_can_return_the_action()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            var update = new Update(_edgeMartUrl, _originalFake, _newFake);
 
             // Act
             var absolute = update.ToUri();
@@ -99,13 +106,46 @@ namespace Oinq.EdgeSpring.Tests
         public void it_can_return_the_edgemart()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            var update = new Update(_edgeMartUrl, _originalFake, _newFake);
 
             // Act
             var absolute = update.ToUri();
 
             // Assert
-            Assert.True(absolute.Query.Contains(String.Format("edgemart={0}", _edgeMart.Name)));
+            Assert.True(absolute.Query.Contains("edgemart=FakeData"));
+        }
+    }
+
+    [TestFixture]
+    public class When_building_an_update_url
+    {
+        private readonly String _edgeMartUrl = "http://server.com:8000/remote?edgemart=FakeData";
+        private IUpdateable _originalFake;
+        private IUpdateable _newFake;
+        private IDictionary<String, String> _keys = new Dictionary<String, String>();
+
+        [TestFixtureSetUp]
+        public void FixtureSetup()
+        {
+            _keys.Add("Key1", "Key1Value");
+            _keys.Add("Key2", "Key2Value");
+            _originalFake = MockRepository.GenerateMock<IUpdateable>();
+            _originalFake.Stub(s => s.GetKeys()).Return(_keys);
+
+            _newFake = MockRepository.GenerateMock<IUpdateable>();
+        }
+
+        [Test]
+        public void it_can_return_the_filters()
+        {
+            // Assert
+            var update = new Update(_edgeMartUrl, _originalFake, _newFake);
+
+            // Act
+            var absolute = update.ToUri();
+
+            // Assert
+            Assert.True(absolute.Query.Contains("&filters=Key1:Key1Value&filters=Key2:Key2Value"));
         }
     }
 }

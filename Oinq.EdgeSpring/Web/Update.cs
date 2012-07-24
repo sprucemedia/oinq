@@ -8,17 +8,18 @@ namespace Oinq.EdgeSpring.Web
     /// <summary>
     /// Represents an update request to be sent to the EdgeSpring API.
     /// </summary>
-    public class Update<T> where T : class
+    public class Update
     {
         // private fields
         private readonly String _action = "update";
-        private EdgeMart<T> _edgeMart;
-        private T _modifiedObject;
+        private String _edgeMartUrl;
+        private IUpdateable _originalObject;
+        private IUpdateable _modifiedObject;
 
         // constructors
-        public Update(EdgeMart<T> edgemart, T originalObject, T modifiedObject)
+        public Update(String edgemartUrl, IUpdateable originalObject, IUpdateable modifiedObject)
         {
-            if (edgemart == null)
+            if (String.IsNullOrEmpty(edgemartUrl))
             {
                 throw new ArgumentNullException("edgemart");
             }
@@ -31,17 +32,25 @@ namespace Oinq.EdgeSpring.Web
                 throw new ArgumentNullException("modifiedObject");
             }
 
-            _edgeMart = edgemart;
+            _edgeMartUrl = edgemartUrl;
+            _originalObject = originalObject;
             _modifiedObject = modifiedObject;
         }
 
         // public methods
         public Uri ToUri()
         {
-            StringBuilder sb = new StringBuilder(_edgeMart.UrlString);
+            StringBuilder sb = new StringBuilder(_edgeMartUrl);
             sb.Append(String.Format("&action={0}", _action));
 
-            // filter = need keys
+            // filters
+            IDictionary<String, String> filters = _originalObject.GetKeys();
+            foreach (String key in filters.Keys)
+            {
+                sb.Append(String.Format("&filters={0}:{1}", key, filters[key]));
+            }
+
+
             // dims = need old values where different
             // measures = need old values
             // values = need new values where different
