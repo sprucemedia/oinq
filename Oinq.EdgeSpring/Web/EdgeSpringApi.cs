@@ -22,8 +22,6 @@ namespace Oinq.EdgeSpring.Web
             request.RequestFormat = DataFormat.Json;
             request.AddBody(query);
 
-            System.Diagnostics.Debug.WriteLine(String.Format("ES query: {0}", query.query));
-
             return Execute<QueryResponse<T>>(request, requestUri.Authority);
         }
 

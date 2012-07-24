@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using Oinq.EdgeSpring.Web;
 
 namespace Oinq.EdgeSpring
@@ -25,8 +25,18 @@ namespace Oinq.EdgeSpring
         /// <returns>A query result.</returns>
         protected override Object Execute<TResult>(ITranslatedQuery translatedQuery)
         {
-            Query query = new Query(((SelectQuery)translatedQuery).CommandText);
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            String commandText = ((SelectQuery)translatedQuery).CommandText;
+            timer.Stop();
+
+            Debug.WriteLine(String.Format("ES query: {0}", commandText));
+            Debug.WriteLine(String.Format("ES query generated: {0}ms", timer.ElapsedMilliseconds));
+
+            Query query = new Query(commandText);
             QueryResponse<TResult> response = EdgeSpringApi.GetQueryResponse<TResult>(query, ((EdgeMart)Source).AbsoluteUri);
+
+            Debug.WriteLine(String.Format("ES query execution time: {0}", response.query_time));
 
             return response.results.records;
         }
