@@ -138,6 +138,11 @@ namespace Oinq
                                 GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]));
                         }
                         break;
+                    case "First":
+                    case "FirstOrDefault":
+                        {
+                            return BindTake(node.Arguments[0], Expression.Constant(1));
+                        }
                     case "Count":
                     case "Min":
                     case "Max":
@@ -338,8 +343,8 @@ namespace Oinq
             ProjectedColumns pc = ProjectColumns(resultExpr, alias, projection.Source.Alias);
 
             // make it possible to tie _aggregates back to this group-by
-            Expression projectedElementSubquery = ((NewExpression)pc.Projector).Arguments[1];
-            _groupByMap.Add(projectedElementSubquery, info);
+            //Expression projectedElementSubquery = ((NewExpression)pc.Projector).Arguments[1];
+            //_groupByMap.Add(projectedElementSubquery, info);
 
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, projection.Source, null, null, groupExprs),

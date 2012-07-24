@@ -271,7 +271,7 @@ namespace Oinq.Tests
             Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Dimension, count() as Total; t3 = limit t2 1000; ", queryText);
         }
 
-        //[Test]
+        [Test]
         public void it_can_execute_methods_against_the_projection_locally()
         {
             // Arrange
@@ -282,7 +282,6 @@ namespace Oinq.Tests
 
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as DimInt; t2 = limit t1 1000; ", queryText);
-
         }
     }
 
