@@ -122,6 +122,11 @@ namespace Oinq.EdgeSpring
         {
         }
 
+        /// <summary>
+        /// Creates a new EdgeMart.
+        /// </summary>
+        /// <param name="baseConnectionString">Base connection string.</param>
+        /// <returns>EdgeMart{{T}}</returns>
         public static EdgeMart<T> Create(String baseConnectionString)
         {
             if (baseConnectionString.IndexOf("edgemart", StringComparison.InvariantCultureIgnoreCase) >= 0)

@@ -65,6 +65,7 @@
     <Compile Include="UrlTests.cs" />
     <Compile Include="Web\FakeData.cs" />
     <Compile Include="Web\SerializationTests.cs" />
+    <Compile Include="Web\UpdateTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web\JsonData\response.txt" />
