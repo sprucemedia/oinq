@@ -5,28 +5,28 @@ namespace Oinq
     /// <summary>
     /// Attribute used for mapping binder method names to Pig extensions.
     /// </summary>
-    public sealed class PigExtension : Attribute
+    public sealed class PigExtensionAttribute : Attribute
     {
         // private fields
-        private String _name;
+        private readonly Type _binderType;
 
         // constructors
         /// <summary>
         /// Initializes an member of PigExtension.
         /// </summary>
-        /// <param path="binderName">Name of the binder class.</param>
-        public PigExtension(String binderName)
+        /// <param name="binderType">Type of the binder class.</param>
+        public PigExtensionAttribute(Type binderType)
         {
-            _name = binderName;
+            _binderType = binderType;
         }
 
         // public properties
         /// <summary>
-        /// Gets the path of the method in the extension.
+        /// Gets the type of the class that contains the binder.
         /// </summary>
-        public String BinderName
+        public Type BinderType
         {
-            get { return _name; }
+            get { return _binderType; }
         }
     }
 }

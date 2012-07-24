@@ -122,6 +122,12 @@ namespace Oinq.EdgeSpring
         {
         }
 
+        /// <summary>
+        /// Creates an <see cref="EdgeMart" /> using the information from the type.
+        /// </summary>
+        /// <param name="baseConnectionString">Server settings in the form of a connection string (EdgeMart settings will be
+        /// figured out from the type parameter).</param>
+        /// <returns>An <see cref="EdgeMart" /> for the specified type.</returns>
         public static EdgeMart<T> Create(String baseConnectionString)
         {
             if (baseConnectionString.IndexOf("edgemart", StringComparison.InvariantCultureIgnoreCase) >= 0)
