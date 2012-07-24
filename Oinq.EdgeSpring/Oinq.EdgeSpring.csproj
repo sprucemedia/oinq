@@ -66,6 +66,7 @@
     <Compile Include="Web\QueryResponse.cs" />
     <Compile Include="Web\QueryResult.cs" />
     <Compile Include="Web\QueryResultDescription.cs" />
+    <Compile Include="Web\UpdateResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

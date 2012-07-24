@@ -105,4 +105,40 @@ namespace Oinq.EdgeSpring.Tests
             Assert.AreNotEqual(default(Int32), response.results.records[0].miles);
         }
     }
+
+    [TestFixture]
+    public class When_deserializing_an_update_response
+    {
+        private const String TEST_FILE = @"..\..\Web\JsonData\updateresponse.txt";
+        private IRestResponse<UpdateResponse> _response;
+
+        [TestFixtureSetUp]
+        public void TestFixtureSetup()
+        {
+            String results;
+            StreamReader testFile = null;
+            try
+            {
+                testFile = new StreamReader(TEST_FILE);
+                results = testFile.ReadToEnd();
+            }
+            finally
+            {
+                testFile.Close();
+            }
+
+            _response = MockRepository.GenerateMock<IRestResponse<UpdateResponse>>();
+            _response.Stub(s => s.Content).Return(results);
+        }
+
+        [Test]
+        public void it_is_able_deserialize_an_edgespring_response()
+        {
+            // Act
+            UpdateResponse response = JsonConvert.DeserializeObject<UpdateResponse>(_response.Content);
+
+            // Assert
+            Assert.IsNotNull(response);
+        }
+    }
 }

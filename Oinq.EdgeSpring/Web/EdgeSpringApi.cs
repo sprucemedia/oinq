@@ -25,6 +25,18 @@ namespace Oinq.EdgeSpring.Web
             return Execute<QueryResponse<T>>(request, requestUri.Authority);
         }
 
+        /// <summary>
+        /// Gets the results for an update to an EdgeSpring EdgeMart.
+        /// </summary>
+        /// <param name="requestUri">The URI of the request.</param>
+        /// <returns>The Update Response.</returns>
+        public static UpdateResponse GetUpdateResponse(Uri requestUri)
+        {
+            var request = new RestRequest(requestUri.PathAndQuery);
+
+            return Execute<UpdateResponse>(request, requestUri.Authority);
+        }
+
         // private static methods
         private static T Execute<T>(IRestRequest request, String baseUrl) where T : new()
         {

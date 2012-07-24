@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Oinq.EdgeSpring.Web
 {
     /// <summary>
-    /// Represents a response from the EdgeSpring REST API query action.
+    /// Represents a response from the EdgeSpring REST API update action.
     /// </summary>
-    public class QueryResponse<T>
+    public class UpdateResponse
     {
         // constructors
         /// <summary>
-        /// Initializes a new QueryResponse from a response string.
+        /// Initializes a new UpdateResponse from a response string.
         /// </summary>
-        public QueryResponse()
+        public UpdateResponse()
         {
         }
 
@@ -22,19 +23,9 @@ namespace Oinq.EdgeSpring.Web
         public String action { get; set; }
 
         /// <summary>
-        /// Gets the row limit on the query.
+        /// Gets the EdgeSpring Edgemart name.
         /// </summary>
-        public Int32 limit { get; set; }
-
-        /// <summary>
-        /// Gets the scope of the request.
-        /// </summary>
-        public Scope otherscope { get; set; }
-
-        /// <summary>
-        /// Gets the query text of the query request.
-        /// </summary>
-        public String query { get; set; }
+        public String edgemart { get; set; }
 
         /// <summary>
         /// Gets the query execution time from the output.
@@ -52,8 +43,13 @@ namespace Oinq.EdgeSpring.Web
         public String responseId { get; set; }
 
         /// <summary>
-        /// Gets the results of the query.
+        /// Gets the result string.
         /// </summary>
-        public QueryResult<T> results { get; set; }
+        public List<String> results { get; set; }
+
+        /// <summary>
+        /// Gets the EdgeSpring worker id.
+        /// </summary>
+        public String workerId { get; set; }
     }
 }

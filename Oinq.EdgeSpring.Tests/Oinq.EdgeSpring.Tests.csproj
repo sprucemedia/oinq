@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Web\JsonData\response.txt" />
+    <Content Include="Web\JsonData\updateresponse.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
