@@ -774,7 +774,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Dim1, Mea1 as Mea1, DimDesc as DimDesc; t5 = limit t4 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t5 = limit t4 1000; ", queryText);
         }
 
         [Test]
@@ -788,7 +788,52 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Dim1, Mea1 as Mea1, DimDesc as DimDesc; t5 = limit t4 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = group t1 by (DimDesc); t3 = group t0 by Dim1, t2 by Dim1; t4 = foreach t3 generate Dim1 as Key, Mea1 as Measure, DimDesc as Description; t5 = limit t4 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_project_to_a_class_with_a_parse_and_aggregate()
+        {
+            // Arrange
+            var fakeData = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f.Mea1, (dimension, data) => new { Dim1 = dimension, Total = data.Sum() });
+            var fakeDataExt = _extendedSource.AsQueryable<FakeDataMeta>().Where(e => e.Dim1 == "5");
+            var joined = fakeData.Join(fakeDataExt, f => f.Dim1, e => e.Dim1, (f, e) => new FakeProjectionInt { Key = Int32.Parse(f.Dim1), Measure = f.Total, Description = e.DimDesc });
+
+            // Act
+            var queryText = ((IPigQueryable)joined).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, sum(Mea1) as Measure, DimDesc as Description; t6 = limit t5 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_project_to_a_class_with_a_parse_and_aggregate_and_sort()
+        {
+            // Arrange
+            var fakeData = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f.Mea1, (dimension, data) => new { Dim1 = dimension, Total = data.Sum() });
+            var fakeDataExt = _extendedSource.AsQueryable<FakeDataMeta>().Where(e => e.Dim1 == "5");
+            var joined = fakeData.Join(fakeDataExt, f => f.Dim1, e => e.Dim1, (f, e) => new FakeProjectionInt { Key = Int32.Parse(f.Dim1), Measure = f.Total, Description = e.DimDesc }).OrderByDescending(e => e.Key);
+
+            // Act
+            var queryText = ((IPigQueryable)joined).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, sum(Mea1) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_project_to_a_class_with_a_parse_and_sort_and_convert()
+        {
+            // Arrange
+            var fakeData = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f.Mea1, (dimension, data) => new { Dim1 = dimension, Total = Convert.ToInt32(data.Sum() + data.Sum()) });
+            var fakeDataExt = _extendedSource.AsQueryable<FakeDataMeta>().Where(e => e.Dim1 == "5");
+            var joined = fakeData.Join(fakeDataExt, f => f.Dim1, e => e.Dim1, (f, e) => new FakeProjectionInt { Key = Int32.Parse(f.Dim1), Measure = f.Total, Description = e.DimDesc }).OrderByDescending(e => e.Key);
+
+            // Act
+            var queryText = ((IPigQueryable)joined).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
         }
     }
 }

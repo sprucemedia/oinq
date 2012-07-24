@@ -10,7 +10,7 @@ namespace Oinq.EdgeSpring
     public class EdgeSpringQueryProvider : QueryProvider
     {
         /// <summary>
-        /// Initializes a new instance of EdgeSpringQueryProvider.
+        /// Initializes a new member of EdgeSpringQueryProvider.
         /// </summary>
         /// <param name="source">IDataFile of type EdgeMart.</param>
         public EdgeSpringQueryProvider(EdgeMart source)

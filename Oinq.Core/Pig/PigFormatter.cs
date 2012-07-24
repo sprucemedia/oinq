@@ -333,7 +333,7 @@ namespace Oinq
             {
                 foreach (ColumnDeclaration column in outputColumns)
                 {
-                    FindSourceColumnName(column);
+                    FindSourceColumnName(column.Expression);
                 }
                 for (Int32 i = 0, n = joins.Count; i < n; i++)
                 {
@@ -384,7 +384,7 @@ namespace Oinq
             if (orderBys != null && orderBys.Count > 0)
             {
                 List<ColumnDeclaration> columns = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType == PigExpressionType.Column).ToList();
-                List<ColumnDeclaration> aggs = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType != PigExpressionType.Column).ToList();
+                List<ColumnDeclaration> aggs = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType == PigExpressionType.Aggregate).ToList();
                 Dictionary<String, String> columnMaps = new Dictionary<String, String>();
                 foreach (ColumnDeclaration column in columns)
                 {
@@ -411,6 +411,18 @@ namespace Oinq
                         if (aggs.Count == 1)
                         {
                             WriteColumnName(aggs[0].Name);
+                        }
+                    }
+                    var parseExp = orderBy.Expression as MethodCallExpression;
+                    if (parseExp != null)
+                    {
+                        foreach(ColumnDeclaration col in outputColumns)
+                        {
+                            var mce = col.Expression as MethodCallExpression;
+                            if (mce != null && parseExp.Method == mce.Method && parseExp.Method.DeclaringType == mce.Method.DeclaringType)
+                            {
+                                WriteColumnName(col.Name);
+                            }
                         }
                     }
 
@@ -595,6 +607,12 @@ namespace Oinq
                     return node;
                 }
             }
+            else if (node.Method.Name == "Parse" || node.Method.DeclaringType == typeof(Convert))
+            {
+                Visit(node.Arguments[0]);
+                // Do nothing else for now - should be replaces with new EdgeSpring functions once they become available.
+                return node;
+            }
             throw new NotSupportedException(String.Format("The method '{0}' is not supported", node.Method.Name));
         }
 
@@ -611,6 +629,9 @@ namespace Oinq
                     _sb.Append(" not ");
                     Visit(node.Operand);
                     break;
+                case ExpressionType.Convert:
+                    Visit(node.Operand);
+                    break;
                 default:
                     throw new NotSupportedException(String.Format("The unary operator '{0}' is not supported", node.NodeType));
             }
@@ -618,30 +639,67 @@ namespace Oinq
         }
 
         // private methods
-        private void FindSourceColumnName(ColumnDeclaration column)
+        private void FindSourceColumnName(Expression expression)
         {
-            switch ((PigExpressionType)column.Expression.NodeType)
+            ColumnExpression columnExpression;
+            switch ((PigExpressionType)expression.NodeType)
             {
                 case PigExpressionType.Column:
-                    _columnNames.Add(((ColumnExpression)column.Expression).Name);
+                    _columnNames.Add(((ColumnExpression)expression).Name);
                     break;
                 case PigExpressionType.Aggregate:
-                    var arg = ((AggregateExpression)column.Expression).Argument;
+                    var arg = ((AggregateExpression)expression).Argument;
                     var col = arg as ColumnExpression;
                     if (col != null)
                     {
                         _columnNames.Add(col.Name);
-                        break;
                     }
                     break;
+                case PigExpressionType.Join:
+                    break;
                 default:
-                    BinaryExpression bi = column.Expression as BinaryExpression;
-                    if (bi == null)
+                    BinaryExpression binary = expression as BinaryExpression;
+                    if (binary != null)
                     {
-                        throw new NotSupportedException("Aggregates must fall on the left side of the join.");
+                        FindSourceColumnName(binary.Left);
+                        FindSourceColumnName(binary.Right);
+                        break;
+                    }
+
+                    UnaryExpression unary = expression as UnaryExpression;
+                    if (unary != null)
+                    {
+                        FindSourceColumnName(unary.Operand);
+                        break;
+                    }
+
+                    if (expression.NodeType == ExpressionType.Call)
+                    {
+                        MethodCallExpression exp = expression as MethodCallExpression;
+                        if (exp.Arguments.Count == 1)
+                        {
+                            columnExpression = exp.Arguments.First() as ColumnExpression;
+                            if (columnExpression != null)
+                            {
+                                _columnNames.Add(columnExpression.Name);
+                                break;
+                            }
+                            FindSourceColumnName(exp.Arguments.First());
+                            break;
+                        }
+                    }
+                    else
+                    {
+                       throw new NotSupportedException("Aggregates must fall on the left side of the join.");
                     }
                     break;
             }
+        }
+
+        private ColumnExpression FindColumnSource(MethodCallExpression expression)
+        {
+            return null;
+
         }
 
         private SourceAlias FindRootSource(Expression expression)

@@ -80,9 +80,9 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates a new instance of Url based on the settings in this UrlBuilder.
+        /// Creates a new member of Url based on the settings in this UrlBuilder.
         /// </summary>
-        /// <returns>A new instance of Url.</returns>
+        /// <returns>A new member of Url.</returns>
         public Url ToUrl()
         {
             return Url.Create(ToString());

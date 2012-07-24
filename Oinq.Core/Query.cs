@@ -30,7 +30,7 @@ namespace Oinq
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the Query class.
+        /// Initializes a new member of the Query class.
         /// </summary>
         /// <param path="provider">The query provider.</param>
         public Query(IQueryProvider provider)
@@ -44,7 +44,7 @@ namespace Oinq
         }
 
         /// <summary>
-        /// Initializes a new instance of the Query class.
+        /// Initializes a new member of the Query class.
         /// </summary>
         /// <param path="provider">The query provider.</param>
         /// <param path="expression">The expression.</param>

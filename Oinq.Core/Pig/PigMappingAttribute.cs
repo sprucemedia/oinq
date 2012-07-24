@@ -12,7 +12,7 @@ namespace Oinq
 
         // constructors
         /// <summary>
-        /// Initializes an instance of PigMapping.
+        /// Initializes an member of PigMapping.
         /// </summary>
         /// <param path="path"></param>
         public PigMapping(String name)

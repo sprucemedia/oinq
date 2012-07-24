@@ -14,7 +14,7 @@ namespace Oinq.EdgeSpring
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of ServerAddress.
+        /// Initializes a new member of ServerAddress.
         /// </summary>
         /// <param name="host">The server's host name.</param>
         public ServerAddress(String host)
@@ -24,7 +24,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Initializes a new instance of ServerAddress.
+        /// Initializes a new member of ServerAddress.
         /// </summary>
         /// <param name="host">The server's host name.</param>
         /// <param name="port">The server's port number.</param>
@@ -39,7 +39,7 @@ namespace Oinq.EdgeSpring
         /// Parses a string representation of a server address.
         /// </summary>
         /// <param name="value">The string representation of a server address.</param>
-        /// <returns>A new instance of ServerAddress initialized with values parsed from the string.</returns>
+        /// <returns>A new member of ServerAddress initialized with values parsed from the string.</returns>
         public static ServerAddress Parse(String value)
         {
             ServerAddress address;

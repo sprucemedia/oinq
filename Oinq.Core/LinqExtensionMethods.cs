@@ -12,7 +12,7 @@ namespace Oinq
         /// </summary>
         /// <typeparam path="T">The type of records in an IDataFile.</typeparam>
         /// <param path="dataFile">The IDataFile.</param>
-        /// <returns>An instance of IQueryable{{T}} for an IDataFile.</returns>
+        /// <returns>An member of IQueryable{{T}} for an IDataFile.</returns>
         public static IQueryable<T> AsQueryable<T>(this IDataFile dataFile)
         {
             var provider = new QueryProvider(dataFile);

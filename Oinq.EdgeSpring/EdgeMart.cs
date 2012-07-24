@@ -13,7 +13,7 @@ namespace Oinq.EdgeSpring
 
         // constructors
         /// <summary>
-        /// Creates a new instance of EdgeMart.
+        /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="url">Server and EdgeMart settings in the form of a Url.</param>
         protected EdgeMart(Url url)
@@ -30,7 +30,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates a new instance of EdgeMart.
+        /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="connectionString">Server and EdgeMart settings in the form of a connection string.</param>
         protected EdgeMart (String connectionString)
@@ -39,7 +39,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates a new instance of EdgeMart.
+        /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="uri">Server and EdgeMart settings in the form of a Uri.</param>
         protected EdgeMart (Uri uri)
@@ -96,7 +96,7 @@ namespace Oinq.EdgeSpring
     public class EdgeMart<T> : EdgeMart
     {
         /// <summary>
-        /// Creates a new instance of EdgeMart.
+        /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="url">Server and EdgeMart settings in the form of a Url.</param>
         public EdgeMart(Url url)
@@ -105,7 +105,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates a new instance of EdgeMart.
+        /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="connectionString">Server and EdgeMart settings in the form of a connection string.</param>
         public EdgeMart(String connectionString)
@@ -114,7 +114,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates a new instance of EdgeMart.
+        /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="uri">Server and EdgeMart settings in the form of a Uri.</param>
         public EdgeMart(Uri uri)

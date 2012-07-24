@@ -12,7 +12,7 @@ namespace Oinq
 
         // constructors
         /// <summary>
-        /// Initializes an instance of PigExtension.
+        /// Initializes an member of PigExtension.
         /// </summary>
         /// <param path="binderName">Name of the binder class.</param>
         public PigExtension(String binderName)

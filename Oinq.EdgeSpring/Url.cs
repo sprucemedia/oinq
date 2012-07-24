@@ -72,10 +72,10 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Creates an instance of Url (might be an existing instance if the same URL has been used before).
+        /// Creates an member of Url (might be an existing member if the same URL has been used before).
         /// </summary>
         /// <param name="url">The URL containing the settings.</param>
-        /// <returns>An instance of Url.</returns>
+        /// <returns>An member of Url.</returns>
         public static Url Create(String url)
         {
             // cache previously seen urls to avoid repeated parsing

@@ -10,7 +10,7 @@ namespace Oinq.EdgeSpring.Web
     {
         //constructors
         /// <summary>
-        /// Initializes a new instance of QueryResultDescription.
+        /// Initializes a new member of QueryResultDescription.
         /// </summary>
         public QueryResultDescription()
         {

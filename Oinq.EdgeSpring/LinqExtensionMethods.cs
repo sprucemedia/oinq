@@ -13,7 +13,7 @@ namespace Oinq.EdgeSpring
         /// </summary>
         /// <typeparam name="T">The type of records in an EdgeMart.</typeparam>
         /// <param name="edgeMart">The EdgeMart.</param>
-        /// <returns>An instance of IQueryable{{T}} for an EdgeMart.</returns>
+        /// <returns>An member of IQueryable{{T}} for an EdgeMart.</returns>
         public static IQueryable<T> AsQueryable<T>(this EdgeMart edgeMart)
         {
             var provider = new EdgeSpringQueryProvider(edgeMart);
@@ -25,7 +25,7 @@ namespace Oinq.EdgeSpring
         /// </summary>
         /// <typeparam name="T">The type of records in an EdgeMart.</typeparam>
         /// <param name="edgeMart">The EdgeMart.</param>
-        /// <returns>An instance of IQueryable{{T}} for an EdgeMart.</returns>
+        /// <returns>An member of IQueryable{{T}} for an EdgeMart.</returns>
         public static IQueryable<T> AsQueryable<T>(this EdgeMart<T> edgeMart)
         {
             var provider = new EdgeSpringQueryProvider(edgeMart);

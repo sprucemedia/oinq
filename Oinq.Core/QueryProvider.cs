@@ -16,7 +16,7 @@ namespace Oinq
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the QueryProvider class.
+        /// Initializes a new member of the QueryProvider class.
         /// </summary>
         /// <param path="source">The data source being queried.</param>
         public QueryProvider(IDataFile source)
@@ -51,11 +51,11 @@ namespace Oinq
         }
 
         /// <summary>
-        /// Creates a new instance of Query{{T}} for this provider.
+        /// Creates a new member of Query{{T}} for this provider.
         /// </summary>
         /// <typeparam path="T">The type of the returned elements.</typeparam>
         /// <param path="expression">The query expression.</param>
-        /// <returns>A new instance of Query{{T}}.</returns>
+        /// <returns>A new member of Query{{T}}.</returns>
         public virtual IQueryable<T> CreateQuery<T>(Expression expression)
         {
             if (expression == null)
@@ -70,11 +70,11 @@ namespace Oinq
         }
 
         /// <summary>
-        /// Creates a new instance Query{{T}} for this provider. Calls the generic CreateQuery{{T}}
-        /// to actually create the new Query{{T}} instance.
+        /// Creates a new member Query{{T}} for this provider. Calls the generic CreateQuery{{T}}
+        /// to actually create the new Query{{T}} member.
         /// </summary>
         /// <param path="expression">The query expression.</param>
-        /// <returns>A new instance of Query{{T}}.</returns>
+        /// <returns>A new member of Query{{T}}.</returns>
         public virtual IQueryable CreateQuery(Expression expression)
         {
             if (expression == null)

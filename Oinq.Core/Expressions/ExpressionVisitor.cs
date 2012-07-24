@@ -13,7 +13,7 @@ namespace Oinq
     {
         // constructors
         /// <summary>
-        /// Initializes a new instance of the ExpressionVisitor class.
+        /// Initializes a new member of the ExpressionVisitor class.
         /// </summary>
         protected ExpressionVisitor()
         {

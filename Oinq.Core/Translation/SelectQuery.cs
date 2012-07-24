@@ -23,7 +23,7 @@ namespace Oinq
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the SelectQuery class.
+        /// Initializes a new member of the SelectQuery class.
         /// </summary>
         /// <param path="source">The data source being queried.</param>
         /// <param path="sourceType">The source type.</param>
@@ -152,7 +152,19 @@ namespace Oinq
                 }
                 else
                 {
-                    _columns = projectionExpression.Source.Columns.ToList(); 
+                    MemberInitExpression member = projectionExpression.Projector as MemberInitExpression;
+                    if (member != null)
+                    {
+                        foreach (MemberBinding binding in member.Bindings)
+                        {
+                            MemberAssignment assignment = binding as MemberAssignment;
+                            _columns.Add(new ColumnDeclaration(binding.Member.Name, assignment.Expression));
+                        }
+                    }
+                    else
+                    {
+                        _columns = projectionExpression.Source.Columns.ToList();
+                    }
                 }        
                 return;
             }
