@@ -6,13 +6,13 @@ namespace Oinq.Tests
 {
     public static class FakeExtensions
     {
-        [PigExtension("Oinq.Tests.FakeExtensions")]
+        [PigExtension(typeof(FakeExtensions))]
         public static Int32 AddUp(this IEnumerable<IAddable> source)
         {
             return 0;
         }
 
-        [PigExtension("Oinq.Tests.FakeExtensions")]
+        [PigExtension(typeof(FakeExtensions))]
         public static Int32 AggOp(this IEnumerable<IAddable> source)
         {
             return 0;

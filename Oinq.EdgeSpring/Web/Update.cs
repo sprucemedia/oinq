@@ -43,5 +43,8 @@ namespace Oinq.EdgeSpring.Web
 
             return new Uri(sb.ToString());
         }
+
+        // private methods
+
     }
 }

@@ -162,12 +162,11 @@ namespace Oinq
                 throw new NotSupportedException(String.Format("The method '{0}' is not supported", node.Method.Name));
             }
             // custom extensions
-            else if (node.Method.GetCustomAttributes(typeof(PigExtension), true).Count() > 0)
+            else if (node.Method.GetCustomAttributes(typeof(PigExtensionAttribute), true).Count() > 0)
             {
                 MethodInfo method = node.Method;
-                PigExtension extension = (PigExtension)method.GetCustomAttributes(typeof(PigExtension), true).First();
-                var typeo = Type.GetType(Assembly.CreateQualifiedName(method.DeclaringType.Assembly.ToString(), extension.BinderName));
-                var mi =  typeo.GetMethod(String.Format("Bind{0}", method.Name));
+                PigExtensionAttribute extension = (PigExtensionAttribute)method.GetCustomAttributes(typeof(PigExtensionAttribute), true).First();
+                var mi =  extension.BinderType.GetMethod(String.Format("Bind{0}", method.Name));
                 var exp = (LambdaExpression)mi.Invoke(null, node.Arguments.ToArray<Object>()); 
                 return Visit(exp.Body);
             }
