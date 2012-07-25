@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Oinq.EdgeSpring
+namespace Oinq.EdgeSpring.Entity
 {
-    public interface IUpdateable
+    public interface IEntity
     {
-        IDictionary<String, String> GetKeys();
     }
 }

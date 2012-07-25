@@ -56,7 +56,12 @@
   <ItemGroup>
     <Compile Include="EdgeMart.cs" />
     <Compile Include="EdgeSpringQueryProvider.cs" />
-    <Compile Include="Interfaces\IUpdateable.cs" />
+    <Compile Include="Entity\EntityExtensions.cs" />
+    <Compile Include="Entity\EntityInfo.cs" />
+    <Compile Include="Entity\EntityPropertyAttribute.cs" />
+    <Compile Include="Entity\EntityPropertyType.cs" />
+    <Compile Include="Entity\IEntity.cs" />
+    <Compile Include="Entity\IEntityInfo.cs" />
     <Compile Include="LinqExtensionMethods.cs" />
     <Compile Include="Web\EdgeSpringApi.cs" />
     <Compile Include="Web\Query.cs" />

@@ -59,6 +59,8 @@
   <ItemGroup>
     <Compile Include="EdgeMartTests.cs" />
     <Compile Include="EdgeSpringQueryProviderTests.cs" />
+    <Compile Include="Entity\EntityTests.cs" />
+    <Compile Include="Entity\FakeEntities.cs" />
     <Compile Include="ServerAddressTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UrlBuilderTests.cs" />

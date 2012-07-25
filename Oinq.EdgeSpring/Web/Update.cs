@@ -1,23 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using System.Text;
+using Oinq.EdgeSpring.Entity;
 
 namespace Oinq.EdgeSpring.Web
 {
+    public enum UpdateType
+    {
+        Dimension,
+        Measure
+    }
+
     /// <summary>
     /// Represents an update request to be sent to the EdgeSpring API.
     /// </summary>
     public class Update
     {
         // private fields
-        private readonly String _action = "update";
+        private const String ACTION = "action";
+        private const String ACTION_TYPE = "update";
+        private const String FILTER = "filters";
+        private const String DIMS = "dims";
+        private const String MEASURES = "measures";
+        private const String VALUES = "values";
+
         private String _edgeMartUrl;
-        private IUpdateable _originalObject;
-        private IUpdateable _modifiedObject;
+        private IEntity _originalObject;
+        private IEntity _modifiedObject;
+        private IEntityInfo _entityInfo;
 
         // constructors
-        public Update(String edgemartUrl, IUpdateable originalObject, IUpdateable modifiedObject)
+        public Update(String edgemartUrl, IEntity originalObject, IEntity modifiedObject, IEntityInfo entityInfo)
         {
             if (String.IsNullOrEmpty(edgemartUrl))
             {
@@ -31,34 +45,49 @@ namespace Oinq.EdgeSpring.Web
             {
                 throw new ArgumentNullException("modifiedObject");
             }
+            if (entityInfo == null)
+            {
+                throw new ArgumentNullException("entityInfo");
+            }
 
             _edgeMartUrl = edgemartUrl;
             _originalObject = originalObject;
             _modifiedObject = modifiedObject;
+            _entityInfo = entityInfo;
         }
 
         // public methods
-        public Uri ToUri()
+        public Uri ToUri(UpdateType updateType)
         {
             StringBuilder sb = new StringBuilder(_edgeMartUrl);
-            sb.Append(String.Format("&action={0}", _action));
+            sb.Append(String.Format("&{0}={1}", ACTION, ACTION_TYPE));
 
             // filters
-            IDictionary<String, String> filters = _originalObject.GetKeys();
-            foreach (String key in filters.Keys)
+            IList<PropertyInfo> filters = _entityInfo.Keys;
+            foreach (PropertyInfo pi in filters)
             {
-                sb.Append(String.Format("&filters={0}:{1}", key, filters[key]));
+                sb.Append(GetKeyValuePairString(FILTER, pi.Name, pi.GetValue(_originalObject, null).ToString()));
             }
 
-
-            // dims = need old values where different
-            // measures = need old values
-            // values = need new values where different
-
+            IList<PropertyInfo> fields = (updateType == UpdateType.Dimension) ? _entityInfo.Dimensions : _entityInfo.Measures;
+            foreach (PropertyInfo pi in fields)
+            {
+                String fieldType = (updateType == UpdateType.Dimension) ? DIMS : MEASURES;
+                String originalValue = pi.GetValue(_originalObject, null).ToString();
+                String modifiedValue = pi.GetValue(_modifiedObject, null).ToString();
+                if (modifiedValue != originalValue)
+                {                
+                    sb.Append(GetKeyValuePairString(fieldType, pi.Name, originalValue));
+                    sb.Append(GetKeyValuePairString(VALUES, pi.Name, modifiedValue));
+                }
+            }
             return new Uri(sb.ToString());
         }
 
         // private methods
-
+        private String GetKeyValuePairString(String type, String key, String value)
+        {
+            return String.Format("&{0}={1}:{2}", type, key, value);
+        }
     }
 }
