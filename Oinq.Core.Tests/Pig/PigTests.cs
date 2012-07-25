@@ -834,5 +834,20 @@ namespace Oinq.Tests
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
         }
+
+        //[Test]
+        public void complex_case()
+        {
+            // Arrange
+            var fakeData = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f.Mea1, (dimension, data) => new { Dim1 = dimension, Total = Convert.ToInt32(data.Sum() + data.Sum()), Total2 = data.Sum() });
+            var fakeDataExt = _extendedSource.AsQueryable<FakeDataMeta>().Where(e => e.Dim1 == "5");
+            var joined = fakeData.Join(fakeDataExt, f => f.Dim1, e => e.Dim1, (f, e) => new { Fake = f, Extension = e }).OrderByDescending(e => e.Fake.Dim1).Take(10);
+
+            // Act
+            var queryText = ((IPigQueryable)joined).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
+        }
     }
 }

@@ -639,9 +639,84 @@ namespace Oinq
         }
 
         // private methods
+        private void InterpretNonPigExpression(Expression expression)
+        {
+            switch (expression.NodeType)
+            {
+                case ExpressionType.Negate:
+                case ExpressionType.NegateChecked:
+                case ExpressionType.Not:
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                case ExpressionType.ArrayLength:
+                case ExpressionType.Quote:
+                case ExpressionType.TypeAs:
+                case ExpressionType.UnaryPlus:
+                    FindSourceColumnName(((UnaryExpression)expression).Operand);
+                    break;
+                case ExpressionType.Add:
+                case ExpressionType.AddChecked:
+                case ExpressionType.Subtract:
+                case ExpressionType.SubtractChecked:
+                case ExpressionType.Multiply:
+                case ExpressionType.MultiplyChecked:
+                case ExpressionType.Divide:
+                case ExpressionType.Modulo:
+                case ExpressionType.And:
+                case ExpressionType.AndAlso:
+                case ExpressionType.Or:
+                case ExpressionType.OrElse:
+                case ExpressionType.LessThan:
+                case ExpressionType.LessThanOrEqual:
+                case ExpressionType.GreaterThan:
+                case ExpressionType.GreaterThanOrEqual:
+                case ExpressionType.Equal:
+                case ExpressionType.NotEqual:
+                case ExpressionType.Coalesce:
+                case ExpressionType.ArrayIndex:
+                case ExpressionType.RightShift:
+                case ExpressionType.LeftShift:
+                case ExpressionType.ExclusiveOr:
+                case ExpressionType.Power:
+                    BinaryExpression binary = expression as BinaryExpression;
+                    FindSourceColumnName(binary.Left);
+                    FindSourceColumnName(binary.Right);
+                    break;
+                case ExpressionType.Call:
+                    MethodCallExpression exp = expression as MethodCallExpression;
+                    if (exp.Arguments.Count == 1)
+                    {
+                        ColumnExpression columnExpression = exp.Arguments.First() as ColumnExpression;
+                        if (columnExpression != null)
+                        {
+                            _columnNames.Add(columnExpression.Name);
+                            break;
+                        }
+                        FindSourceColumnName(exp.Arguments.First());
+                        break;
+                    }
+                    break;
+                case ExpressionType.New:
+                    NewExpression expr = expression as NewExpression;
+                    foreach (Expression argument in expr.Arguments)
+                    {
+                        FindSourceColumnName(argument);
+                    }
+                    break;
+                case ExpressionType.MemberInit:
+                    MemberInitExpression mie = expression as MemberInitExpression;
+                    foreach (MemberBinding binding in mie.Bindings)
+                    {
+                        _columnNames.Add(binding.Member.Name);
+                    }
+                    break;
+                default:
+                    throw new NotSupportedException("Aggregates must fall on the left side of the join.");
+            }
+        }
+
         private void FindSourceColumnName(Expression expression)
         {
-            ColumnExpression columnExpression;
             switch ((PigExpressionType)expression.NodeType)
             {
                 case PigExpressionType.Column:
@@ -658,48 +733,9 @@ namespace Oinq
                 case PigExpressionType.Join:
                     break;
                 default:
-                    BinaryExpression binary = expression as BinaryExpression;
-                    if (binary != null)
-                    {
-                        FindSourceColumnName(binary.Left);
-                        FindSourceColumnName(binary.Right);
-                        break;
-                    }
-
-                    UnaryExpression unary = expression as UnaryExpression;
-                    if (unary != null)
-                    {
-                        FindSourceColumnName(unary.Operand);
-                        break;
-                    }
-
-                    if (expression.NodeType == ExpressionType.Call)
-                    {
-                        MethodCallExpression exp = expression as MethodCallExpression;
-                        if (exp.Arguments.Count == 1)
-                        {
-                            columnExpression = exp.Arguments.First() as ColumnExpression;
-                            if (columnExpression != null)
-                            {
-                                _columnNames.Add(columnExpression.Name);
-                                break;
-                            }
-                            FindSourceColumnName(exp.Arguments.First());
-                            break;
-                        }
-                    }
-                    else
-                    {
-                       throw new NotSupportedException("Aggregates must fall on the left side of the join.");
-                    }
+                    InterpretNonPigExpression(expression);
                     break;
             }
-        }
-
-        private ColumnExpression FindColumnSource(MethodCallExpression expression)
-        {
-            return null;
-
         }
 
         private SourceAlias FindRootSource(Expression expression)
