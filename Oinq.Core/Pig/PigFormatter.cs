@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Pig
 {
     /// <summary>
     /// Formats the query text for consumption by Pig.
@@ -15,15 +16,15 @@ namespace Oinq
     internal class PigFormatter : PigExpressionVisitor
     {
         // private fields
-        private StringBuilder _sb;
-        private Int32 _aliasCount;
-        private Dictionary<String, String> _mappings;
-        private List<String> _ignores;
-        private Dictionary<String, String> _sources;
+        private const Int32 ResultLimit = 1000;
+        private readonly Dictionary<SourceAlias, Int32> _aliases;
+        private readonly List<String> _columnNames;
+        private readonly StringBuilder _sb;
+        private readonly Dictionary<String, String> _sources;
         private SourceAlias _alias;
-        private Dictionary<SourceAlias, Int32> _aliases;
-        private const Int32 RESULT_LIMIT = 1000;
-        private List<String> _columnNames;
+        private Int32 _aliasCount;
+        private List<String> _ignores;
+        private Dictionary<String, String> _mappings;
 
         // constructors
         private PigFormatter()
@@ -37,13 +38,13 @@ namespace Oinq
         // internal methods
         internal static String Format(TranslatedQuery query)
         {
-            SelectQuery selectQuery = query as SelectQuery;
+            var selectQuery = query as SelectQuery;
             if (selectQuery == null)
             {
                 throw new ArgumentException("The query parameter must be assignable to SelectQuery.", "query");
             }
 
-            PigFormatter formatter = new PigFormatter();
+            var formatter = new PigFormatter();
             formatter.SetSourceMappings(selectQuery.Sources);
             foreach (SourceExpression s in selectQuery.Sources)
             {
@@ -89,7 +90,7 @@ namespace Oinq
             Int32 value;
             if (_aliases.TryGetValue(alias, out value))
             {
-                _aliases[alias] = value += 1;
+                _aliases[alias] = value + 1;
             }
             else
             {
@@ -135,13 +136,20 @@ namespace Oinq
         {
             switch (methodName)
             {
-                case "Add": return "+";
-                case "Subtract": return "-";
-                case "Multiply": return "*";
-                case "Divide": return "/";
-                case "Negate": return "-";
-                case "Remainder": return "%";
-                default: return null;
+                case "Add":
+                    return "+";
+                case "Subtract":
+                    return "-";
+                case "Multiply":
+                    return "*";
+                case "Divide":
+                    return "/";
+                case "Negate":
+                    return "-";
+                case "Remainder":
+                    return "%";
+                default:
+                    return null;
             }
         }
 
@@ -187,7 +195,7 @@ namespace Oinq
 
         protected virtual Boolean IsBoolean(Type type)
         {
-            return type == typeof(Boolean) || type == typeof(Boolean?);
+            return type == typeof (Boolean) || type == typeof (Boolean?);
         }
 
         protected virtual Boolean IsPredicate(Expression expr)
@@ -198,9 +206,9 @@ namespace Oinq
                 case ExpressionType.AndAlso:
                 case ExpressionType.Or:
                 case ExpressionType.OrElse:
-                    return IsBoolean(((BinaryExpression)expr).Type);
+                    return IsBoolean((expr).Type);
                 case ExpressionType.Not:
-                    return IsBoolean(((UnaryExpression)expr).Type);
+                    return IsBoolean((expr).Type);
                 case ExpressionType.Equal:
                 case ExpressionType.NotEqual:
                 case ExpressionType.LessThan:
@@ -208,7 +216,7 @@ namespace Oinq
                 case ExpressionType.GreaterThan:
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.Call:
-                    return IsBoolean(((MethodCallExpression)expr).Type);
+                    return IsBoolean((expr).Type);
                 default:
                     return false;
             }
@@ -284,14 +292,7 @@ namespace Oinq
         protected void WriteColumnName(String columnName)
         {
             String mappedName;
-            if (_mappings.TryGetValue(columnName, out mappedName))
-            {
-                Write(mappedName);
-            }
-            else
-            {
-                Write(columnName);
-            }
+            Write(_mappings.TryGetValue(columnName, out mappedName) ? mappedName : columnName);
         }
 
         protected void WriteFilter(Expression where)
@@ -328,7 +329,8 @@ namespace Oinq
             }
         }
 
-        protected void WriteJoins(ReadOnlyCollection<JoinExpression> joins, ReadOnlyCollection<ColumnDeclaration> outputColumns)
+        protected void WriteJoins(ReadOnlyCollection<JoinExpression> joins,
+                                  ReadOnlyCollection<ColumnDeclaration> outputColumns)
         {
             if (joins.Count > 0)
             {
@@ -339,16 +341,16 @@ namespace Oinq
                 for (Int32 i = 0, n = joins.Count; i < n; i++)
                 {
                     JoinExpression join = joins[i];
-                    BinaryExpression condition = (BinaryExpression)join.Condition;
+                    var condition = (BinaryExpression) join.Condition;
                     SourceAlias left = FindRootSource(join.Left);
                     SourceAlias right = FindRootSource(join.Right);
-                    
+
                     Write(String.Format("{0} = group {1} by (", GetNextAliasName(), GetLastAliasName(right)));
-                    List<String> columns = ((SelectExpression)join.Right).Columns.Select(s => s.Name).ToList();
+                    List<String> columns = ((SelectExpression) join.Right).Columns.Select(s => s.Name).ToList();
                     Boolean first = true;
-                    foreach(String name in columns)
+                    foreach (String name in columns)
                     {
-                        if (name != ((ColumnExpression)condition.Right).Name && _columnNames.Contains(name))
+                        if (name != ((ColumnExpression) condition.Right).Name && _columnNames.Contains(name))
                         {
                             if (!first)
                             {
@@ -361,7 +363,7 @@ namespace Oinq
                     Write("); ");
                     AddAlias(right, _aliasCount);
                     AddAlias();
-                    
+
                     Write(String.Format("{0} = group {1} by ", GetNextAliasName(), GetLastAliasName(left)));
                     Visit(condition.Left);
                     Write(String.Format(", {0} by ", GetLastAliasName(right)));
@@ -380,16 +382,21 @@ namespace Oinq
             Write(String.Format("{0} = load '{1}'; ", GetLastAliasName(_alias), _sources[sourceType.Name]));
         }
 
-        protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys, ReadOnlyCollection<ColumnDeclaration> outputColumns)
+        protected void WriteOrderBy(ReadOnlyCollection<OrderByExpression> orderBys,
+                                    ReadOnlyCollection<ColumnDeclaration> outputColumns)
         {
             if (orderBys != null && orderBys.Count > 0)
             {
-                List<ColumnDeclaration> columns = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType == PigExpressionType.Column).ToList();
-                List<ColumnDeclaration> aggs = outputColumns.Where(p => (PigExpressionType)p.Expression.NodeType == PigExpressionType.Aggregate).ToList();
-                Dictionary<String, String> columnMaps = new Dictionary<String, String>();
+                var columns =
+                    outputColumns.Where(p => (PigExpressionType) p.Expression.NodeType == PigExpressionType.Column).
+                        ToList();
+                var aggs =
+                    outputColumns.Where(p => (PigExpressionType) p.Expression.NodeType == PigExpressionType.Aggregate).
+                        ToList();
+                var columnMaps = new Dictionary<String, String>();
                 foreach (ColumnDeclaration column in columns)
                 {
-                    columnMaps.Add(column.Name, ((ColumnExpression)column.Expression).Name);
+                    columnMaps.Add(column.Name, ((ColumnExpression) column.Expression).Name);
                 }
                 Write(String.Format("{0} = order {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
 
@@ -417,10 +424,11 @@ namespace Oinq
                     var parseExp = orderBy.Expression as MethodCallExpression;
                     if (parseExp != null)
                     {
-                        foreach(ColumnDeclaration col in outputColumns)
+                        foreach (ColumnDeclaration col in outputColumns)
                         {
                             var mce = col.Expression as MethodCallExpression;
-                            if (mce != null && parseExp.Method == mce.Method && parseExp.Method.DeclaringType == mce.Method.DeclaringType)
+                            if (mce != null && parseExp.Method == mce.Method &&
+                                parseExp.Method.DeclaringType == mce.Method.DeclaringType)
                             {
                                 WriteColumnName(col.Name);
                             }
@@ -459,7 +467,7 @@ namespace Oinq
             }
             else
             {
-                Write(String.Format("{0} = limit {1} {2}; ", nextAlias, lastAlias, RESULT_LIMIT.ToString()));
+                Write(String.Format("{0} = limit {1} {2}; ", nextAlias, lastAlias, ResultLimit.ToString(CultureInfo.InvariantCulture)));
             }
         }
 
@@ -478,7 +486,7 @@ namespace Oinq
                 switch (Type.GetTypeCode(value.GetType()))
                 {
                     case TypeCode.Boolean:
-                        Write(((Boolean)value) ? 1 : 0);
+                        Write(((Boolean) value) ? 1 : 0);
                         break;
                     case TypeCode.String:
                         Write("'");
@@ -549,7 +557,7 @@ namespace Oinq
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(Decimal))
+            if (node.Method.DeclaringType == typeof (Decimal))
             {
                 switch (node.Method.Name)
                 {
@@ -583,13 +591,13 @@ namespace Oinq
                         return node;
                 }
             }
-            else if (node.Method.Name == "ToString" && node.Object.Type == typeof(String))
+            else if (node.Object != null && (node.Method.Name == "ToString" && node.Object.Type == typeof (String)))
             {
-                return Visit(node.Object);  // no op
+                return Visit(node.Object); // no op
             }
             else if (node.Method.Name == "Equals")
             {
-                if (node.Method.IsStatic && node.Method.DeclaringType == typeof(Object))
+                if (node.Method.IsStatic && node.Method.DeclaringType == typeof (Object))
                 {
                     Write("(");
                     Visit(node.Arguments[0]);
@@ -598,7 +606,7 @@ namespace Oinq
                     Write(")");
                     return node;
                 }
-                else if (!node.Method.IsStatic && node.Arguments.Count == 1 && node.Arguments[0].Type == node.Object.Type)
+                if (node.Object != null && (!node.Method.IsStatic && node.Arguments.Count == 1 && node.Arguments[0].Type == node.Object.Type))
                 {
                     Write("(");
                     Visit(node.Object);
@@ -608,7 +616,7 @@ namespace Oinq
                     return node;
                 }
             }
-            else if (node.Method.Name == "Parse" || node.Method.DeclaringType == typeof(Convert))
+            else if (node.Method.Name == "Parse" || node.Method.DeclaringType == typeof (Convert))
             {
                 Visit(node.Arguments[0]);
                 // Do nothing else for now - should be replaces with new EdgeSpring functions once they become available.
@@ -619,7 +627,8 @@ namespace Oinq
 
         protected override NewExpression VisitNew(NewExpression node)
         {
-            throw new NotSupportedException(String.Format("The constructor for '{0}' is not supported", node.Constructor.DeclaringType));
+            throw new NotSupportedException(String.Format("The constructor for '{0}' is not supported",
+                                                          node.Constructor.DeclaringType));
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -634,7 +643,8 @@ namespace Oinq
                     Visit(node.Operand);
                     break;
                 default:
-                    throw new NotSupportedException(String.Format("The unary operator '{0}' is not supported", node.NodeType));
+                    throw new NotSupportedException(String.Format("The unary operator '{0}' is not supported",
+                                                                  node.NodeType));
             }
             return node;
         }
@@ -653,7 +663,7 @@ namespace Oinq
                 case ExpressionType.Quote:
                 case ExpressionType.TypeAs:
                 case ExpressionType.UnaryPlus:
-                    FindSourceColumnName(((UnaryExpression)expression).Operand);
+                    FindSourceColumnName(((UnaryExpression) expression).Operand);
                     break;
                 case ExpressionType.Add:
                 case ExpressionType.AddChecked:
@@ -679,15 +689,18 @@ namespace Oinq
                 case ExpressionType.LeftShift:
                 case ExpressionType.ExclusiveOr:
                 case ExpressionType.Power:
-                    BinaryExpression binary = expression as BinaryExpression;
-                    FindSourceColumnName(binary.Left);
-                    FindSourceColumnName(binary.Right);
+                    var binary = expression as BinaryExpression;
+                    if (binary != null)
+                    {
+                        FindSourceColumnName(binary.Left);
+                        FindSourceColumnName(binary.Right);
+                    }
                     break;
                 case ExpressionType.Call:
-                    MethodCallExpression exp = expression as MethodCallExpression;
-                    if (exp.Arguments.Count == 1)
+                    var exp = expression as MethodCallExpression;
+                    if (exp != null && exp.Arguments.Count == 1)
                     {
-                        ColumnExpression columnExpression = exp.Arguments.First() as ColumnExpression;
+                        var columnExpression = exp.Arguments.First() as ColumnExpression;
                         if (columnExpression != null)
                         {
                             _columnNames.Add(columnExpression.Name);
@@ -698,18 +711,20 @@ namespace Oinq
                     }
                     break;
                 case ExpressionType.New:
-                    NewExpression expr = expression as NewExpression;
-                    foreach (Expression argument in expr.Arguments)
-                    {
-                        FindSourceColumnName(argument);
-                    }
+                    var expr = expression as NewExpression;
+                    if (expr != null)
+                        foreach (Expression argument in expr.Arguments)
+                        {
+                            FindSourceColumnName(argument);
+                        }
                     break;
                 case ExpressionType.MemberInit:
-                    MemberInitExpression mie = expression as MemberInitExpression;
-                    foreach (MemberBinding binding in mie.Bindings)
-                    {
-                        _columnNames.Add(binding.Member.Name);
-                    }
+                    var mie = expression as MemberInitExpression;
+                    if (mie != null)
+                        foreach (MemberBinding binding in mie.Bindings)
+                        {
+                            _columnNames.Add(binding.Member.Name);
+                        }
                     break;
                 default:
                     throw new NotSupportedException("Aggregates must fall on the left side of the join.");
@@ -718,13 +733,13 @@ namespace Oinq
 
         private void FindSourceColumnName(Expression expression)
         {
-            switch ((PigExpressionType)expression.NodeType)
+            switch ((PigExpressionType) expression.NodeType)
             {
                 case PigExpressionType.Column:
-                    _columnNames.Add(((ColumnExpression)expression).Name);
+                    _columnNames.Add(((ColumnExpression) expression).Name);
                     break;
                 case PigExpressionType.Aggregate:
-                    var arg = ((AggregateExpression)expression).Argument;
+                    Expression arg = ((AggregateExpression) expression).Argument;
                     var col = arg as ColumnExpression;
                     if (col != null)
                     {
@@ -741,60 +756,53 @@ namespace Oinq
 
         private SourceAlias FindRootSource(Expression expression)
         {
-            switch ((PigExpressionType)expression.NodeType)
+            switch ((PigExpressionType) expression.NodeType)
             {
                 case PigExpressionType.Source:
-                    return ((SourceExpression)expression).Alias;
+                    return ((SourceExpression) expression).Alias;
                 case PigExpressionType.Select:
-                    return FindRootSource(((SelectExpression)expression).From);
+                    return FindRootSource(((SelectExpression) expression).From);
                 default:
                     throw new InvalidOperationException("An invalid expression exists in the tree.");
             }
         }
 
-        private void GetMappings(PropertyInfo[] sourceProperties)
+        private void GetMappings(IEnumerable<PropertyInfo> sourceProperties)
         {
             foreach (PropertyInfo property in sourceProperties)
             {
-                Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigMapping), true);
+                Object[] mappingAttributes = property.GetCustomAttributes(typeof (PigMapping), true);
                 foreach (Object attribute in mappingAttributes)
                 {
-                    _mappings.Add(property.Name, ((PigMapping)attribute).Name);
+                    _mappings.Add(property.Name, ((PigMapping) attribute).Name);
                 }
             }
         }
 
-        private void SetSourceMappings(ReadOnlyCollection<SourceExpression> sources)
+        private void SetSourceMappings(IEnumerable<SourceExpression> sources)
         {
             _ignores = new List<String>();
             _mappings = new Dictionary<String, String>();
 
-            foreach (SourceExpression source in sources)
+            foreach (var source in sources)
             {
-                Type sourceType = source.Type;
-                Object[] attributes = sourceType.GetCustomAttributes(typeof(PigSourceMapping), true);
-                if (attributes != null && attributes.Length > 0)
-                {
-                    _sources.Add(source.Name, ((PigSourceMapping)attributes[0]).Path);
-                }
-                else
-                {
-                    _sources.Add(source.Name, source.Name);
-                }
+                var sourceType = source.Type;
+                var attributes = sourceType.GetCustomAttributes(typeof (PigSourceMapping), true);
+                _sources.Add(source.Name, attributes.Length > 0 ? ((PigSourceMapping) attributes[0]).Path : source.Name);
 
                 // Get all properties that are in the source type.
-                PropertyInfo[] sourceProperties = sourceType.GetProperties();
+                var sourceProperties = sourceType.GetProperties();
                 GetIgnores(sourceProperties);
                 GetMappings(sourceProperties);
-            }     
+            }
         }
 
-        private void GetIgnores(PropertyInfo[] sourceProperties)
+        private void GetIgnores(IEnumerable<PropertyInfo> sourceProperties)
         {
-            foreach (PropertyInfo property in sourceProperties)
+            foreach (var property in sourceProperties)
             {
-                Object[] mappingAttributes = property.GetCustomAttributes(typeof(PigIgnore), true);
-                if (mappingAttributes != null && mappingAttributes.Length > 0)
+                var mappingAttributes = property.GetCustomAttributes(typeof (PigIgnore), true);
+                if (mappingAttributes.Length > 0)
                 {
                     _ignores.Add(property.Name);
                 }

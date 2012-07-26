@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Oinq
 {
@@ -12,15 +10,15 @@ namespace Oinq
     {
         internal static Type FindIEnumerable(Type seqType)
         {
-            if (seqType == null || seqType == typeof(String))
+            if (seqType == null || seqType == typeof (String))
                 return null;
             if (seqType.IsArray)
-                return typeof(IEnumerable<>).MakeGenericType(seqType.GetElementType());
+                return typeof (IEnumerable<>).MakeGenericType(seqType.GetElementType());
             if (seqType.IsGenericType)
             {
                 foreach (Type arg in seqType.GetGenericArguments())
                 {
-                    Type ienum = typeof(IEnumerable<>).MakeGenericType(arg);
+                    Type ienum = typeof (IEnumerable<>).MakeGenericType(arg);
                     if (ienum.IsAssignableFrom(seqType))
                     {
                         return ienum;
@@ -28,7 +26,7 @@ namespace Oinq
                 }
             }
             Type[] ifaces = seqType.GetInterfaces();
-            if (ifaces != null && ifaces.Length > 0)
+            if (ifaces.Length > 0)
             {
                 foreach (Type iface in ifaces)
                 {
@@ -36,7 +34,7 @@ namespace Oinq
                     if (ienum != null) return ienum;
                 }
             }
-            if (seqType.BaseType != null && seqType.BaseType != typeof(Object))
+            if (seqType.BaseType != null && seqType.BaseType != typeof (Object))
             {
                 return FindIEnumerable(seqType.BaseType);
             }

@@ -7,26 +7,20 @@ namespace Oinq
     /// </summary>
     public sealed class PigMapping : Attribute
     {
-        // private fields
-        private String _name;
-
         // constructors
         /// <summary>
         /// Initializes an member of PigMapping.
         /// </summary>
-        /// <param path="path"></param>
+        /// <param name="name">Mapping name</param>
         public PigMapping(String name)
         {
-            _name = name;
+            Name = name;
         }
 
         // public properties
         /// <summary>
         /// Gets the path of the field in the data source.
         /// </summary>
-        public String Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; private set; }
     }
 }

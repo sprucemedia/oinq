@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Oinq;
+using Oinq.Pig;
 
 namespace Oinq.EdgeSpring.Tests
 {

@@ -7,9 +7,6 @@ namespace Oinq
     /// </summary>
     public sealed class PigSourceMapping : Attribute
     {
-        // private fields
-        private String _path;
-
         // constructors
         /// <summary>
         /// Initializes an member of PigMapping.
@@ -17,16 +14,13 @@ namespace Oinq
         /// <param path="path"></param>
         public PigSourceMapping(String path)
         {
-            _path = path;
+            Path = path;
         }
 
         // public properties
         /// <summary>
         /// Gets the path to the data source.
         /// </summary>
-        public String Path
-        {
-            get { return _path; }
-        }
+        public string Path { get; private set; }
     }
 }

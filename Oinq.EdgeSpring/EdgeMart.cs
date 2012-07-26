@@ -1,4 +1,5 @@
 ﻿using System;
+using Oinq.Pig;
 
 namespace Oinq.EdgeSpring
 {

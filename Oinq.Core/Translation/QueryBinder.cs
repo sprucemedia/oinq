@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Oinq.Expressions;
+using Oinq.Pig;
 using ExpressionVisitor = Oinq.Expressions.ExpressionVisitor;
 
 namespace Oinq
