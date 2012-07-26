@@ -8,14 +8,6 @@ namespace Oinq.EdgeSpring.Web
     /// </summary>
     public class QueryResultDescription
     {
-        //constructors
-        /// <summary>
-        /// Initializes a new member of QueryResultDescription.
-        /// </summary>
-        public QueryResultDescription()
-        {
-        }
-
         /// <summary>
         /// Gets a list of the dimensions of the query.
         /// </summary>

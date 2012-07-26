@@ -10,9 +10,9 @@ namespace Oinq.EdgeSpring.Entity
     public class EntityInfo : IEntityInfo
     {
         // private fields
-        private ReadOnlyCollection<PropertyInfo> _keys;
-        private ReadOnlyCollection<PropertyInfo> _dimensions;
-        private ReadOnlyCollection<PropertyInfo> _measures;
+        private readonly ReadOnlyCollection<PropertyInfo> _dimensions;
+        private readonly ReadOnlyCollection<PropertyInfo> _keys;
+        private readonly ReadOnlyCollection<PropertyInfo> _measures;
 
         // constructors
         /// <summary>
@@ -21,7 +21,8 @@ namespace Oinq.EdgeSpring.Entity
         /// <param name="keys">A collection of keys.</param>
         /// <param name="dimensions">A collection of dimensions.</param>
         /// <param name="measures">A collection of measures.</param>
-        public EntityInfo(IEnumerable<PropertyInfo> keys, IEnumerable<PropertyInfo> dimensions, IEnumerable<PropertyInfo> measures)
+        public EntityInfo(IEnumerable<PropertyInfo> keys, IEnumerable<PropertyInfo> dimensions,
+                          IEnumerable<PropertyInfo> measures)
         {
             _keys = keys as ReadOnlyCollection<PropertyInfo>;
             _dimensions = dimensions as ReadOnlyCollection<PropertyInfo>;
@@ -42,6 +43,9 @@ namespace Oinq.EdgeSpring.Entity
         }
 
         // public properties
+
+        #region IEntityInfo Members
+
         /// <summary>
         /// Gets the dimensions of IEntity.
         /// </summary>
@@ -65,5 +69,7 @@ namespace Oinq.EdgeSpring.Entity
         {
             get { return _measures; }
         }
+
+        #endregion
     }
 }

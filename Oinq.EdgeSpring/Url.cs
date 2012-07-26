@@ -9,11 +9,11 @@ namespace Oinq.EdgeSpring
     public class Url : IEquatable<Url>
     {
         // private static fields
-        private static object __staticLock = new Object();
-        private static Dictionary<String, Url> __cache = new Dictionary<string, Url>();
+        private static readonly object StaticLock = new Object();
+        private static readonly Dictionary<String, Url> Cache = new Dictionary<string, Url>();
 
         // private fields
-        private String _url;
+        private readonly String _url;
 
         // constructor
         /// <summary>
@@ -38,6 +38,24 @@ namespace Oinq.EdgeSpring
         /// </summary>
         public ServerAddress Server { get; private set; }
 
+        #region IEquatable<Url> Members
+
+        /// <summary>
+        /// Compares two Urls.
+        /// </summary>
+        /// <param name="rhs">The other URL.</param>
+        /// <returns>True if the two URLs are equal.</returns>
+        public Boolean Equals(Url rhs)
+        {
+            if (ReferenceEquals(rhs, null) || GetType() != rhs.GetType())
+            {
+                return false;
+            }
+            return _url == rhs._url; // this works because URL is in canonical form
+        }
+
+        #endregion
+
         // public operators
         /// <summary>
         /// Compares two Urls.
@@ -47,7 +65,7 @@ namespace Oinq.EdgeSpring
         /// <returns>True if the two URLs are equal (or both null).</returns>
         public static Boolean operator ==(Url lhs, Url rhs)
         {
-            return object.Equals(lhs, rhs);
+            return Equals(lhs, rhs);
         }
 
         /// <summary>
@@ -68,7 +86,7 @@ namespace Oinq.EdgeSpring
         /// </summary>
         public static void ClearCache()
         {
-            __cache.Clear();
+            Cache.Clear();
         }
 
         /// <summary>
@@ -79,41 +97,31 @@ namespace Oinq.EdgeSpring
         public static Url Create(String url)
         {
             // cache previously seen urls to avoid repeated parsing
-            lock (__staticLock)
+            lock (StaticLock)
             {
                 Url esUrl;
-                if (!__cache.TryGetValue(url, out esUrl))
+                if (!Cache.TryGetValue(url, out esUrl))
                 {
                     esUrl = new Url(url);
-                    var canonicalUrl = esUrl.ToString();
+                    string canonicalUrl = esUrl.ToString();
                     if (canonicalUrl != url)
                     {
-                        if (__cache.ContainsKey(canonicalUrl))
+                        if (Cache.ContainsKey(canonicalUrl))
                         {
-                            esUrl = __cache[canonicalUrl]; // use existing Url
+                            esUrl = Cache[canonicalUrl]; // use existing Url
                         }
                         else
                         {
-                            __cache[canonicalUrl] = esUrl; // cache under canonicalUrl also
+                            Cache[canonicalUrl] = esUrl; // cache under canonicalUrl also
                         }
                     }
-                    __cache[url] = esUrl;
+                    Cache[url] = esUrl;
                 }
                 return esUrl;
             }
         }
 
         // public methods
-        /// <summary>
-        /// Compares two Urls.
-        /// </summary>
-        /// <param name="rhs">The other URL.</param>
-        /// <returns>True if the two URLs are equal.</returns>
-        public Boolean Equals(Url rhs)
-        {
-            if (object.ReferenceEquals(rhs, null) || GetType() != rhs.GetType()) { return false; }
-            return _url == rhs._url; // this works because URL is in canonical form
-        }
 
         /// <summary>
         /// Compares two Urls.

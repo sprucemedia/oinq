@@ -13,9 +13,9 @@ namespace Oinq.EdgeSpring
         /// Initializes a new member of EdgeSpringQueryProvider.
         /// </summary>
         /// <param name="source">IDataFile of type EdgeMart.</param>
-        public EdgeSpringQueryProvider(EdgeMart source)
+        public EdgeSpringQueryProvider(IDataFile source)
             : base(source)
-        {          
+        {
         }
 
         /// <summary>
@@ -25,16 +25,17 @@ namespace Oinq.EdgeSpring
         /// <returns>A query result.</returns>
         protected override Object Execute<TResult>(ITranslatedQuery translatedQuery)
         {
-            Stopwatch timer = new Stopwatch();
+            var timer = new Stopwatch();
             timer.Start();
-            String commandText = ((SelectQuery)translatedQuery).CommandText;
+            String commandText = ((SelectQuery) translatedQuery).CommandText;
             timer.Stop();
 
             Debug.WriteLine(String.Format("ES query: {0}", commandText));
             Debug.WriteLine(String.Format("ES query generated: {0}ms", timer.ElapsedMilliseconds));
 
-            Query query = new Query(commandText);
-            QueryResponse<TResult> response = EdgeSpringApi.GetQueryResponse<TResult>(query, ((EdgeMart)Source).AbsoluteUri);
+            var query = new Query(commandText);
+            QueryResponse<TResult> response = EdgeSpringApi.GetQueryResponse<TResult>(query,
+                                                                                      ((EdgeMart) Source).AbsoluteUri);
 
             Debug.WriteLine(String.Format("ES query execution time: {0}", response.query_time));
 

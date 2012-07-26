@@ -8,7 +8,7 @@ namespace Oinq.EdgeSpring.Web
     public class Query
     {
         // private fields
-        private readonly String _action = "query";
+        private const String _action = "query";
         private readonly Scope _otherScope;
         private readonly String _queryText;
 

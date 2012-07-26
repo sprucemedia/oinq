@@ -21,17 +21,17 @@ namespace Oinq.EdgeSpring.Web
     public class Update
     {
         // private fields
-        private const String ACTION = "action";
-        private const String ACTION_TYPE = "update";
-        private const String FILTER = "filters";
-        private const String DIMS = "dims";
-        private const String MEASURES = "measures";
-        private const String VALUES = "values";
+        private const String Action = "action";
+        private const String ActionType = "update";
+        private const String Filter = "filters";
+        private const String Dims = "dims";
+        private const String Measures = "measures";
+        private const String Values = "values";
 
-        private String _edgeMartUrl;
-        private IEntity _originalObject;
-        private IEntity _modifiedObject;
-        private IEntityInfo _entityInfo;
+        private readonly String _edgeMartUrl;
+        private readonly IEntity _originalObject;
+        private readonly IEntity _modifiedObject;
+        private readonly IEntityInfo _entityInfo;
 
         // constructors
         /// <summary>
@@ -45,7 +45,7 @@ namespace Oinq.EdgeSpring.Web
         {
             if (String.IsNullOrEmpty(edgemartUrl))
             {
-                throw new ArgumentNullException("edgemart");
+                throw new ArgumentNullException("edgemartUrl");
             }
             if (originalObject == null)
             {
@@ -74,26 +74,26 @@ namespace Oinq.EdgeSpring.Web
         /// <returns>The Uri.</returns>
         public Uri ToUri(UpdateType updateType)
         {
-            StringBuilder sb = new StringBuilder(_edgeMartUrl);
-            sb.Append(String.Format("&{0}={1}", ACTION, ACTION_TYPE));
+            var sb = new StringBuilder(_edgeMartUrl);
+            sb.Append(String.Format("&{0}={1}", Action, ActionType));
 
             // filters
             IList<PropertyInfo> filters = _entityInfo.Keys;
             foreach (PropertyInfo pi in filters)
             {
-                sb.Append(GetKeyValuePairString(FILTER, pi.Name, pi.GetValue(_originalObject, null).ToString()));
+                sb.Append(GetKeyValuePairString(Filter, pi.Name, pi.GetValue(_originalObject, null).ToString()));
             }
 
             IList<PropertyInfo> fields = (updateType == UpdateType.Dimension) ? _entityInfo.Dimensions : _entityInfo.Measures;
             foreach (PropertyInfo pi in fields)
             {
-                String fieldType = (updateType == UpdateType.Dimension) ? DIMS : MEASURES;
+                String fieldType = (updateType == UpdateType.Dimension) ? Dims : Measures;
                 String originalValue = pi.GetValue(_originalObject, null).ToString();
                 String modifiedValue = pi.GetValue(_modifiedObject, null).ToString();
                 if (modifiedValue != originalValue)
                 {                
                     sb.Append(GetKeyValuePairString(fieldType, pi.Name, originalValue));
-                    sb.Append(GetKeyValuePairString(VALUES, pi.Name, modifiedValue));
+                    sb.Append(GetKeyValuePairString(Values, pi.Name, modifiedValue));
                 }
             }
             return new Uri(sb.ToString());

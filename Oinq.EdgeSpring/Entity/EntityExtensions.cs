@@ -20,15 +20,15 @@ namespace Oinq.EdgeSpring.Entity
             IList<PropertyInfo> keys = new List<PropertyInfo>();
             IList<PropertyInfo> dimensions = new List<PropertyInfo>();
             IList<PropertyInfo> measures = new List<PropertyInfo>();
-            Type entityType = entity.GetType();
-            
-            IList<PropertyInfo> properties = entityType.GetProperties()
-                .Where(p => p.GetCustomAttributes(typeof(EntityPropertyAttribute), true).Count() == 1)
+            var entityType = entity.GetType();
+
+            var properties = entityType.GetProperties()
+                .Where(p => p.GetCustomAttributes(typeof (EntityPropertyAttribute), true).Count() == 1)
                 .ToList();
 
-            foreach (PropertyInfo property in properties)
+            foreach (var property in properties)
             {
-                EntityPropertyType propertyType = property.GetCustomAttributes(typeof(EntityPropertyAttribute), true)
+                EntityPropertyType propertyType = property.GetCustomAttributes(typeof (EntityPropertyAttribute), true)
                     .Cast<EntityPropertyAttribute>().Single().PropertyType;
                 switch (propertyType)
                 {
@@ -50,18 +50,15 @@ namespace Oinq.EdgeSpring.Entity
         }
 
         // private methods
-        private static void ValidateEntityInfo(IList<PropertyInfo> keys, IList<PropertyInfo> dimensions, IList<PropertyInfo> measures)
+        private static void ValidateEntityInfo(IList<PropertyInfo> keys, IList<PropertyInfo> dimensions,
+                                               IList<PropertyInfo> measures)
         {
             // There must be at least one key.
-            if (keys.Count == 0)
-            {
-                throw new ArgumentException("The entity does not contain any defined keys.");
-            }
+            if (keys.Count == 0) throw new ArgumentException("The entity does not contain any defined keys.");
+
             // Either the dimensions or measures must be populated.
             if (dimensions.Count == 0 && measures.Count == 0)
-            {
                 throw new ArgumentException("The entity does not contain any defined dimensions or measures.");
-            }
         }
     }
 }
