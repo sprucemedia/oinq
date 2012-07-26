@@ -1,5 +1,4 @@
 ﻿using System;
-using Oinq;
 
 namespace Oinq.EdgeSpring
 {
@@ -9,7 +8,7 @@ namespace Oinq.EdgeSpring
     public abstract class EdgeMart : IDataFile
     {
         // private fields
-        private Url _url;
+        private readonly Url _url;
 
         // constructors
         /// <summary>
@@ -18,10 +17,7 @@ namespace Oinq.EdgeSpring
         /// <param name="url">Server and EdgeMart settings in the form of a Url.</param>
         protected EdgeMart(Url url)
         {
-            if (url == null)
-            {
-                throw new ArgumentNullException("server");
-            }
+            if (url == null) throw new ArgumentNullException("url");
             if (String.IsNullOrEmpty(url.EdgeMartName))
             {
                 throw new ArgumentException("The name of the EdgeMart is required.");
@@ -33,7 +29,7 @@ namespace Oinq.EdgeSpring
         /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="connectionString">Server and EdgeMart settings in the form of a connection string.</param>
-        protected EdgeMart (String connectionString)
+        protected EdgeMart(String connectionString)
             : this(Url.Create(connectionString))
         {
         }
@@ -42,27 +38,12 @@ namespace Oinq.EdgeSpring
         /// Creates a new member of EdgeMart.
         /// </summary>
         /// <param name="uri">Server and EdgeMart settings in the form of a Uri.</param>
-        protected EdgeMart (Uri uri)
-            : this (Url.Create(uri.ToString()))
+        protected EdgeMart(Uri uri)
+            : this(Url.Create(uri.ToString()))
         {
         }
 
         // public properties
-        /// <summary>
-        /// Gets the name of this EdgeMart.
-        /// </summary>
-        public virtual String Name
-        {
-            get { return _url.EdgeMartName; }
-        }
-
-        /// <summary>
-        /// Gets the path to the EdgeMart.
-        /// </summary>
-        public virtual string AbsolutePath
-        {
-            get { return _url.EdgeMartName; }
-        }
 
         /// <summary>
         /// Gets the url string for this EdgeMart.
@@ -87,6 +68,26 @@ namespace Oinq.EdgeSpring
         {
             get { return _url.ToString(); }
         }
+
+        #region IDataFile Members
+
+        /// <summary>
+        /// Gets the name of this EdgeMart.
+        /// </summary>
+        public virtual String Name
+        {
+            get { return _url.EdgeMartName; }
+        }
+
+        /// <summary>
+        /// Gets the path to the EdgeMart.
+        /// </summary>
+        public virtual string AbsolutePath
+        {
+            get { return _url.EdgeMartName; }
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -135,18 +136,10 @@ namespace Oinq.EdgeSpring
                 return new EdgeMart<T>(baseConnectionString);
             }
 
-            String martName;
-            var objectType = typeof(T);
-            var sourceAttributes = objectType.GetCustomAttributes(typeof(PigSourceMapping), true);
-            if (sourceAttributes.Length > 0)
-            {
-                martName = ((PigSourceMapping)sourceAttributes[0]).Path;
-            }
-            else
-            {
-                martName = objectType.Name;
-            }
-            return new EdgeMart<T>(baseConnectionString + "?edgemart=" +martName);
+            var objectType = typeof (T);
+            var sourceAttributes = objectType.GetCustomAttributes(typeof (PigSourceMapping), true);
+            var martName = sourceAttributes.Length > 0 ? ((PigSourceMapping) sourceAttributes[0]).Path : objectType.Name;
+            return new EdgeMart<T>(baseConnectionString + "?edgemart=" + martName);
         }
     }
 }

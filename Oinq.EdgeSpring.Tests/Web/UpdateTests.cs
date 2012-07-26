@@ -1,28 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using NUnit.Framework;
+using Oinq.EdgeSpring.Entity;
 using Oinq.EdgeSpring.Web;
+using Rhino.Mocks;
 
 namespace Oinq.EdgeSpring.Tests
 {
     [TestFixture]
     public class When_creating_an_update
     {
-        private readonly Uri _uri = new Uri("http://server.com:8000/remote?edgemart=FakeData");
-        private EdgeMart<FakeData> _edgeMart;
-        private FakeData _originalFake = new FakeData();
-        private FakeData _newFake = new FakeData();
+        private readonly String _edgeMartUrl = "http://server.com:8000/remote?edgemart=FakeData";
+        private IEntity _original;
+        private IEntity _new;
+        private IEntityInfo _entityInfo;
+        private UpdateType _updateType = UpdateType.Dimension; // The choice is irrelevant for these tests.
 
         [TestFixtureSetUp]
         public void FixtureSetup()
         {
-            _edgeMart = new EdgeMart<FakeData>(_uri);
+           _original = new FakeDimensionEntity
+            {
+                Key1 = "Key1Value",
+                Key2 = "Key2Value",
+                Dim1 = "Dim1Value",
+                Dim2 = "Dim2Value",
+                Dim3 = "Dim3Value"
+            };
+            _new = _original;
+            _entityInfo = _original.GetEntityProperties();
         }
 
         [Test]
         public void it_can_create_with_a_edgemart_and_object()
         {
             // Act
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            var update = new Update(_edgeMartUrl, _original, _new, _entityInfo);
 
             // Assert
             Assert.IsNotNull(update);
@@ -32,10 +46,10 @@ namespace Oinq.EdgeSpring.Tests
         public void it_requires_an_edgemart()
         {
             // Arrange
-            EdgeMart<FakeData> nullFake = null;
+            String nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(nullFake, _originalFake, _newFake);
+            TestDelegate a = () => new Update(nullFake, _original, _new, _entityInfo);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -48,7 +62,7 @@ namespace Oinq.EdgeSpring.Tests
             FakeData nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(_edgeMart, nullFake, _newFake);
+            TestDelegate a = () => new Update(_edgeMartUrl, nullFake, _new, _entityInfo);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -61,7 +75,20 @@ namespace Oinq.EdgeSpring.Tests
             FakeData nullFake = null;
 
             // Act
-            TestDelegate a = () => new Update<FakeData>(_edgeMart, _originalFake, nullFake);
+            TestDelegate a = () => new Update(_edgeMartUrl, _original, nullFake, _entityInfo);
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(a);
+        }
+
+        [Test]
+        public void it_requires_entity_info()
+        {
+            // Arrange
+            IEntityInfo nullFake = null;
+
+            // Act
+            TestDelegate a = () => new Update(_edgeMartUrl, _original, _new, nullFake);
 
             // Assert
             Assert.Throws<ArgumentNullException>(a);
@@ -70,26 +97,26 @@ namespace Oinq.EdgeSpring.Tests
         [Test]
         public void it_can_return_the_server_information()
         {
-            // Assert
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            // Arrange
+            var update = new Update(_edgeMartUrl, _original, _new, _entityInfo);
 
             // Act
-            var absolute = update.ToUri();
+            var absolute = update.ToUri(_updateType);
 
             // Assert
-            Assert.AreEqual(_edgeMart.Server.Host, absolute.Host);
-            Assert.AreEqual(_edgeMart.Server.Port, absolute.Port);
-            Assert.AreEqual(_uri.AbsolutePath, absolute.AbsolutePath);
+            Assert.AreEqual("server.com", absolute.Host);
+            Assert.AreEqual(8000, absolute.Port);
+            Assert.AreEqual("/remote", absolute.AbsolutePath);
         }
 
         [Test]
         public void it_can_return_the_action()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            var update = new Update(_edgeMartUrl, _original, _new, _entityInfo);
 
             // Act
-            var absolute = update.ToUri();
+            var absolute = update.ToUri(_updateType);
 
             // Assert
             Assert.True(absolute.Query.Contains("action=update")); 
@@ -99,13 +126,113 @@ namespace Oinq.EdgeSpring.Tests
         public void it_can_return_the_edgemart()
         {
             // Assert
-            var update = new Update<FakeData>(_edgeMart, _originalFake, _newFake);
+            var update = new Update(_edgeMartUrl, _original, _new, _entityInfo);
 
             // Act
-            var absolute = update.ToUri();
+            var absolute = update.ToUri(_updateType);
 
             // Assert
-            Assert.True(absolute.Query.Contains(String.Format("edgemart={0}", _edgeMart.Name)));
+            Assert.True(absolute.Query.Contains("edgemart=FakeData"));
+        }
+    }
+
+    [TestFixture]
+    public class When_building_an_update_url
+    {
+        private readonly String _edgeMartUrl = "http://server.com:8000/remote?edgemart=FakeData";
+
+        [Test]
+        public void it_can_return_the_filters()
+        {
+            // Arrange
+            var original = new FakeDimensionEntity
+            {
+                Key1 = "Key1Value",
+                Key2 = "Key2Value",
+                Dim1 = "Dim1Value",
+                Dim2 = "Dim2Value",
+                Dim3 = "Dim3Value"
+            };
+            var delta = original;
+            var entityInfo = original.GetEntityProperties();
+            var update = new Update(_edgeMartUrl, original, delta, entityInfo);
+
+            // Act
+            var absolute = update.ToUri(UpdateType.Dimension);
+
+            // Assert
+            Assert.True(absolute.Query.Contains("&filters=Key1:Key1Value&filters=Key2:Key2Value"));
+        }
+
+        [Test]
+        public void it_can_return_changed_dimensions()
+        {
+            // Arrange
+            var original = new FakeDimensionEntity
+            {
+                Key1 = "Key1Value",
+                Key2 = "Key2Value",
+                Dim1 = "Dim1Value",
+                Dim2 = "Dim2Value",
+                Dim3 = "Dim3Value"
+            };
+            var delta = new FakeDimensionEntity
+            {
+                Key1 = "Key1Value",
+                Key2 = "Key2Value",
+                Dim1 = "Changed",
+                Dim2 = "Dim2Value",
+                Dim3 = "Dim3Value"
+            };
+            var entityInfo = original.GetEntityProperties();
+            var update = new Update(_edgeMartUrl, original, delta, entityInfo);
+
+            // Act
+            var absolute = update.ToUri(UpdateType.Dimension);
+
+            // Assert
+            Assert.True(absolute.Query.Contains("&filters=Key1:Key1Value&filters=Key2:Key2Value"));
+            Assert.True(absolute.Query.Contains("&dims=Dim1:Dim1Value"));
+            Assert.True(absolute.Query.Contains("&values=Dim1:Changed"));
+            Assert.False(absolute.Query.Contains("&dims=Dim2"));
+            Assert.False(absolute.Query.Contains("&dims=Dim3"));
+        }
+
+        [Test]
+        public void it_can_return_changed_measures()
+        {
+            // Arrange
+            var original = new FakeMeasureEntity
+            {
+                Key1 = "Key1Value",
+                Key2 = "Key2Value",
+                Mea1 = 1,
+                Mea2 = 2,
+                Mea3 = 3,
+                Mea4 = 4
+            };
+            var delta = new FakeMeasureEntity
+            {
+                Key1 = "Key1Value",
+                Key2 = "Key2Value",
+                Mea1 = 11,
+                Mea2 = 2,
+                Mea3 = 3,
+                Mea4 = 4
+            };
+            var entityInfo = original.GetEntityProperties();
+            var update = new Update(_edgeMartUrl, original, delta, entityInfo);
+
+            // Act
+            var absolute = update.ToUri(UpdateType.Measure);
+
+            // Assert
+            Assert.True(absolute.Query.Contains("&filters=Key1:Key1Value&filters=Key2:Key2Value"));
+            Assert.True(absolute.Query.Contains("&measures=Mea1:1"));
+            Assert.True(absolute.Query.Contains("&values=Mea1:11"));
+            Assert.False(absolute.Query.Contains("&measures=Mea2"));
+            Assert.False(absolute.Query.Contains("&measures=Mea3"));
+            Assert.False(absolute.Query.Contains("&measures=Mea4"));
         }
     }
 }

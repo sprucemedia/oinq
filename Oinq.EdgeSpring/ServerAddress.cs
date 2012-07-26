@@ -10,7 +10,7 @@ namespace Oinq.EdgeSpring
     public class ServerAddress : IEquatable<ServerAddress>
     {
         // private fields
-        private const int DEFAULT_PORT = 8000;
+        private const int DefaultPort = 8000;
 
         // constructors
         /// <summary>
@@ -20,7 +20,7 @@ namespace Oinq.EdgeSpring
         public ServerAddress(String host)
         {
             Host = host;
-            Port = DEFAULT_PORT;
+            Port = DefaultPort;
         }
 
         /// <summary>
@@ -44,13 +44,8 @@ namespace Oinq.EdgeSpring
         {
             ServerAddress address;
             if (TryParse(value, out address))
-            {
                 return address;
-            }
-            else
-            {
-                throw new FormatException(String.Format("'{0}' is not a valid server address.", value));
-            }
+            throw new FormatException(String.Format("'{0}' is not a valid server address.", value));
         }
 
         /// <summary>
@@ -69,7 +64,7 @@ namespace Oinq.EdgeSpring
                 {
                     String host = match.Groups["host"].Value;
                     String portString = match.Groups["port"].Value;
-                    Int32 port = (String.IsNullOrEmpty(portString)) ? DEFAULT_PORT : XmlConvert.ToInt32(portString);
+                    Int32 port = (String.IsNullOrEmpty(portString)) ? DefaultPort : XmlConvert.ToInt32(portString);
                     address = new ServerAddress(host, port);
                     return true;
                 }
@@ -98,7 +93,7 @@ namespace Oinq.EdgeSpring
         /// <returns>True if the two addresses are equal (or both are null).</returns>
         public static Boolean operator ==(ServerAddress lhs, ServerAddress rhs)
         {
-            return Object.Equals(lhs, rhs);
+            return Equals(lhs, rhs);
         }
 
         /// <summary>
@@ -120,7 +115,7 @@ namespace Oinq.EdgeSpring
         /// <returns>True if the two server addresses are equal.</returns>
         public Boolean Equals(ServerAddress rhs)
         {
-            if (Object.ReferenceEquals(rhs, null) || GetType() != rhs.GetType()) { return false; }
+            if (ReferenceEquals(rhs, null) || GetType() != rhs.GetType()) { return false; }
             return Host.Equals(rhs.Host, StringComparison.OrdinalIgnoreCase) && Port == rhs.Port;
         }
 

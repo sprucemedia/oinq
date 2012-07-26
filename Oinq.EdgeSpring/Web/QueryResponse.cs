@@ -7,14 +7,6 @@ namespace Oinq.EdgeSpring.Web
     /// </summary>
     public class QueryResponse<T>
     {
-        // constructors
-        /// <summary>
-        /// Initializes a new QueryResponse from a response string.
-        /// </summary>
-        public QueryResponse()
-        {
-        }
-
         // public properties
         /// <summary>
         /// Gets the type of action in the API request.

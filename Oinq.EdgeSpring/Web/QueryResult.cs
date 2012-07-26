@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Oinq.EdgeSpring.Web
 {
@@ -8,14 +7,6 @@ namespace Oinq.EdgeSpring.Web
     /// </summary>
     public class QueryResult<T>
     {
-        // constructors
-        /// <summary>
-        /// Initializes a new QueryResult from a list of records.
-        /// </summary>
-        public QueryResult()
-        {
-        }
-
         // public properties
         /// <summary>
         /// Gets the result description.

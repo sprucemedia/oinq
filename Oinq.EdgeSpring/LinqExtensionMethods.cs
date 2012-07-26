@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Oinq;
 
 namespace Oinq.EdgeSpring
 {
@@ -9,7 +8,7 @@ namespace Oinq.EdgeSpring
     public static class LinqExtensionMethods
     {
         /// <summary>
-        /// Returns an isntance of IQueryable{{T}} for an EdgeMart.
+        /// Returns an instance of IQueryable{{T}} for an EdgeMart.
         /// </summary>
         /// <typeparam name="T">The type of records in an EdgeMart.</typeparam>
         /// <param name="edgeMart">The EdgeMart.</param>
@@ -21,7 +20,7 @@ namespace Oinq.EdgeSpring
         }
 
         /// <summary>
-        /// Returns an isntance of IQueryable{{T}} for an EdgeMart.
+        /// Returns an instance of IQueryable{{T}} for an EdgeMart.
         /// </summary>
         /// <typeparam name="T">The type of records in an EdgeMart.</typeparam>
         /// <param name="edgeMart">The EdgeMart.</param>

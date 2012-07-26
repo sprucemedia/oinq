@@ -94,7 +94,7 @@ namespace Oinq.EdgeSpring
         /// <returns>The canonical URL.</returns>
         public override String ToString()
         {
-            StringBuilder url = new StringBuilder();
+            var url = new StringBuilder();
             url.Append("http://");
 
             if (Server != null)

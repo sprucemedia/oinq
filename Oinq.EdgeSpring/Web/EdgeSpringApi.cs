@@ -17,9 +17,8 @@ namespace Oinq.EdgeSpring.Web
         /// <returns>The Query Response.</returns>
         public static QueryResponse<T> GetQueryResponse<T>(Query query, Uri requestUri)
         {
-            var request = new RestRequest(requestUri.PathAndQuery, Method.POST);
-            request.RootElement = "results";
-            request.RequestFormat = DataFormat.Json;
+            var request = new RestRequest(requestUri.PathAndQuery, Method.POST)
+                              {RootElement = "results", RequestFormat = DataFormat.Json};
             request.AddBody(query);
 
             return Execute<QueryResponse<T>>(request, requestUri.Authority);
@@ -41,7 +40,7 @@ namespace Oinq.EdgeSpring.Web
         private static T Execute<T>(IRestRequest request, String baseUrl) where T : new()
         {
             var client = new RestClient("http://" + baseUrl);
-            var temp = client.Execute(request);
+            IRestResponse temp = client.Execute(request);
 
             return JsonConvert.DeserializeObject<T>(temp.Content);
         }

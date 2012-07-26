@@ -8,14 +8,6 @@ namespace Oinq.EdgeSpring.Web
     /// </summary>
     public class UpdateResponse
     {
-        // constructors
-        /// <summary>
-        /// Initializes a new UpdateResponse from a response string.
-        /// </summary>
-        public UpdateResponse()
-        {
-        }
-
         // public properties
         /// <summary>
         /// Gets the type of action in the API request.
