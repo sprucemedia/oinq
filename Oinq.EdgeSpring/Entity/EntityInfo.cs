@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
 namespace Oinq.EdgeSpring.Entity
 {
+    /// <summary>
+    /// Meta-data class describing IEntity.
+    /// </summary>
     public class EntityInfo : IEntityInfo
     {
         // private fields
@@ -13,6 +15,12 @@ namespace Oinq.EdgeSpring.Entity
         private ReadOnlyCollection<PropertyInfo> _measures;
 
         // constructors
+        /// <summary>
+        /// Initializes a new instance of EntityInfo.
+        /// </summary>
+        /// <param name="keys">A collection of keys.</param>
+        /// <param name="dimensions">A collection of dimensions.</param>
+        /// <param name="measures">A collection of measures.</param>
         public EntityInfo(IEnumerable<PropertyInfo> keys, IEnumerable<PropertyInfo> dimensions, IEnumerable<PropertyInfo> measures)
         {
             _keys = keys as ReadOnlyCollection<PropertyInfo>;
@@ -34,16 +42,25 @@ namespace Oinq.EdgeSpring.Entity
         }
 
         // public properties
+        /// <summary>
+        /// Gets the dimensions of IEntity.
+        /// </summary>
         public ReadOnlyCollection<PropertyInfo> Dimensions
         {
             get { return _dimensions; }
         }
 
+        /// <summary>
+        /// Gets the keys of IEntity.
+        /// </summary>
         public ReadOnlyCollection<PropertyInfo> Keys
         {
             get { return _keys; }
         }
 
+        /// <summary>
+        /// Gets the measures of IEntity.
+        /// </summary>
         public ReadOnlyCollection<PropertyInfo> Measures
         {
             get { return _measures; }

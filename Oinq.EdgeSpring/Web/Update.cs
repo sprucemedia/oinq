@@ -6,6 +6,9 @@ using Oinq.EdgeSpring.Entity;
 
 namespace Oinq.EdgeSpring.Web
 {
+    /// <summary>
+    /// Enumeration of update types.
+    /// </summary>
     public enum UpdateType
     {
         Dimension,
@@ -31,6 +34,13 @@ namespace Oinq.EdgeSpring.Web
         private IEntityInfo _entityInfo;
 
         // constructors
+        /// <summary>
+        /// Initializes an update request.
+        /// </summary>
+        /// <param name="edgemartUrl">Url of the Edgemart to be updated.</param>
+        /// <param name="originalObject">The original object to be updated.</param>
+        /// <param name="modifiedObject">The modified object.</param>
+        /// <param name="entityInfo">Entify Info.</param>
         public Update(String edgemartUrl, IEntity originalObject, IEntity modifiedObject, IEntityInfo entityInfo)
         {
             if (String.IsNullOrEmpty(edgemartUrl))
@@ -57,6 +67,11 @@ namespace Oinq.EdgeSpring.Web
         }
 
         // public methods
+        /// <summary>
+        /// Generates a URI for the REST-ful update request.
+        /// </summary>
+        /// <param name="updateType">The type of update.</param>
+        /// <returns>The Uri.</returns>
         public Uri ToUri(UpdateType updateType)
         {
             StringBuilder sb = new StringBuilder(_edgeMartUrl);
@@ -85,7 +100,7 @@ namespace Oinq.EdgeSpring.Web
         }
 
         // private methods
-        private String GetKeyValuePairString(String type, String key, String value)
+        private static String GetKeyValuePairString(String type, String key, String value)
         {
             return String.Format("&{0}={1}:{2}", type, key, value);
         }

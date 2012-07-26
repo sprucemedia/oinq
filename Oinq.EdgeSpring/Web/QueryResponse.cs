@@ -9,7 +9,7 @@ namespace Oinq.EdgeSpring.Web
     {
         // constructors
         /// <summary>
-        /// Initializes a new QueryResponse from a response string.
+        /// Initializes a new QueryResponse.
         /// </summary>
         public QueryResponse()
         {

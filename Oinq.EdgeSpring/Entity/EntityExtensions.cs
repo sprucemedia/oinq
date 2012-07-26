@@ -5,8 +5,16 @@ using System.Reflection;
 
 namespace Oinq.EdgeSpring.Entity
 {
+    /// <summary>
+    /// Extension methods for IEntity.
+    /// </summary>
     public static class EntityExtensions
     {
+        /// <summary>
+        /// Gets information about entity properties.
+        /// </summary>
+        /// <param name="entity">An instance of IEntity.</param>
+        /// <returns>IEntityInfo.</returns>
         public static IEntityInfo GetEntityProperties(this IEntity entity)
         {
             IList<PropertyInfo> keys = new List<PropertyInfo>();
@@ -22,7 +30,6 @@ namespace Oinq.EdgeSpring.Entity
             {
                 EntityPropertyType propertyType = property.GetCustomAttributes(typeof(EntityPropertyAttribute), true)
                     .Cast<EntityPropertyAttribute>().Single().PropertyType;
-                String propertyTypeName = Enum.GetName(typeof(EntityPropertyType), propertyType);
                 switch (propertyType)
                 {
                     case EntityPropertyType.Dimension:
@@ -42,6 +49,7 @@ namespace Oinq.EdgeSpring.Entity
             return new EntityInfo(keys, dimensions, measures);
         }
 
+        // private methods
         private static void ValidateEntityInfo(IList<PropertyInfo> keys, IList<PropertyInfo> dimensions, IList<PropertyInfo> measures)
         {
             // There must be at least one key.

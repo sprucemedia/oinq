@@ -10,7 +10,7 @@ namespace Oinq.EdgeSpring.Web
     {
         // constructors
         /// <summary>
-        /// Initializes a new UpdateResponse from a response string.
+        /// Initializes a new UpdateResponse.
         /// </summary>
         public UpdateResponse()
         {
