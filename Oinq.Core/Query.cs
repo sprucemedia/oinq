@@ -21,18 +21,18 @@ namespace Oinq
     /// <summary>
     /// An implementation IQueryable{{T}} for querying a data file.
     /// </summary>
-    /// <typeparam path="T">The type of facts being queried.</typeparam>
-    public sealed class Query<T> : IQueryable<T>, IQueryable, IEnumerable<T>, IEnumerable, IOrderedQueryable<T>, IOrderedQueryable, IPigQueryable
+    /// <typeparam name="T">The type of facts being queried.</typeparam>
+    public sealed class Query<T> : IOrderedQueryable<T>, IPigQueryable
     {
         // private fields
-        private IQueryProvider _provider;
-        private Expression _expression;
+        private readonly Expression _expression;
+        private readonly IQueryProvider _provider;
 
         // constructors
         /// <summary>
         /// Initializes a new member of the Query class.
         /// </summary>
-        /// <param path="provider">The query provider.</param>
+        /// <param name="provider">The query provider.</param>
         public Query(IQueryProvider provider)
         {
             if (provider == null)
@@ -46,8 +46,8 @@ namespace Oinq
         /// <summary>
         /// Initializes a new member of the Query class.
         /// </summary>
-        /// <param path="provider">The query provider.</param>
-        /// <param path="expression">The expression.</param>
+        /// <param name="provider">The query provider.</param>
+        /// <param name="expression">The expression.</param>
         public Query(IQueryProvider provider, Expression expression)
         {
             if (provider == null)
@@ -58,24 +58,17 @@ namespace Oinq
             {
                 throw new ArgumentNullException("expression");
             }
-            if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
+            if (!typeof (IQueryable<T>).IsAssignableFrom(expression.Type))
             {
                 throw new ArgumentOutOfRangeException("expression");
             }
             _provider = provider;
             _expression = expression;
         }
-        // public methods
-        
 
-        /// <summary>
-        /// Gets an _enumerator for the results of an Pig LINQ query.
-        /// </summary>
-        /// <returns>An _enumerator for the results of an Pig LINQ query.</returns>
-        public IEnumerator<T> GetEnumerator()
-        {
-            return ((IEnumerable<T>)_provider.Execute(_expression)).GetEnumerator();
-        }
+        // public methods
+
+        #region IPigQueryable Members
 
         /// <summary>
         /// Gets the Pig query that will be sent to the server when this LINQ query is executed.
@@ -83,36 +76,32 @@ namespace Oinq
         /// <returns>The Pig query.</returns>
         public String GetPigQuery()
         {
-            return ((QueryProvider)_provider).BuildQueryText(this);
+            return ((QueryProvider) _provider).BuildQueryText(this);
         }
 
+        #endregion
+
+        #region IQueryable<T> Members
+
         /// <summary>
-        /// Returns a textual representation of the Query.
+        /// Gets an _enumerator for the results of an Pig LINQ query.
         /// </summary>
-        /// <returns>The String.</returns>
-        public override String ToString()
+        /// <returns>An _enumerator for the results of an Pig LINQ query.</returns>
+        public IEnumerator<T> GetEnumerator()
         {
-            if (_expression.NodeType == ExpressionType.Constant &&
-                ((ConstantExpression)_expression).Value == this)
-            {
-                return "Query(" + typeof(T) + ")";
-            }
-            else
-            {
-                return _expression.ToString();
-            }
+            return ((IEnumerable<T>) _provider.Execute(_expression)).GetEnumerator();
         }
 
         // explicit implementation of IEnumerable
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)_provider.Execute(_expression)).GetEnumerator();
+            return ((IEnumerable) _provider.Execute(_expression)).GetEnumerator();
         }
 
         // explicit implementation of IQueryable
         Type IQueryable.ElementType
         {
-            get { return typeof(T); }
+            get { return typeof (T); }
         }
 
         Expression IQueryable.Expression
@@ -123,6 +112,22 @@ namespace Oinq
         IQueryProvider IQueryable.Provider
         {
             get { return _provider; }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Returns a textual representation of the Query.
+        /// </summary>
+        /// <returns>The String.</returns>
+        public override String ToString()
+        {
+            if (_expression.NodeType == ExpressionType.Constant &&
+                ((ConstantExpression) _expression).Value == this)
+            {
+                return "Query(" + typeof (T) + ")";
+            }
+            return _expression.ToString();
         }
     }
 }

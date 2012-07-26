@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Abstract class representing a Pig query.
@@ -9,12 +9,11 @@ namespace Oinq
     internal abstract class PigExpression : Expression
     {
         // private fields
-        private ExpressionType _nodeType;
-        private Type _type;
+        private readonly ExpressionType _nodeType;
+        private readonly Type _type;
 
         // constructors
         protected PigExpression(PigExpressionType eType, Type type)
-            : base()
         {
             _nodeType = ((ExpressionType)eType);
             _type = type;

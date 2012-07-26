@@ -1,33 +1,22 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Represents a column declaration in a column projection.
     /// </summary>
     internal class ColumnDeclaration
     {
-        // private fields
-        private Expression _expression;
-        private String _name;
-
         // constructors
         internal ColumnDeclaration(String name, Expression expression)
         {
-            _expression = expression;
-            _name = name;
+            Expression = expression;
+            Name = name;
         }
 
         // internal properties
-        internal Expression Expression
-        {
-            get { return _expression; }
-        }
-
-        internal String Name
-        {
-            get { return _name; }
-        }
+        internal Expression Expression { get; private set; }
+        internal string Name { get; private set; }
     }
 }

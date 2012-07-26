@@ -2,21 +2,13 @@
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Represents a select Pig query.
     /// </summary>
     internal class SelectExpression : AliasedExpression
     {
-        // private fields
-        private ReadOnlyCollection<ColumnDeclaration> _columns;
-        private Expression _from;
-        private ReadOnlyCollection<Expression> _groupBy;
-        private ReadOnlyCollection<OrderByExpression> _orderBy;
-        private Expression _take;
-        private Expression _where;
-
         // constructors
         internal SelectExpression(SourceAlias alias, IEnumerable<ColumnDeclaration> columns,
             Expression from, Expression where)
@@ -36,55 +28,29 @@ namespace Oinq
             IEnumerable<Expression> groupBy, Expression take)
             : base(PigExpressionType.Select, typeof(void), alias)
         {
-            _columns = columns as ReadOnlyCollection<ColumnDeclaration>;
-            if (_columns == null)
+            Columns = columns as ReadOnlyCollection<ColumnDeclaration> ??
+                      new List<ColumnDeclaration>(columns).AsReadOnly();
+            OrderBy = orderBy as ReadOnlyCollection<OrderByExpression>;
+            if (OrderBy == null && orderBy != null)
             {
-                _columns = new List<ColumnDeclaration>(columns).AsReadOnly();
+                OrderBy = new List<OrderByExpression>(orderBy).AsReadOnly();
             }
-            _orderBy = orderBy as ReadOnlyCollection<OrderByExpression>;
-            if (_orderBy == null && orderBy != null)
+            GroupBy = groupBy as ReadOnlyCollection<Expression>;
+            if (GroupBy == null && groupBy != null)
             {
-                _orderBy = new List<OrderByExpression>(orderBy).AsReadOnly();
+                GroupBy = new List<Expression>(groupBy).AsReadOnly();
             }
-            _groupBy = groupBy as ReadOnlyCollection<Expression>;
-            if (_groupBy == null && groupBy != null)
-            {
-                _groupBy = new List<Expression>(groupBy).AsReadOnly();
-            }
-            _take = take;
-            _from = from;
-            _where = where;
+            Take = take;
+            From = from;
+            Where = where;
         }
 
         // internal properties
-        internal ReadOnlyCollection<ColumnDeclaration> Columns
-        {
-            get { return _columns; }
-        }
-
-        internal Expression From
-        {
-            get { return _from; }
-        }
-
-        internal ReadOnlyCollection<Expression> GroupBy
-        {
-            get { return _groupBy; }
-        }
-
-        internal ReadOnlyCollection<OrderByExpression> OrderBy
-        {
-            get { return _orderBy; }
-        }
-
-        internal Expression Take
-        {
-            get { return _take; }
-        }
-
-        internal Expression Where
-        {
-            get { return _where; }
-        }
+        internal ReadOnlyCollection<ColumnDeclaration> Columns { get; private set; }
+        internal Expression From { get; private set; }
+        internal ReadOnlyCollection<Expression> GroupBy { get; private set; }
+        internal ReadOnlyCollection<OrderByExpression> OrderBy { get; private set; }
+        internal Expression Take { get; private set; }
+        internal Expression Where { get; private set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,13 +11,13 @@ namespace Oinq
     public class QueryProvider : IQueryProvider
     {
         // private fields
-        private IDataFile _source;
+        private readonly IDataFile _source;
 
         // constructors
         /// <summary>
         /// Initializes a new member of the QueryProvider class.
         /// </summary>
-        /// <param path="source">The data source being queried.</param>
+        /// <param name="source">The data source being queried.</param>
         public QueryProvider(IDataFile source)
         {
             if (source == null)
@@ -38,23 +37,14 @@ namespace Oinq
         }
 
         // public methods
-        /// <summary>
-        /// Builds the Pig query that will be sent when the LINQ query is executed.
-        /// </summary>
-        /// <typeparam path="T">The type of the objects being queried.</typeparam>
-        /// <param path="query">The LINQ query.</param>
-        /// <returns>The query text.</returns>
-        public String BuildQueryText<T>(Query<T> query)
-        {
-            var translatedQuery = QueryTranslator.Translate(this, ((IQueryable)query).Expression);
-            return ((SelectQuery)translatedQuery).CommandText;
-        }
+
+        #region IQueryProvider Members
 
         /// <summary>
         /// Creates a new member of Query{{T}} for this provider.
         /// </summary>
-        /// <typeparam path="T">The type of the returned elements.</typeparam>
-        /// <param path="expression">The query expression.</param>
+        /// <typeparam name="T">The type of the returned elements.</typeparam>
+        /// <param name="expression">The query expression.</param>
         /// <returns>A new member of Query{{T}}.</returns>
         public virtual IQueryable<T> CreateQuery<T>(Expression expression)
         {
@@ -62,7 +52,7 @@ namespace Oinq
             {
                 throw new ArgumentNullException("expression");
             }
-            if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
+            if (!typeof (IQueryable<T>).IsAssignableFrom(expression.Type))
             {
                 throw new ArgumentOutOfRangeException("expression");
             }
@@ -73,7 +63,7 @@ namespace Oinq
         /// Creates a new member Query{{T}} for this provider. Calls the generic CreateQuery{{T}}
         /// to actually create the new Query{{T}} member.
         /// </summary>
-        /// <param path="expression">The query expression.</param>
+        /// <param name="expression">The query expression.</param>
         /// <returns>A new member of Query{{T}}.</returns>
         public virtual IQueryable CreateQuery(Expression expression)
         {
@@ -81,11 +71,11 @@ namespace Oinq
             {
                 throw new ArgumentNullException("expression");
             }
-            var elementType = TypeHelper.GetElementType(expression.Type);
+            Type elementType = TypeHelper.GetElementType(expression.Type);
             try
             {
-                var queryableType = typeof(Query<>).MakeGenericType(elementType);
-                return (IQueryable)Activator.CreateInstance(queryableType, new Object[] { this, expression });
+                Type queryableType = typeof (Query<>).MakeGenericType(elementType);
+                return (IQueryable) Activator.CreateInstance(queryableType, new Object[] {this, expression});
             }
             catch (TargetInvocationException ex)
             {
@@ -96,18 +86,18 @@ namespace Oinq
         /// <summary>
         /// Executes a query.
         /// </summary>
-        /// <typeparam path="TResult">The type of the result.</typeparam>
-        /// <param path="expression">The query expression.</param>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="expression">The query expression.</param>
         /// <returns>The result of the query.</returns>
         public virtual TResult Execute<TResult>(Expression expression)
         {
-            return (TResult)Execute(expression);
+            return (TResult) Execute(expression);
         }
 
         /// <summary>
         /// Executes a query. Calls the generic method Execute{{T}} to actually execute the query.
         /// </summary>
-        /// <param path="expression">The query expression.</param>
+        /// <param name="expression">The query expression.</param>
         /// <returns>The result of the query.</returns>
         public virtual Object Execute(Expression expression)
         {
@@ -117,9 +107,23 @@ namespace Oinq
             }
             var translatedQuery = QueryTranslator.Translate(this, expression);
 
-            MethodInfo mi = this.GetType().GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
-            MethodInfo gmi = mi.MakeGenericMethod(TypeHelper.GetElementType(expression.Type));
+            var mi = GetType().GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
+            var gmi = mi.MakeGenericMethod(TypeHelper.GetElementType(expression.Type));
             return gmi.Invoke(this, new Object[] {translatedQuery});
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Builds the Pig query that will be sent when the LINQ query is executed.
+        /// </summary>
+        /// <typeparam name="T">The type of the objects being queried.</typeparam>
+        /// <param name="query">The LINQ query.</param>
+        /// <returns>The query text.</returns>
+        public String BuildQueryText<T>(Query<T> query)
+        {
+            var translatedQuery = QueryTranslator.Translate(this, ((IQueryable) query).Expression);
+            return (translatedQuery).CommandText;
         }
 
         // protected methods
@@ -127,7 +131,8 @@ namespace Oinq
         /// <summary>
         /// Executes a query.
         /// </summary>
-        /// <param path="translatedQuery">The TranslatedQuery.</param>
+        /// <param name="translatedQuery">The TranslatedQuery.</param>
+        /// <exception cref="NotImplementedException">NotImplementedException.</exception>
         /// <returns>The query result.</returns>
         protected virtual Object Execute<TResult>(ITranslatedQuery translatedQuery)
         {

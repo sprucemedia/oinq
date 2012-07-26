@@ -1,41 +1,25 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Represents a join in a Pig query.
     /// </summary>
     internal class JoinExpression : PigExpression
     {
-        // private fields
-        private Expression _condition;
-        private Expression _left;
-        private Expression _right;
-
         // constructors
         internal JoinExpression(Type type, Expression left, Expression right, Expression condition)
             : base(PigExpressionType.Join, type)
         {
-            _left = left;
-            _right = right;
-            _condition = condition;
+            Left = left;
+            Right = right;
+            Condition = condition;
         }
 
         // internal properties
-        internal new Expression Condition
-        {
-            get { return _condition; }
-        }
-
-        internal Expression Left
-        {
-            get { return _left; }
-        }
-
-        internal Expression Right
-        {
-            get { return _right; }
-        }
+        internal new Expression Condition { get; private set; }
+        internal Expression Left { get; private set; }
+        internal Expression Right { get; private set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Oinq
+﻿namespace Oinq.Expressions
 {
     /// <summary>
     /// Represents the direction of an order by clause.

@@ -1,27 +1,20 @@
 ﻿using System;
-using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Abstract class representing a subquery.
     /// </summary>
     internal abstract class SubqueryExpression : PigExpression
     {
-        // private fields
-        private SelectExpression _select;
-
         // constructors
         internal SubqueryExpression(PigExpressionType eType, Type type, SelectExpression select)
             : base(eType, type)
         {
-            _select = select;
+            Select = select;
         }
 
         // internal properties
-        internal SelectExpression Select
-        {
-            get { return _select; }
-        }
+        internal SelectExpression Select { get; private set; }
     }
 }

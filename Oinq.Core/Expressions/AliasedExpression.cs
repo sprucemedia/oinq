@@ -1,26 +1,21 @@
 ﻿using System;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Abstract type representing a Pig expression with an alias.
     /// </summary>
     internal abstract class AliasedExpression : PigExpression
     {
-        private SourceAlias _alias;
-
         // constructors
         protected AliasedExpression(PigExpressionType nodeType, Type type, SourceAlias alias)
             : base(nodeType, type)
         {
-            _alias = alias;
+            Alias = alias;
         }
 
         // internal properties
-        internal SourceAlias Alias
-        {
-            get { return _alias; }
-        }
+        internal SourceAlias Alias { get; private set; }
     }
 
     /// <summary>
@@ -28,11 +23,6 @@ namespace Oinq
     /// </summary>
     internal class SourceAlias
     {
-        // constructors
-        internal SourceAlias()
-        {
-        }
-
         // internal properties
         public override String ToString()
         {

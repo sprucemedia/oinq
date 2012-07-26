@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Expressions
 {
     /// <summary>
     /// Represents an Pig-specific implementation of ExpressionVisitor.
@@ -18,27 +18,27 @@ namespace Oinq
             {
                 return null;
             }
-            switch ((PigExpressionType)node.NodeType)
+            switch ((PigExpressionType) node.NodeType)
             {
                 case PigExpressionType.Source:
-                    return VisitSource((SourceExpression)node);
+                    return VisitSource(node);
                 case PigExpressionType.Column:
-                    return VisitColumn((ColumnExpression)node);
+                    return VisitColumn((ColumnExpression) node);
                 case PigExpressionType.Select:
-                    return VisitSelect((SelectExpression)node);
+                    return VisitSelect((SelectExpression) node);
                 case PigExpressionType.Join:
-                    return VisitJoin((JoinExpression)node);
+                    return VisitJoin((JoinExpression) node);
                 case PigExpressionType.Aggregate:
-                    return VisitAggregate((AggregateExpression)node);
+                    return VisitAggregate((AggregateExpression) node);
                 case PigExpressionType.Subquery:
                 case PigExpressionType.Scalar:
-                    return VisitSubquery((SubqueryExpression)node);
+                    return VisitSubquery((SubqueryExpression) node);
                 case PigExpressionType.AggregateSubquery:
-                    return VisitAggregateSubquery((AggregateSubqueryExpression)node);
+                    return VisitAggregateSubquery((AggregateSubqueryExpression) node);
                 case PigExpressionType.IsNull:
-                    return VisitIsNull((IsNullExpression)node);
+                    return VisitIsNull((IsNullExpression) node);
                 case PigExpressionType.Projection:
-                    return VisitProjection((ProjectionExpression)node);
+                    return VisitProjection((ProjectionExpression) node);
                 default:
                     return base.Visit(node);
             }
@@ -57,7 +57,7 @@ namespace Oinq
         protected virtual Expression VisitAggregateSubquery(AggregateSubqueryExpression node)
         {
             Expression e = Visit(node.AggregateAsSubquery);
-            var subquery = (ScalarExpression)e;
+            var subquery = (ScalarExpression) e;
             if (subquery != node.AggregateAsSubquery)
             {
                 return new AggregateSubqueryExpression(node.GroupByAlias, node.AggregateInGroupSelect, subquery);
@@ -70,7 +70,8 @@ namespace Oinq
             return node;
         }
 
-        protected ReadOnlyCollection<ColumnDeclaration> VisitColumnDeclarations(ReadOnlyCollection<ColumnDeclaration> nodes)
+        protected ReadOnlyCollection<ColumnDeclaration> VisitColumnDeclarations(
+            ReadOnlyCollection<ColumnDeclaration> nodes)
         {
             List<ColumnDeclaration> alternate = null;
             for (Int32 i = 0, n = nodes.Count; i < n; i++)
@@ -143,7 +144,7 @@ namespace Oinq
 
         protected virtual Expression VisitProjection(ProjectionExpression node)
         {
-            SelectExpression source = (SelectExpression)Visit(node.Source);
+            var source = (SelectExpression) Visit(node.Source);
             Expression projector = Visit(node.Projector);
             if (source != node.Source || projector != node.Projector)
             {
@@ -154,7 +155,7 @@ namespace Oinq
 
         protected virtual Expression VisitScalar(ScalarExpression node)
         {
-            var select = (SelectExpression)Visit(node.Select);
+            var select = (SelectExpression) Visit(node.Select);
             if (select != node.Select)
             {
                 return new ScalarExpression(node.Type, select);
@@ -189,10 +190,10 @@ namespace Oinq
 
         protected virtual Expression VisitSubquery(SubqueryExpression node)
         {
-            SelectExpression select = (SelectExpression)Visit(node.Select);
+            var select = (SelectExpression) Visit(node.Select);
             if (select != node.Select)
             {
-                return VisitScalar((ScalarExpression)node);
+                return VisitScalar((ScalarExpression) node);
             }
             return node;
         }
