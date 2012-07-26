@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{80F56D33-0F4B-4A21-9297-90D859B68A24}"
 	ProjectSection(SolutionItems) = preProject
 		CodeAnalysisRuleSets.ruleset = CodeAnalysisRuleSets.ruleset
+		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oinq.EdgeSpring.Tests", "Oinq.EdgeSpring.Tests\Oinq.EdgeSpring.Tests.csproj", "{3E350F9B-D176-4D93-AABA-AE9801D5CDFA}"
