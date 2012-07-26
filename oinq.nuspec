@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Oinq</id>
-    <version>0.9.7</version>
+    <version>0.9.8</version>
     <authors>Brian Knight</authors>
     <owners>Spruce Media</owners>
     <description>A LINQ IQueryable provider that targets translation of LINQ expressions into Pig-like languages.</description>
@@ -11,6 +11,8 @@
     <language>en-US</language>
     <dependencies>
       <dependency id="System.Linq.Dynamic" version="1.0.0" />
+      <dependency id="Newtonsoft.Json" version="4.0.2" />
+      <dependency id="RestSharp" version "103.2" />
     </dependencies>
   </metadata>
 </package>
