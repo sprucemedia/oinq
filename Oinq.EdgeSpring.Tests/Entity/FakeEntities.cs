@@ -89,4 +89,13 @@ namespace Oinq.EdgeSpring.Tests
         [EntityProperty(EntityPropertyType.Measure)]
         public Int32 Mea4 { get; set; }
     }
+
+    public class FakeKeyEntity : IEntity
+    {
+        // Keys
+        [EntityProperty(EntityPropertyType.Key)]
+        public String Key1 { get; set; }
+        [EntityProperty(EntityPropertyType.Key)]
+        public String Key2 { get; set; }
+    }
 }

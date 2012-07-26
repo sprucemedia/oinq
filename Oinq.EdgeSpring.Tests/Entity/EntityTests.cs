@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Oinq.EdgeSpring.Entity;
 
 namespace Oinq.EdgeSpring.Tests
@@ -73,6 +69,20 @@ namespace Oinq.EdgeSpring.Tests
         {
             // Arrange
             IEntity entity = new FakeNoKeyEntity();
+            IEntityInfo ei;
+
+            // Act
+            TestDelegate a = () => ei = entity.GetEntityProperties();
+
+            // Assert
+            Assert.Throws<ArgumentException>(a);
+        }
+
+        [Test]
+        public void it_throws_an_exception_for_an_entity_with_only_keys()
+        {
+            // Arrange
+            IEntity entity = new FakeKeyEntity();
             IEntityInfo ei;
 
             // Act
