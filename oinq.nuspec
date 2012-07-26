@@ -12,7 +12,7 @@
     <dependencies>
       <dependency id="System.Linq.Dynamic" version="1.0.0" />
       <dependency id="Newtonsoft.Json" version="4.0.2" />
-      <dependency id="RestSharp" version "103.2" />
+      <dependency id="RestSharp" version="103.2" />
     </dependencies>
   </metadata>
 </package>

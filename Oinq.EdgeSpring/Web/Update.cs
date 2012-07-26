@@ -11,7 +11,13 @@ namespace Oinq.EdgeSpring.Web
     /// </summary>
     public enum UpdateType
     {
+        /// <summary>
+        /// Dimensional update.
+        /// </summary>
         Dimension,
+        /// <summary>
+        /// Measure update.
+        /// </summary>
         Measure
     }
 
