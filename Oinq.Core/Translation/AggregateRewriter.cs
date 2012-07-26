@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Rewrite node expressions, moving them into same select expression that has the group-by clause.
@@ -12,8 +12,8 @@ namespace Oinq
     internal class AggregateRewriter : PigExpressionVisitor
     {
         // private fields
-        private ILookup<SourceAlias, AggregateSubqueryExpression> _lookup;
-        private Dictionary<AggregateSubqueryExpression, Expression> _map;
+        private readonly ILookup<SourceAlias, AggregateSubqueryExpression> _lookup;
+        private readonly Dictionary<AggregateSubqueryExpression, Expression> _map;
 
         // constructors
         private AggregateRewriter(Expression expression)
@@ -31,18 +31,19 @@ namespace Oinq
         // protected override methods
         protected override Expression VisitSelect(SelectExpression node)
         {
-            node = (SelectExpression)base.VisitSelect(node);
+            node = (SelectExpression) base.VisitSelect(node);
             if (_lookup.Contains(node.Alias))
             {
-                List<ColumnDeclaration> aggColumns = new List<ColumnDeclaration>(node.Columns);
+                var aggColumns = new List<ColumnDeclaration>(node.Columns);
                 foreach (AggregateSubqueryExpression ae in _lookup[node.Alias])
                 {
                     String name = "agg" + aggColumns.Count;
-                    ColumnDeclaration cd = new ColumnDeclaration(name, ae.AggregateInGroupSelect);
+                    var cd = new ColumnDeclaration(name, ae.AggregateInGroupSelect);
                     _map.Add(ae, new ColumnExpression(ae.Type, ae.GroupByAlias, name));
                     aggColumns.Add(cd);
                 }
-                return new SelectExpression(node.Alias, aggColumns, node.From, node.Where, node.OrderBy, node.GroupBy, node.Take);
+                return new SelectExpression(node.Alias, aggColumns, node.From, node.Where, node.OrderBy, node.GroupBy,
+                                            node.Take);
             }
             return node;
         }
@@ -57,10 +58,12 @@ namespace Oinq
             return Visit(node.AggregateAsSubquery);
         }
 
-        class AggregateGatherer : PigExpressionVisitor
+        #region Nested type: AggregateGatherer
+
+        private class AggregateGatherer : PigExpressionVisitor
         {
             // private fields
-            private List<AggregateSubqueryExpression> _aggregates = new List<AggregateSubqueryExpression>();
+            private readonly List<AggregateSubqueryExpression> _aggregates = new List<AggregateSubqueryExpression>();
 
             // constructors
             private AggregateGatherer()
@@ -68,9 +71,9 @@ namespace Oinq
             }
 
             // internal static fields
-            internal static List<AggregateSubqueryExpression> Gather(Expression expression)
+            internal static IEnumerable<AggregateSubqueryExpression> Gather(Expression expression)
             {
-                AggregateGatherer gatherer = new AggregateGatherer();
+                var gatherer = new AggregateGatherer();
                 gatherer.Visit(expression);
                 return gatherer._aggregates;
             }
@@ -82,5 +85,7 @@ namespace Oinq
                 return base.VisitAggregateSubquery(node);
             }
         }
+
+        #endregion
     }
 }

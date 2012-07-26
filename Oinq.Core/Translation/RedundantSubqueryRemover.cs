@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     internal class RedundantSubqueryRemover : PigExpressionVisitor
     {
@@ -21,7 +21,7 @@ namespace Oinq
         // protected override methods
         protected override Expression VisitSelect(SelectExpression node)
         {
-            node = (SelectExpression)base.VisitSelect(node);
+            node = (SelectExpression) base.VisitSelect(node);
 
             // first remove all purely redundant subqueries
             List<SelectExpression> redundant = RedundantSubqueryGatherer.Gather(node.From);
@@ -60,14 +60,9 @@ namespace Oinq
             return node;
         }
 
-        protected override Expression VisitSubquery(SubqueryExpression node)
-        {
-            return base.VisitSubquery(node);
-        }
-
         protected override Expression VisitProjection(ProjectionExpression node)
         {
-            node = (ProjectionExpression)base.VisitProjection(node);
+            node = (ProjectionExpression) base.VisitProjection(node);
             if (node.Source.From is SelectExpression)
             {
                 List<SelectExpression> redundant = RedundantSubqueryGatherer.Gather(node.Source);
@@ -84,7 +79,7 @@ namespace Oinq
         {
             foreach (ColumnDeclaration decl in select.Columns)
             {
-                ColumnExpression col = decl.Expression as ColumnExpression;
+                var col = decl.Expression as ColumnExpression;
                 if (col == null || decl.Name != col.Name)
                 {
                     return false;
@@ -95,24 +90,26 @@ namespace Oinq
 
         private static Boolean ProjectionIsNameMapOnly(SelectExpression select)
         {
-            SelectExpression fromSelect = select.From as SelectExpression;
+            var fromSelect = select.From as SelectExpression;
             if (fromSelect == null || select.Columns.Count != fromSelect.Columns.Count)
                 return false;
             // test that all _columns in 'select' are refering to _columns in the same position
             // in 'fromSelect'.
             for (Int32 i = 0, n = select.Columns.Count; i < n; i++)
             {
-                ColumnExpression col = select.Columns[i].Expression as ColumnExpression;
+                var col = select.Columns[i].Expression as ColumnExpression;
                 if (col == null || !(col.Name == fromSelect.Columns[i].Name))
                     return false;
             }
             return true;
         }
 
-        class RedundantSubqueryGatherer : PigExpressionVisitor
+        #region Nested type: RedundantSubqueryGatherer
+
+        private class RedundantSubqueryGatherer : PigExpressionVisitor
         {
             // private fields
-            List<SelectExpression> _redundant;
+            private List<SelectExpression> _redundant;
 
             // constructors
             private RedundantSubqueryGatherer()
@@ -122,7 +119,7 @@ namespace Oinq
             // internal static methods
             internal static List<SelectExpression> Gather(Expression source)
             {
-                RedundantSubqueryGatherer gatherer = new RedundantSubqueryGatherer();
+                var gatherer = new RedundantSubqueryGatherer();
                 gatherer.Visit(source);
                 return gatherer._redundant;
             }
@@ -131,11 +128,11 @@ namespace Oinq
             private static Boolean IsRedudantSubquery(SelectExpression select)
             {
                 return (select.From is SelectExpression || select.From is SourceExpression)
-                    && (ProjectionIsSimple(select) || ProjectionIsNameMapOnly(select))
-                    && (select.Where == null)
-                    && (select.Take == null)
-                    && (select.OrderBy == null || select.OrderBy.Count == 0)
-                    && (select.GroupBy == null || select.GroupBy.Count == 0);
+                       && (ProjectionIsSimple(select) || ProjectionIsNameMapOnly(select))
+                       && (select.Where == null)
+                       && (select.Take == null)
+                       && (select.OrderBy == null || select.OrderBy.Count == 0)
+                       && (select.GroupBy == null || select.GroupBy.Count == 0);
             }
 
             // protected override methods
@@ -152,5 +149,7 @@ namespace Oinq
                 return select;
             }
         }
+
+        #endregion
     }
 }

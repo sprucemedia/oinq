@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Removes column declarations in SelectExpressions that are not referenced.
@@ -12,7 +13,7 @@ namespace Oinq
     internal class UnusedColumnRemover : PigExpressionVisitor
     {
         // private fields
-        Dictionary<SourceAlias, HashSet<String>> _allColumnsUsed;
+        private readonly Dictionary<SourceAlias, HashSet<String>> _allColumnsUsed;
 
         // constructors
         private UnusedColumnRemover()
@@ -35,7 +36,7 @@ namespace Oinq
 
         protected override Expression VisitSubquery(SubqueryExpression node)
         {
-            System.Diagnostics.Debug.Assert(node.Select.Columns.Count == 1);
+            Debug.Assert(node.Select.Columns.Count == 1);
             MarkColumnAsUsed(node.Select.Alias, node.Select.Columns[0].Name);
             Expression result = base.VisitSubquery(node);
             return result;
@@ -105,7 +106,7 @@ namespace Oinq
         {
             // visit mapping in reverse order
             Expression projector = Visit(node.Projector);
-            SelectExpression source = (SelectExpression)Visit(node.Source);
+            var source = (SelectExpression) Visit(node.Source);
             if (projector != node.Projector || source != node.Source)
             {
                 return new ProjectionExpression(source, projector, node.Aggregator);

@@ -1,7 +1,7 @@
 ﻿using System;
 using Oinq.Pig;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Represents a LINQ query that has been translated to a Pig query.
@@ -9,15 +9,15 @@ namespace Oinq
     public abstract class TranslatedQuery : ITranslatedQuery
     {
         // private fields
-        private IDataFile _source;
-        private Type _sourceType;
+        private readonly IDataFile _source;
+        private readonly Type _sourceType;
 
         // constructors
         /// <summary>
         /// Initializes a new member of the TranslatedQuery class.
         /// </summary>
-        /// <param path="source">The data _source being queried.</param>
-        /// <param path="sourceType">The _source type being queried.</param>
+        /// <param name="source">The data _source being queried.</param>
+        /// <param name="sourceType">The _source type being queried.</param>
         protected TranslatedQuery(IDataFile source, Type sourceType)
         {
             _source = source;
@@ -25,6 +25,9 @@ namespace Oinq
         }
 
         // public properties
+
+        #region ITranslatedQuery Members
+
         /// <summary>
         /// Pig-based command text for the query.
         /// </summary>
@@ -48,5 +51,7 @@ namespace Oinq
         {
             get { return _sourceType; }
         }
+
+        #endregion
     }
 }

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using ExpressionVisitor = Oinq.Expressions.ExpressionVisitor;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Evaluates and replaces sub-trees when first candidate is reached (top-down)
     /// </summary>
     internal class SubtreeEvaluator : ExpressionVisitor
     {
-        private HashSet<Expression> _candidates;
+        private readonly HashSet<Expression> _candidates;
 
         // constructors
         internal SubtreeEvaluator(HashSet<Expression> candidates)

@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Returns the set of all _aliases produced by a query source
@@ -10,7 +10,7 @@ namespace Oinq
     internal class AliasesProduced : PigExpressionVisitor
     {
         // private fields
-        private HashSet<SourceAlias> _aliases;
+        private readonly HashSet<SourceAlias> _aliases;
 
         // constructors
         private AliasesProduced()
@@ -21,7 +21,7 @@ namespace Oinq
         // internal static methods
         internal static HashSet<SourceAlias> Gather(Expression source)
         {
-            AliasesProduced produced = new AliasesProduced();
+            var produced = new AliasesProduced();
             produced.Visit(source);
             return produced._aliases;
         }
@@ -36,7 +36,7 @@ namespace Oinq
         protected override Expression VisitSource(Expression node)
         {
             var file = node as SourceExpression;
-            _aliases.Add(file.Alias);
+            if (file != null) _aliases.Add(file.Alias);
             return node;
         }
     }

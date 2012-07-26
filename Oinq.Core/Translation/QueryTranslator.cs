@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// A translator from LINQ expression queries to Pig queries.
@@ -14,24 +14,24 @@ namespace Oinq
         /// <summary>
         /// Translates a LINQ expression into an actionable Pig query.
         /// </summary>
-        /// <param path="query">IQueryable.</param>
+        /// <param name="query">IQueryable.</param>
         /// <returns>A TranslatedQuery.</returns>
         public static TranslatedQuery Translate(IQueryable query)
         {
-            return Translate((QueryProvider)query.Provider, query.Expression);
+            return Translate((QueryProvider) query.Provider, query.Expression);
         }
 
         /// <summary>
         /// Translates a LINQ expression into an actionable Pig query.
         /// </summary>
-        /// <param path="provider">The QueryProvider.</param>
-        /// <param path="expression">The LINQ expression.</param>
+        /// <param name="provider">The QueryProvider.</param>
+        /// <param name="expression">The LINQ expression.</param>
         /// <returns>A TranslatedQuery.</returns>
         public static TranslatedQuery Translate(QueryProvider provider, Expression expression)
         {
-            var sourceType = GetSourceType(expression);
+            Type sourceType = GetSourceType(expression);
 
-            ProjectionExpression projection = expression as ProjectionExpression;
+            var projection = expression as ProjectionExpression;
             if (projection == null)
             {
                 expression = PartialEvaluator.Evaluate(expression);
@@ -40,9 +40,9 @@ namespace Oinq
                 //expression = OrderByRewriter.Rewrite(expression);
                 expression = UnusedColumnRemover.Remove(expression);
                 expression = RedundantSubqueryRemover.Remove(expression);
-                projection = (ProjectionExpression)expression;
+                projection = (ProjectionExpression) expression;
             }
-            
+
             // assume for now it is a SelectQuery       
             var selectQuery = new SelectQuery(provider.Source, sourceType);
             selectQuery.Translate(projection);
@@ -56,11 +56,11 @@ namespace Oinq
             var constantExpression = expression as ConstantExpression;
             if (constantExpression != null)
             {
-                var constantType = constantExpression.Type;
+                Type constantType = constantExpression.Type;
                 if (constantType.IsGenericType)
                 {
-                    var genericTypeDefinition = constantType.GetGenericTypeDefinition();
-                    if (genericTypeDefinition == typeof(Query<>))
+                    Type genericTypeDefinition = constantType.GetGenericTypeDefinition();
+                    if (genericTypeDefinition == typeof (Query<>))
                     {
                         return constantType.GetGenericArguments()[0];
                     }
@@ -73,7 +73,8 @@ namespace Oinq
                 return GetSourceType(methodCallExpression.Arguments[0]);
             }
 
-            var message = String.Format("Unable to find document type of expression: {0}.", expression.NodeType.ToString());
+            var message = String.Format("Unable to find document type of expression: {0}.",
+                                           expression.NodeType.ToString());
             throw new ArgumentOutOfRangeException(message);
         }
     }

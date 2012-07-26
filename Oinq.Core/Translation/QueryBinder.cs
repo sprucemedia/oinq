@@ -4,10 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Oinq.Expressions;
-using Oinq.Pig;
 using ExpressionVisitor = Oinq.Expressions.ExpressionVisitor;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// QueryBinder is a visitor that converts method calls to LINQ operations into
@@ -16,14 +15,14 @@ namespace Oinq
     internal class QueryBinder : ExpressionVisitor
     {
         // private fields
-        private Dictionary<ParameterExpression, Expression> _map;
-        private Expression _root;
-        private List<OrderByExpression> _thenBys;
-        private Dictionary<Expression, GroupByInfo> _groupByMap;
+        private readonly Dictionary<Expression, GroupByInfo> _groupByMap;
+        private readonly Dictionary<ParameterExpression, Expression> _map;
+        private readonly Expression _root;
         private Expression _currentGroupElement;
+        private List<OrderByExpression> _thenBys;
 
         // constructors
-        private QueryBinder(IQueryProvider provider, Expression root)
+        private QueryBinder(Expression root)
         {
             _map = new Dictionary<ParameterExpression, Expression>();
             _groupByMap = new Dictionary<Expression, GroupByInfo>();
@@ -33,7 +32,7 @@ namespace Oinq
         // internal static methods
         internal static Expression Bind(IQueryProvider provider, Expression node)
         {
-            return new QueryBinder(provider, node).Visit(node);
+            return new QueryBinder(node).Visit(node);
         }
 
         // protected override methods
@@ -52,10 +51,10 @@ namespace Oinq
             switch (source.NodeType)
             {
                 case ExpressionType.MemberInit:
-                    MemberInitExpression min = (MemberInitExpression)source;
+                    var min = (MemberInitExpression) source;
                     for (Int32 i = 0, n = min.Bindings.Count; i < n; i++)
                     {
-                        MemberAssignment assign = min.Bindings[i] as MemberAssignment;
+                        var assign = min.Bindings[i] as MemberAssignment;
                         if (assign != null && MembersMatch(assign.Member, node.Member))
                         {
                             return assign.Expression;
@@ -63,15 +62,12 @@ namespace Oinq
                     }
                     break;
                 case ExpressionType.New:
-                    NewExpression nex = (NewExpression)source;
-                    if (nex.Members != null)
+                    var nex = (NewExpression) source;
+                    for (Int32 i = 0, n = nex.Members.Count; i < n; i++)
                     {
-                        for (Int32 i = 0, n = nex.Members.Count; i < n; i++)
+                        if (MembersMatch(nex.Members[i], node.Member))
                         {
-                            if (MembersMatch(nex.Members[i], node.Member))
-                            {
-                                return nex.Arguments[i];
-                            }
+                            return nex.Arguments[i];
                         }
                     }
                     break;
@@ -85,30 +81,30 @@ namespace Oinq
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(Queryable) || node.Method.DeclaringType == typeof(Enumerable))
+            if (node.Method.DeclaringType == typeof (Queryable) || node.Method.DeclaringType == typeof (Enumerable))
             {
                 switch (node.Method.Name)
                 {
                     case "Where":
-                        return BindWhere(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]));
+                        return BindWhere(node.Arguments[0], GetLambda(node.Arguments[1]));
                     case "Select":
-                        return BindSelect(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]));
+                        return BindSelect(node.Arguments[0], GetLambda(node.Arguments[1]));
                     case "Join":
                         return BindJoin(
                             node.Type, node.Arguments[0], node.Arguments[1],
                             GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]), GetLambda(node.Arguments[4]));
                     case "OrderBy":
-                        return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]), 
-                            OrderByDirection.Ascending);
+                        return BindOrderBy(node.Arguments[0], GetLambda(node.Arguments[1]),
+                                           OrderByDirection.Ascending);
                     case "OrderByDescending":
-                        return BindOrderBy(node.Type, node.Arguments[0], GetLambda(node.Arguments[1]),
-                            OrderByDirection.Descending);
+                        return BindOrderBy(node.Arguments[0], GetLambda(node.Arguments[1]),
+                                           OrderByDirection.Descending);
                     case "ThenBy":
                         return BindThenBy(node.Arguments[0], GetLambda(node.Arguments[1]),
-                            OrderByDirection.Ascending);
+                                          OrderByDirection.Ascending);
                     case "ThenByDescending":
                         return BindThenBy(node.Arguments[0], GetLambda(node.Arguments[1]),
-                            OrderByDirection.Descending);
+                                          OrderByDirection.Descending);
                     case "Take":
                         if (node.Arguments.Count == 2)
                         {
@@ -120,7 +116,7 @@ namespace Oinq
                         {
                             return BindGroupBy(node.Arguments[0], GetLambda(node.Arguments[1]), null, null);
                         }
-                        else if (node.Arguments.Count == 3)
+                        if (node.Arguments.Count == 3)
                         {
                             LambdaExpression lambda1 = GetLambda(node.Arguments[1]);
                             LambdaExpression lambda2 = GetLambda(node.Arguments[2]);
@@ -129,7 +125,7 @@ namespace Oinq
                                 // second lambda is element selector
                                 return BindGroupBy(node.Arguments[0], lambda1, lambda2, null);
                             }
-                            else if (lambda2.Parameters.Count == 2)
+                            if (lambda2.Parameters.Count == 2)
                             {
                                 // second lambda is result selector
                                 return BindGroupBy(node.Arguments[0], lambda1, null, lambda2);
@@ -138,7 +134,7 @@ namespace Oinq
                         else if (node.Arguments.Count == 4)
                         {
                             return BindGroupBy(node.Arguments[0], GetLambda(node.Arguments[1]),
-                                GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]));
+                                               GetLambda(node.Arguments[2]), GetLambda(node.Arguments[3]));
                         }
                         break;
                     case "First":
@@ -155,22 +151,24 @@ namespace Oinq
                         {
                             return BindAggregate(node.Arguments[0], node.Method.Name, node.Method, null, node == _root);
                         }
-                        else if (node.Arguments.Count == 2)
+                        if (node.Arguments.Count == 2)
                         {
                             LambdaExpression selector = GetLambda(node.Arguments[1]);
-                            return BindAggregate(node.Arguments[0], node.Method.Name, node.Method, selector, node == _root);
+                            return BindAggregate(node.Arguments[0], node.Method.Name, node.Method, selector,
+                                                 node == _root);
                         }
                         break;
                 }
                 throw new NotSupportedException(String.Format("The method '{0}' is not supported", node.Method.Name));
             }
-            // custom extensions
-            else if (node.Method.GetCustomAttributes(typeof(PigExtensionAttribute), true).Count() > 0)
+                // custom extensions
+            if (node.Method.GetCustomAttributes(typeof (PigExtensionAttribute), true).Any())
             {
                 MethodInfo method = node.Method;
-                PigExtensionAttribute extension = (PigExtensionAttribute)method.GetCustomAttributes(typeof(PigExtensionAttribute), true).First();
-                var mi =  extension.BinderType.GetMethod(String.Format("Bind{0}", method.Name));
-                var exp = (LambdaExpression)mi.Invoke(null, node.Arguments.ToArray<Object>()); 
+                var extension =
+                    (PigExtensionAttribute) method.GetCustomAttributes(typeof (PigExtensionAttribute), true).First();
+                MethodInfo mi = extension.BinderType.GetMethod(String.Format("Bind{0}", method.Name));
+                var exp = (LambdaExpression) mi.Invoke(null, node.Arguments.ToArray<Object>());
                 return Visit(exp.Body);
             }
             return base.VisitMethodCall(node);
@@ -187,7 +185,8 @@ namespace Oinq
         }
 
         // private methods
-        private Expression BindAggregate(Expression source, String aggName, MethodInfo method, LambdaExpression argument, Boolean isRoot)
+        private Expression BindAggregate(Expression source, String aggName, MethodInfo method, LambdaExpression argument,
+                                         Boolean isRoot)
         {
             Type returnType = method.ReturnType;
             Boolean hasPredicateArg = HasPredicateArg(aggName);
@@ -195,11 +194,11 @@ namespace Oinq
             Boolean argumentWasPredicate = false;
 
             // check for distinct
-            MethodCallExpression mcs = source as MethodCallExpression;
+            var mcs = source as MethodCallExpression;
             if (mcs != null && !hasPredicateArg && argument == null)
             {
                 if (mcs.Method.Name == "Distinct" && mcs.Arguments.Count == 1 &&
-                    (mcs.Method.DeclaringType == typeof(Queryable) || mcs.Method.DeclaringType == typeof(Enumerable)))
+                    (mcs.Method.DeclaringType == typeof (Queryable) || mcs.Method.DeclaringType == typeof (Enumerable)))
                 {
                     source = mcs.Arguments[0];
                     isDistinct = true;
@@ -209,7 +208,7 @@ namespace Oinq
             if (argument != null && hasPredicateArg)
             {
                 // convert query.Count(predicate) into query.Where(predicate).Count()
-                source = Expression.Call(typeof(Queryable), "Where", method.GetGenericArguments(), source, argument);
+                source = Expression.Call(typeof (Queryable), "Where", method.GetGenericArguments(), source, argument);
                 argument = null;
                 argumentWasPredicate = true;
             }
@@ -227,18 +226,20 @@ namespace Oinq
                 argExpr = projection.Projector;
             }
 
-            var alias = GetNextAlias();
+            SourceAlias alias = GetNextAlias();
             Expression aggExpr = new AggregateExpression(returnType, aggName, argExpr, isDistinct);
-            SelectExpression select = new SelectExpression(alias, new ColumnDeclaration[] { new ColumnDeclaration("", aggExpr) }, projection.Source, null);
+            var select = new SelectExpression(alias, new[] {new ColumnDeclaration("", aggExpr)}, projection.Source, null);
 
             if (isRoot)
             {
-                ParameterExpression p = Expression.Parameter(typeof(IEnumerable<>).MakeGenericType(aggExpr.Type), "node");
-                LambdaExpression gator = Expression.Lambda(Expression.Call(typeof(Enumerable), "Single", new Type[] { returnType }, p), p);
+                ParameterExpression p = Expression.Parameter(typeof (IEnumerable<>).MakeGenericType(aggExpr.Type),
+                                                             "node");
+                LambdaExpression gator =
+                    Expression.Lambda(Expression.Call(typeof (Enumerable), "Single", new[] {returnType}, p), p);
                 return new ProjectionExpression(select, new ColumnExpression(returnType, alias, ""), gator);
             }
 
-            ScalarExpression subquery = new ScalarExpression(returnType, select);
+            var subquery = new ScalarExpression(returnType, select);
 
             // if we can find the corresponding group-info we can build a special AggregateSubquery node that will enable us to
             // optimize the node expression later using AggregateRewriter
@@ -270,7 +271,8 @@ namespace Oinq
             return subquery;
         }
 
-        private Expression BindGroupBy(Expression source, LambdaExpression keySelector, LambdaExpression elementSelector, LambdaExpression resultSelector)
+        private Expression BindGroupBy(Expression source, LambdaExpression keySelector, LambdaExpression elementSelector,
+                                       LambdaExpression resultSelector)
         {
             ProjectionExpression projection = VisitSequence(source);
 
@@ -296,8 +298,9 @@ namespace Oinq
             Expression subqueryKey = Visit(keySelector.Body);
 
             // use same projection trick to get group-by expressions based on subquery
-            ProjectedColumns subqueryKeyPC = ProjectColumns(subqueryKey, subqueryBasis.Source.Alias, subqueryBasis.Source.Alias);
-            IEnumerable<Expression> subqueryGroupExprs = subqueryKeyPC.Columns.Select(c => c.Expression);
+            var subqueryKeyPc = ProjectColumns(subqueryKey, subqueryBasis.Source.Alias,
+                                                            subqueryBasis.Source.Alias);
+            IEnumerable<Expression> subqueryGroupExprs = subqueryKeyPc.Columns.Select(c => c.Expression);
             Expression subqueryCorrelation = BuildPredicateWithNullsEqual(subqueryGroupExprs, groupExprs);
 
             // compute element based on duplicated subquery
@@ -309,17 +312,17 @@ namespace Oinq
             }
 
             // build subquery that projects the desired element
-            var elementAlias = GetNextAlias();
-            ProjectedColumns elementPC = ProjectColumns(subqueryElemExpr, elementAlias, subqueryBasis.Source.Alias);
-            ProjectionExpression elementSubquery =
+            SourceAlias elementAlias = GetNextAlias();
+            ProjectedColumns elementPc = ProjectColumns(subqueryElemExpr, elementAlias, subqueryBasis.Source.Alias);
+            var elementSubquery =
                 new ProjectionExpression(
-                    new SelectExpression(elementAlias, elementPC.Columns, subqueryBasis.Source, subqueryCorrelation),
-                    elementPC.Projector
+                    new SelectExpression(elementAlias, elementPc.Columns, subqueryBasis.Source, subqueryCorrelation),
+                    elementPc.Projector
                     );
-            var alias = GetNextAlias();
+            SourceAlias alias = GetNextAlias();
 
             // make it possible to tie _aggregates back to this group-by
-            GroupByInfo info = new GroupByInfo(alias, elemExpr);
+            var info = new GroupByInfo(alias, elemExpr);
             _groupByMap.Add(elementSubquery, info);
 
             Expression resultExpr;
@@ -337,8 +340,8 @@ namespace Oinq
             {
                 // result must be IGrouping<K,E>
                 resultExpr = Expression.New(
-                    typeof(Grouping<,>).MakeGenericType(keyExpr.Type, subqueryElemExpr.Type).GetConstructors()[0],
-                    new Expression[] { keyExpr, elementSubquery }
+                    typeof (Grouping<,>).MakeGenericType(keyExpr.Type, subqueryElemExpr.Type).GetConstructors()[0],
+                    new[] {keyExpr, elementSubquery}
                     );
             }
 
@@ -355,36 +358,38 @@ namespace Oinq
         }
 
         private Expression BindJoin(Type resultType, Expression outerSource, Expression innerSource,
-            LambdaExpression outerKey, LambdaExpression innerKey, LambdaExpression resultSelector)
+                                    LambdaExpression outerKey, LambdaExpression innerKey,
+                                    LambdaExpression resultSelector)
         {
             ProjectionExpression outerProjection = VisitSequence(outerSource);
             ProjectionExpression innerProjection = VisitSequence(innerSource);
             _map[outerKey.Parameters[0]] = outerProjection.Projector;
             Expression outerKeyExpr = Visit(outerKey.Body);
             _map[innerKey.Parameters[0]] = innerProjection.Projector;
-            Expression innerKeyExpr = this.Visit(innerKey.Body);
+            Expression innerKeyExpr = Visit(innerKey.Body);
             _map[resultSelector.Parameters[0]] = outerProjection.Projector;
             _map[resultSelector.Parameters[1]] = innerProjection.Projector;
-            Expression resultExpr = this.Visit(resultSelector.Body);
-            JoinExpression join = new JoinExpression(resultType, outerProjection.Source, innerProjection.Source, 
-                Expression.Equal(outerKeyExpr, innerKeyExpr));
+            Expression resultExpr = Visit(resultSelector.Body);
+            var join = new JoinExpression(resultType, outerProjection.Source, innerProjection.Source,
+                                          Expression.Equal(outerKeyExpr, innerKeyExpr));
             SourceAlias alias = GetNextAlias();
-            ProjectedColumns pc = this.ProjectColumns(resultExpr, alias, outerProjection.Source.Alias, innerProjection.Source.Alias);
+            ProjectedColumns pc = ProjectColumns(resultExpr, alias, outerProjection.Source.Alias,
+                                                 innerProjection.Source.Alias);
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, join, null),
                 pc.Projector
                 );
         }
 
-        private Expression BindOrderBy(Type resultType, Expression source, LambdaExpression orderSelector, 
-            OrderByDirection orderType)
+        private Expression BindOrderBy(Expression source, LambdaExpression orderSelector,
+                                       OrderByDirection orderType)
         {
             List<OrderByExpression> myThenBys = _thenBys;
             _thenBys = null;
             ProjectionExpression projection = VisitSequence(source);
 
             _map[orderSelector.Parameters[0]] = projection.Projector;
-            List<OrderByExpression> orderings = new List<OrderByExpression>();
+            var orderings = new List<OrderByExpression>();
             orderings.Add(new OrderByExpression(Visit(orderSelector.Body), orderType));
 
             if (myThenBys != null)
@@ -392,13 +397,13 @@ namespace Oinq
                 for (Int32 i = myThenBys.Count - 1; i >= 0; i--)
                 {
                     OrderByExpression tb = myThenBys[i];
-                    LambdaExpression lambda = (LambdaExpression)tb.Expression;
+                    var lambda = (LambdaExpression) tb.Expression;
                     _map[lambda.Parameters[0]] = projection.Projector;
                     orderings.Add(new OrderByExpression(Visit(lambda.Body), tb.Direction));
                 }
             }
 
-            var alias = GetNextAlias();
+            SourceAlias alias = GetNextAlias();
             ProjectedColumns pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, projection.Source, null, orderings.AsReadOnly(), null),
@@ -406,12 +411,12 @@ namespace Oinq
                 );
         }
 
-        private Expression BindSelect(Type resultType, Expression source, LambdaExpression selector)
+        private Expression BindSelect(Expression source, LambdaExpression selector)
         {
             ProjectionExpression projection = VisitSequence(source);
             _map[selector.Parameters[0]] = projection.Projector;
             Expression expression = Visit(selector.Body);
-            var alias = GetNextAlias();
+            SourceAlias alias = GetNextAlias();
             ProjectedColumns pc = ProjectColumns(expression, alias, projection.Source.Alias);
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, projection.Source, null),
@@ -422,7 +427,7 @@ namespace Oinq
         {
             ProjectionExpression projection = VisitSequence(source);
             take = Visit(take);
-            var alias = GetNextAlias();
+            SourceAlias alias = GetNextAlias();
             ProjectedColumns pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, projection.Source, null, null, null, take),
@@ -440,19 +445,20 @@ namespace Oinq
             return Visit(source);
         }
 
-        private Expression BindWhere(Type resultType, Expression source, LambdaExpression predicate)
+        private Expression BindWhere(Expression source, LambdaExpression predicate)
         {
-            ProjectionExpression projection = (ProjectionExpression)Visit(source);
+            var projection = (ProjectionExpression) Visit(source);
             _map[predicate.Parameters[0]] = projection.Projector;
             Expression where = Visit(predicate.Body);
-            var alias = GetNextAlias();
+            SourceAlias alias = GetNextAlias();
             ProjectedColumns pc = ProjectColumns(projection.Projector, alias, projection.Source.Alias);
             return new ProjectionExpression(
                 new SelectExpression(alias, pc.Columns, projection.Source, where),
                 pc.Projector);
         }
 
-        private static Expression BuildPredicateWithNullsEqual(IEnumerable<Expression> source1, IEnumerable<Expression> source2)
+        private static Expression BuildPredicateWithNullsEqual(IEnumerable<Expression> source1,
+                                                               IEnumerable<Expression> source2)
         {
             IEnumerator<Expression> en1 = source1.GetEnumerator();
             IEnumerator<Expression> en2 = source2.GetEnumerator();
@@ -473,7 +479,7 @@ namespace Oinq
         {
             switch (node.NodeType)
             {
-                case (ExpressionType)PigExpressionType.Column:
+                case (ExpressionType) PigExpressionType.Column:
                     return true;
                 default:
                     return false;
@@ -484,13 +490,13 @@ namespace Oinq
         {
             switch (node.NodeType)
             {
-                case (ExpressionType)PigExpressionType.Projection:
-                    return (ProjectionExpression)node;
+                case (ExpressionType) PigExpressionType.Projection:
+                    return (ProjectionExpression) node;
                 case ExpressionType.New:
-                    NewExpression nex = (NewExpression)node;
+                    var nex = (NewExpression) node;
                     if (node.Type.IsGenericType)
                     {
-                        return (ProjectionExpression)nex.Arguments[1];
+                        return (ProjectionExpression) nex.Arguments[1];
                     }
                     goto default;
                 default:
@@ -505,18 +511,18 @@ namespace Oinq
 
         private static Type GetColumnType(MemberInfo member)
         {
-            FieldInfo fi = member as FieldInfo;
+            var fi = member as FieldInfo;
             if (fi != null)
             {
                 return fi.FieldType;
             }
-            PropertyInfo pi = (PropertyInfo)member;
+            var pi = (PropertyInfo) member;
             return pi.PropertyType;
         }
 
         private static IEnumerable<MemberInfo> GetMappedMembers(Type rowType)
         {
-            return rowType.GetProperties().Where(pi => pi.CanWrite).Cast<MemberInfo>();
+            return rowType.GetProperties().Where(pi => pi.CanWrite);
         }
 
         private static SourceAlias GetNextAlias()
@@ -531,10 +537,10 @@ namespace Oinq
 
         private static ProjectionExpression GetTableProjection(Type rowType)
         {
-            var sourceAlias = GetNextAlias();
-            var selectAlias = GetNextAlias();
-            List<MemberBinding> bindings = new List<MemberBinding>();
-            List<ColumnDeclaration> columns = new List<ColumnDeclaration>();
+            SourceAlias sourceAlias = GetNextAlias();
+            SourceAlias selectAlias = GetNextAlias();
+            var bindings = new List<MemberBinding>();
+            var columns = new List<ColumnDeclaration>();
             foreach (MemberInfo mi in GetMappedMembers(rowType))
             {
                 String columnName = GetColumnName(mi);
@@ -560,17 +566,17 @@ namespace Oinq
 
         private static Boolean IsTable(Expression expression)
         {
-            return expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Query<>);
+            return expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof (Query<>);
         }
 
         private static Expression MakeMember(Expression source, MemberInfo mi)
         {
-            FieldInfo fi = mi as FieldInfo;
+            var fi = mi as FieldInfo;
             if (fi != null)
             {
                 return Expression.Field(source, fi);
             }
-            PropertyInfo pi = (PropertyInfo)mi;
+            var pi = (PropertyInfo) mi;
             return Expression.Property(source, pi);
         }
 
@@ -582,16 +588,17 @@ namespace Oinq
             }
             if (a is MethodInfo && b is PropertyInfo)
             {
-                return a == ((PropertyInfo)b).GetGetMethod();
+                return a == ((PropertyInfo) b).GetGetMethod();
             }
-            else if (a is PropertyInfo && b is MethodInfo)
+            if (a is PropertyInfo && b is MethodInfo)
             {
-                return ((PropertyInfo)a).GetGetMethod() == b;
+                return ((PropertyInfo) a).GetGetMethod() == b;
             }
             return false;
         }
 
-        private ProjectedColumns ProjectColumns(Expression expression, SourceAlias newAlias, params SourceAlias[] existingAliases)
+        private ProjectedColumns ProjectColumns(Expression expression, SourceAlias newAlias,
+                                                params SourceAlias[] existingAliases)
         {
             return Projector.ProjectColumns(CanBeColumn, expression, newAlias, existingAliases);
         }
@@ -607,11 +614,11 @@ namespace Oinq
         {
             while (e.NodeType == ExpressionType.Quote)
             {
-                e = ((UnaryExpression)e).Operand;
+                e = ((UnaryExpression) e).Operand;
             }
             if (e.NodeType == ExpressionType.Constant)
             {
-                return ((ConstantExpression)e).Value as LambdaExpression;
+                return ((ConstantExpression) e).Value as LambdaExpression;
             }
             return e as LambdaExpression;
         }

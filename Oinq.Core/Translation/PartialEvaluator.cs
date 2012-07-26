@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// A static class with methods to partially evaluate an Expression.
@@ -13,7 +13,7 @@ namespace Oinq
         /// <summary>
         /// Performs evaluation and replacement of independent sub-trees.
         /// </summary>
-        /// <param path="expression">The root of the expression tree.</param>
+        /// <param name="expression">The root of the expression tree.</param>
         /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         internal static Expression Evaluate(Expression expression)
         {
@@ -23,8 +23,8 @@ namespace Oinq
         /// <summary>
         /// Performs evaluation and replacement of independent sub-trees.
         /// </summary>
-        /// <param path="expression">The root of the expression tree.</param>
-        /// <param path="queryProvider">The query provider.</param>
+        /// <param name="expression">The root of the expression tree.</param>
+        /// <param name="queryProvider">The query provider.</param>
         /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         internal static Expression Evaluate(Expression expression, IQueryProvider queryProvider)
         {
@@ -50,14 +50,14 @@ namespace Oinq
             var methodCallExpression = expression as MethodCallExpression;
             if (methodCallExpression != null)
             {
-                var declaringType = methodCallExpression.Method.DeclaringType;
-                if (declaringType == typeof(Enumerable) || declaringType == typeof(Queryable))
+                Type declaringType = methodCallExpression.Method.DeclaringType;
+                if (declaringType == typeof (Enumerable) || declaringType == typeof (Queryable))
                 {
                     return false;
                 }
             }
 
-            if (expression.NodeType == ExpressionType.Convert && expression.Type == typeof(Object))
+            if (expression.NodeType == ExpressionType.Convert && expression.Type == typeof (Object))
             {
                 return true;
             }

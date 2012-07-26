@@ -6,28 +6,28 @@ using System.Linq;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Represents a LINQ select-style query that has been translated to a Pig query.
     /// </summary>
     public class SelectQuery : TranslatedQuery
     {
-        private Expression _where;
-        private ReadOnlyCollection<OrderByExpression> _orderBy;
-        private Expression _take;
+        private readonly Stack _commandStack;
+        private readonly List<JoinExpression> _joins;
+        private readonly List<SourceExpression> _sources;
         private List<ColumnDeclaration> _columns;
         private ReadOnlyCollection<Expression> _groupBy;
-        private Stack _commandStack;
-        private List<SourceExpression> _sources;
-        private List<JoinExpression> _joins;
+        private ReadOnlyCollection<OrderByExpression> _orderBy;
+        private Expression _take;
+        private Expression _where;
 
         // constructors
         /// <summary>
         /// Initializes a new member of the SelectQuery class.
         /// </summary>
-        /// <param path="source">The data source being queried.</param>
-        /// <param path="sourceType">The source type.</param>
+        /// <param name="source">The data source being queried.</param>
+        /// <param name="sourceType">The source type.</param>
         public SelectQuery(IDataFile source, Type sourceType)
             : base(source, sourceType)
         {
@@ -90,7 +90,7 @@ namespace Oinq
         /// <summary>
         /// Translates a LINQ query expression tree.
         /// </summary>
-        /// <param path="expression">The LINQ query expression tree.</param>
+        /// <param name="expression">The LINQ query expression tree.</param>
         internal void Translate(Expression expression)
         {
             // when we reach the original Query<T>, we're done
@@ -110,10 +110,10 @@ namespace Oinq
                 return;
             }
 
-            SelectExpression selectExpression = expression as SelectExpression;
+            var selectExpression = expression as SelectExpression;
             if (selectExpression != null)
             {
-                AliasedExpression from = selectExpression.From as AliasedExpression;
+                var from = selectExpression.From as AliasedExpression;
                 if (from != null)
                 {
                     _commandStack.Push(selectExpression);
@@ -139,11 +139,11 @@ namespace Oinq
             }
 
             // try projection
-            ProjectionExpression projectionExpression = expression as ProjectionExpression;
+            var projectionExpression = expression as ProjectionExpression;
             if (projectionExpression != null)
             {
                 Translate(projectionExpression.Source);
-                NewExpression anonymous = projectionExpression.Projector as NewExpression;
+                var anonymous = projectionExpression.Projector as NewExpression;
                 if (anonymous != null && anonymous.Members != null)
                 {
                     for (Int32 i = 0, n = anonymous.Arguments.Count; i < n; i++)
@@ -153,24 +153,26 @@ namespace Oinq
                 }
                 else
                 {
-                    MemberInitExpression member = projectionExpression.Projector as MemberInitExpression;
+                    var member = projectionExpression.Projector as MemberInitExpression;
                     if (member != null)
                     {
                         foreach (MemberBinding binding in member.Bindings)
                         {
-                            MemberAssignment assignment = binding as MemberAssignment;
-                            _columns.Add(new ColumnDeclaration(binding.Member.Name, assignment.Expression));
+                            var assignment = binding as MemberAssignment;
+                            if (assignment != null)
+                                _columns.Add(new ColumnDeclaration(binding.Member.Name, assignment.Expression));
                         }
                     }
                     else
                     {
                         _columns = projectionExpression.Source.Columns.ToList();
                     }
-                }        
+                }
                 return;
             }
 
-            var message = String.Format("Don't know how to translate expression: {0}.", expression.NodeType.ToString());
+            string message = String.Format("Don't know how to translate expression: {0}.",
+                                           expression.NodeType.ToString());
             throw new NotSupportedException(message);
         }
     }

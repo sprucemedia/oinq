@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Projector is a visitor that splits an expression representing the result of a query into
@@ -14,16 +14,17 @@ namespace Oinq
     internal class Projector : PigExpressionVisitor
     {
         // private fields
-        private Dictionary<ColumnExpression, ColumnExpression> _map;
-        private List<ColumnDeclaration> _columns;
-        private HashSet<String> _columnNames;
-        private HashSet<Expression> _candidates;
-        private SourceAlias[] _existingAliases;
-        private SourceAlias _newAlias;
+        private readonly HashSet<Expression> _candidates;
+        private readonly HashSet<String> _columnNames;
+        private readonly List<ColumnDeclaration> _columns;
+        private readonly SourceAlias[] _existingAliases;
+        private readonly Dictionary<ColumnExpression, ColumnExpression> _map;
+        private readonly SourceAlias _newAlias;
         private Int32 _iColumn;
 
         // constructors
-        private Projector(Func<Expression, Boolean> canBeColumn, Expression expression, SourceAlias newAlias, params SourceAlias[] existingAliases)
+        private Projector(Func<Expression, Boolean> canBeColumn, Expression expression, SourceAlias newAlias,
+                          params SourceAlias[] existingAliases)
         {
             _map = new Dictionary<ColumnExpression, ColumnExpression>();
             _columns = new List<ColumnDeclaration>();
@@ -35,9 +36,9 @@ namespace Oinq
 
         // internal static methods
         internal static ProjectedColumns ProjectColumns(Func<Expression, Boolean> canBeColumn, Expression expression,
-            SourceAlias newAlias, params SourceAlias[] existingAliases)
+                                                        SourceAlias newAlias, params SourceAlias[] existingAliases)
         {
-            Projector projector = new Projector(canBeColumn, expression, newAlias, existingAliases);
+            var projector = new Projector(canBeColumn, expression, newAlias, existingAliases);
             Expression expr = projector.Visit(expression);
             return new ProjectedColumns(expr, projector._columns.AsReadOnly());
         }
@@ -47,9 +48,10 @@ namespace Oinq
         {
             if (_candidates.Contains(expression))
             {
-                if (expression.NodeType == (ExpressionType)PigExpressionType.Column)
+                string columnName;
+                if (expression.NodeType == (ExpressionType) PigExpressionType.Column)
                 {
-                    ColumnExpression column = (ColumnExpression)expression;
+                    var column = (ColumnExpression) expression;
                     ColumnExpression mapped;
                     if (_map.TryGetValue(column, out mapped))
                     {
@@ -57,7 +59,7 @@ namespace Oinq
                     }
                     if (_existingAliases.Contains(column.Alias))
                     {
-                        String columnName = GetUniqueColumnName(column.Name);
+                        columnName = GetUniqueColumnName(column.Name);
                         _columns.Add(new ColumnDeclaration(columnName, column));
                         mapped = new ColumnExpression(column.Type, _newAlias, columnName);
                         _map[column] = mapped;
@@ -67,17 +69,11 @@ namespace Oinq
                     // must be referring to outer scope
                     return column;
                 }
-                else
-                {
-                    String columnName = GetNextColumnName();
-                    _columns.Add(new ColumnDeclaration(columnName, expression));
-                    return new ColumnExpression(expression.Type, _newAlias, columnName);
-                }
+                columnName = GetNextColumnName();
+                _columns.Add(new ColumnDeclaration(columnName, expression));
+                return new ColumnExpression(expression.Type, _newAlias, columnName);
             }
-            else
-            {
-                return base.Visit(expression);
-            }
+            return base.Visit(expression);
         }
 
         // private methods

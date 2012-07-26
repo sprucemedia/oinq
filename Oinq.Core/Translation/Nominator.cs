@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Nominator is a class that walks an expression tree bottom-up, determining the set of
@@ -12,8 +12,8 @@ namespace Oinq
     internal class Nominator : PigExpressionVisitor
     {
         // private fields
-        private Func<Expression, Boolean> _canBeColumn;
-        private HashSet<Expression> _candidates;
+        private readonly Func<Expression, Boolean> _canBeColumn;
+        private readonly HashSet<Expression> _candidates;
         private Boolean _isBlocked;
 
         // constructors
@@ -27,7 +27,7 @@ namespace Oinq
         // internal static methods
         internal static HashSet<Expression> Nominate(Func<Expression, Boolean> canBeColumn, Expression expression)
         {
-            Nominator nominator = new Nominator(canBeColumn);
+            var nominator = new Nominator(canBeColumn);
             nominator.Visit(expression);
             return nominator._candidates;
         }

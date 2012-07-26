@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Represents an actionable query expression.

@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Oinq.Expressions;
+using Oinq.Translation;
 
 namespace Oinq.Pig
 {

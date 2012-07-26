@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Oinq.Translation;
 
 namespace Oinq.Tests
 {

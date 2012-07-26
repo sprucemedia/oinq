@@ -2,30 +2,19 @@
 using System.Linq.Expressions;
 using Oinq.Expressions;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     internal sealed class ProjectedColumns
     {
-        // private fields
-        private Expression _projector;
-        private ReadOnlyCollection<ColumnDeclaration> _columns;
-
         // constructors
         internal ProjectedColumns(Expression projector, ReadOnlyCollection<ColumnDeclaration> columns)
         {
-            _projector = projector;
-            _columns = columns;
+            Projector = projector;
+            Columns = columns;
         }
 
         // internal properties
-        internal Expression Projector
-        {
-            get { return _projector; }
-        }
-
-        internal ReadOnlyCollection<ColumnDeclaration> Columns
-        {
-            get { return _columns; }
-        }
+        internal Expression Projector { get; private set; }
+        internal ReadOnlyCollection<ColumnDeclaration> Columns { get; private set; }
     }
 }

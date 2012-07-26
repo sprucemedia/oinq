@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Oinq
+namespace Oinq.Translation
 {
     /// <summary>
     /// Represents a collection of objects that have a common key.
     /// </summary>
-    /// <typeparam path="TKey">Key.</typeparam>
-    /// <typeparam path="TElement">Element.</typeparam>
+    /// <typeparam name="TKey">Key.</typeparam>
+    /// <typeparam name="TElement">Element.</typeparam>
     public class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
     {
         // private fields
-        private TKey _key;
-        private IEnumerable<TElement> _group;
+        private readonly IEnumerable<TElement> _group;
+        private readonly TKey _key;
 
         // constructors
         /// <summary>
         /// Initializes a new _instance of Grouping{{TKey, TElement}}.
         /// </summary>
-        /// <param path="key">TKey.</param>
-        /// <param path="group">TElement.</param>
+        /// <param name="key">TKey.</param>
+        /// <param name="group">TElement.</param>
         public Grouping(TKey key, IEnumerable<TElement> group)
         {
             _key = key;
@@ -28,6 +28,9 @@ namespace Oinq
         }
 
         // public properties
+
+        #region IGrouping<TKey,TElement> Members
+
         /// <summary>
         /// Gets the key for a grouping element.
         /// </summary>
@@ -50,5 +53,7 @@ namespace Oinq
         {
             return _group.GetEnumerator();
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Oinq.EdgeSpring.Web;
+using Oinq.Translation;
 
 namespace Oinq.EdgeSpring
 {
