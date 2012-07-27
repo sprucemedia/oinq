@@ -436,6 +436,12 @@ namespace Oinq.Pig
                         }
                     }
 
+                    if (orderBy.Expression.NodeType == ExpressionType.Convert)
+                    {
+                        var dynamicOrderExp = (UnaryExpression)orderBy.Expression;
+                        WriteColumnName(((ColumnExpression)dynamicOrderExp.Operand).Name);
+                    }
+
                     WriteOrderByDirection(orderBy.Direction);
                 }
                 Write("; ");
@@ -621,6 +627,20 @@ namespace Oinq.Pig
             {
                 Visit(node.Arguments[0]);
                 // Do nothing else for now - should be replaces with new EdgeSpring functions once they become available.
+                return node;
+            }
+            else if (node.Method.Name == "Contains" || node.Method.Name == "StartsWith" || node.Method.Name == "EndsWith")
+            {
+                Write("(");
+                Visit(node.Object);
+                Write(" MATCHES '");
+                var value = ((ConstantExpression)node.Arguments[0]).Value;
+                value = String.Format("{0}{1}{2}",
+                                      (node.Method.Name == "EndsWith" || node.Method.Name == "Contains" ? ".*" : ""),
+                                      value,
+                                      (node.Method.Name == "StartsWith" || node.Method.Name == "Contains" ? ".*" : ""));
+                Write(value);
+                Write("')");
                 return node;
             }
             throw new NotSupportedException(String.Format("The method '{0}' is not supported", node.Method.Name));

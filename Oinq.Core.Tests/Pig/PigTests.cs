@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using NUnit.Framework;
 using Rhino.Mocks;
 
@@ -164,6 +165,21 @@ namespace Oinq.Tests
 
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc, Dim1 desc; t3 = limit t2 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_order_by_a_dynamically_constructed_expression()
+        {
+            // Arrange
+            var param = Expression.Parameter(typeof(FakeData), "fake");
+            var sortExpression = Expression.Lambda<Func<FakeData, Object>>(Expression.Convert(Expression.Property(param, "Mea1"), typeof(Object)), param);
+            var query = _source.AsQueryable<FakeData>().OrderBy(sortExpression);
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc; t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -378,6 +394,59 @@ namespace Oinq.Tests
 
             // Assert
             Assert.True(queryText.Contains("t1 = filter t0 by (Mea1 >= 5);"));
+        }
+
+        [Test]
+        public void it_can_implement_contains()
+        {
+            // Arrange
+            IQueryable<FakeData> query = _source.AsQueryable<FakeData>().Where(f => f.Dim1.Contains("test"));
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.True(queryText.Contains("t1 = filter t0 by (Dim1 MATCHES '.*test.*');"));
+        }
+
+        [Test]
+        public void it_can_implement_startswith()
+        {
+            // Arrange
+            IQueryable<FakeData> query = _source.AsQueryable<FakeData>().Where(f => f.Dim1.StartsWith("test"));
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.True(queryText.Contains("t1 = filter t0 by (Dim1 MATCHES 'test.*');"));
+        }
+
+        [Test]
+        public void it_can_implement_endswith()
+        {
+            // Arrange
+            IQueryable<FakeData> query = _source.AsQueryable<FakeData>().Where(f => f.Dim1.EndsWith("test"));
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.True(queryText.Contains("t1 = filter t0 by (Dim1 MATCHES '.*test');"));
+        }
+
+        [Test]
+        public void it_can_implement_contains_using_a_variable()
+        {
+            // Arrange
+            String match = "test";
+            IQueryable<FakeData> query = _source.AsQueryable<FakeData>().Where(f => f.Dim1.Contains(match));
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.True(queryText.Contains("t1 = filter t0 by (Dim1 MATCHES '.*test.*');"));
         }
     }
 
