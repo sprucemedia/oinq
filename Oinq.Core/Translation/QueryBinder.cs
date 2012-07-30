@@ -161,13 +161,16 @@ namespace Oinq.Translation
                 }
                 throw new NotSupportedException(String.Format("The method '{0}' is not supported", node.Method.Name));
             }
-                // custom extensions
-            if (node.Method.GetCustomAttributes(typeof (PigExtensionAttribute), true).Any())
+            // custom extensions
+            var extensions = node.Method.GetCustomAttributes(typeof(PigExtensionAttribute), true);
+            if (extensions.Length == 0 && node.Method.DeclaringType != null)
+            {
+                extensions = node.Method.DeclaringType.GetCustomAttributes(typeof(PigExtensionAttribute), true);
+            }
+            if (extensions.Length > 0)
             {
                 MethodInfo method = node.Method;
-                var extension =
-                    (PigExtensionAttribute) method.GetCustomAttributes(typeof (PigExtensionAttribute), true).First();
-                MethodInfo mi = extension.BinderType.GetMethod(String.Format("Bind{0}", method.Name));
+                MethodInfo mi = ((PigExtensionAttribute)extensions[0]).BinderType.GetMethod(String.Format("Bind{0}", method.Name));
                 var exp = (LambdaExpression) mi.Invoke(null, node.Arguments.ToArray<Object>());
                 return Visit(exp.Body);
             }

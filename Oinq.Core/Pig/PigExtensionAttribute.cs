@@ -5,6 +5,7 @@ namespace Oinq
     /// <summary>
     /// Attribute used for mapping binder method names to Pig extensions.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public sealed class PigExtensionAttribute : Attribute
     {
         // private fields

@@ -644,6 +644,19 @@ namespace Oinq.Tests
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Dimension, ((sum(Mea1) + sum(Mea1)) + sum(Mea1)) as Total; t3 = limit t2 1000; ", queryText);
         }
+
+        [Test]
+        public void it_can_translate_an_aggregate_with_a_class_level_attribute()
+        {
+            // Arrange
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dimension, data) => new { Dimension = dimension, Total = data.MultiplyIt() });
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Dimension, (sum(Mea1) * 2) as Total; t3 = limit t2 1000; ", queryText);
+        }
     }
 
     [TestFixture]
