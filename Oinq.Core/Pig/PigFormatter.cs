@@ -436,10 +436,36 @@ namespace Oinq.Pig
                         }
                     }
 
+                    var memberExp = orderBy.Expression as MemberExpression;
+                    if (memberExp != null)
+                    {
+                        WriteColumnName(memberExp.Member.Name);
+                    }
+
                     if (orderBy.Expression.NodeType == ExpressionType.Convert)
                     {
                         var dynamicOrderExp = (UnaryExpression)orderBy.Expression;
-                        WriteColumnName(((ColumnExpression)dynamicOrderExp.Operand).Name);
+                        var columnExpression = dynamicOrderExp.Operand as ColumnExpression;
+                        if (columnExpression != null)
+                        {
+                            WriteColumnName(columnMaps.FirstOrDefault(x => x.Value == columnExpression.Name).Key);
+                        }
+                        else
+                        {
+                            var dynamicProperty = dynamicOrderExp.Operand as MemberExpression;
+                            if (dynamicProperty != null)
+                            {
+                                WriteColumnName(dynamicProperty.Member.Name);
+                            }
+                            else
+                            {
+                                var dynamicAgg = dynamicOrderExp.Operand as AggregateExpression;
+                                if (dynamicAgg != null)
+                                {
+                                    WriteColumnName(aggs[0].Name);
+                                }
+                            }
+                        }
                     }
 
                     WriteOrderByDirection(orderBy.Direction);

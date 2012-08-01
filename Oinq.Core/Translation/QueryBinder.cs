@@ -393,7 +393,7 @@ namespace Oinq.Translation
 
             _map[orderSelector.Parameters[0]] = projection.Projector;
             var orderings = new List<OrderByExpression>();
-            orderings.Add(new OrderByExpression(Visit(orderSelector.Body), orderType));
+            orderings.Add(new OrderByExpression(orderSelector.Body, orderType));
 
             if (myThenBys != null)
             {

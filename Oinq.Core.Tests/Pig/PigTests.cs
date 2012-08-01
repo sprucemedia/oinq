@@ -183,6 +183,53 @@ namespace Oinq.Tests
         }
 
         [Test]
+        public void it_can_order_by_a_dynamically_constructed_expression_with_a_column_alias()
+        {
+            // Arrange
+            var param = Expression.Parameter(typeof(FakeProjection), "fake");
+            var sortExpression = Expression.Lambda<Func<FakeProjection, Object>>(Expression.Convert(Expression.Property(param, "Measure"), typeof(Object)), param);
+            var query = _source.AsQueryable<FakeData>().Select(f => new FakeProjection { Key = f.Dim1, Measure = f.Mea1 }).OrderBy(sortExpression);
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Key, Mea1 as Measure; t2 = order t1 by Measure asc; t3 = limit t2 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_order_by_a_dynamically_constructed_expression_with_an_aggregate()
+        {
+            // Arrange
+            var param = Expression.Parameter(typeof(FakeProjection), "fake");
+            var sortExpression = Expression.Lambda<Func<FakeProjection, Object>>(Expression.Convert(Expression.Property(param, "Measure"), typeof(Object)), param);
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dim, f) => new FakeProjection { Key = dim, Measure = f.Sum(x => x.Mea1) })
+                .OrderByDescending(sortExpression);
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Key, sum(Mea1) as Measure; t3 = order t2 by Measure desc; t4 = limit t3 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_order_by_a_dynamically_constructed_expression_with_a_custom_extension()
+        {
+            // Arrange
+            var param = Expression.Parameter(typeof(FakeProjection), "fake");
+            var sortExpression = Expression.Lambda<Func<FakeProjection, Object>>(Expression.Convert(Expression.Property(param, "Measure"), typeof(Object)), param);
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dim, f) => new FakeProjection { Key = dim, Measure = f.AggOp() })
+                .OrderByDescending(sortExpression);
+
+            // Act
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            // Assert
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Key, ((sum(Mea1) + sum(Mea1)) + sum(Mea1)) as Measure; t3 = order t2 by Measure desc; t4 = limit t3 1000; ", queryText);
+        }
+
+        [Test]
         public void it_can_limit_the_number_of_results()
         {
             // Arrange
