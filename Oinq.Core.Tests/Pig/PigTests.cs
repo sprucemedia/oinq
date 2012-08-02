@@ -125,7 +125,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by (Mea1 asc); t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 desc; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by (Mea1 desc); t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -151,7 +151,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc, Dim1 asc; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by (Mea1 asc, Dim1 asc); t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc, Dim1 desc; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by (Mea1 asc, Dim1 desc); t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -179,7 +179,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by (Mea1 asc); t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -194,7 +194,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Key, Mea1 as Measure; t2 = order t1 by Measure asc; t3 = limit t2 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Key, Mea1 as Measure; t2 = order t1 by (Measure asc); t3 = limit t2 1000; ", queryText);
         }
 
         [Test]
@@ -210,7 +210,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Key, sum(Mea1) as Measure; t3 = order t2 by Measure desc; t4 = limit t3 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Key, sum(Mea1) as Measure; t3 = order t2 by (Measure desc); t4 = limit t3 1000; ", queryText);
         }
 
         [Test]
@@ -226,7 +226,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Key, ((sum(Mea1) + sum(Mea1)) + sum(Mea1)) as Measure; t3 = order t2 by Measure desc; t4 = limit t3 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Key, ((sum(Mea1) + sum(Mea1)) + sum(Mea1)) as Measure; t3 = order t2 by (Measure desc); t4 = limit t3 1000; ", queryText);
         }
 
         [Test]
@@ -252,7 +252,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)query).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by Mea1 asc; t3 = limit t2 100; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = foreach t0 generate Dim1 as Dim1, Mea1 as Mea1; t2 = order t1 by (Mea1 asc); t3 = limit t2 100; ", queryText);
         }
 
         [Test]
@@ -802,7 +802,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)joined).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = order t5 by Dim desc; t7 = limit t6 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = order t5 by (Dim desc); t7 = limit t6 1000; ", queryText);
         }
 
         [Test]
@@ -818,7 +818,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)joined).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = order t5 by Total desc; t7 = limit t6 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Dim, DimDesc as Description, sum(Mea1) as Total; t6 = order t5 by (Total desc); t7 = limit t6 1000; ", queryText);
         }
 
         [Test]
@@ -946,7 +946,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)joined).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, sum(Mea1) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, sum(Mea1) as Measure, DimDesc as Description; t6 = order t5 by (Key desc); t7 = limit t6 1000; ", queryText);
         }
 
         [Test]
@@ -961,7 +961,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)joined).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by (Key desc); t7 = limit t6 1000; ", queryText);
         }
 
         //[Test]
@@ -976,7 +976,7 @@ namespace Oinq.Tests
             var queryText = ((IPigQueryable)joined).GetPigQuery();
 
             // Assert
-            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by Key desc; t7 = limit t6 1000; ", queryText);
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = load 'FakeDataMeta'; t2 = filter t1 by (Dim1 == '5'); t3 = group t2 by (DimDesc); t4 = group t0 by Dim1, t3 by Dim1; t5 = foreach t4 generate Dim1 as Key, (sum(Mea1) + sum(Mea1)) as Measure, DimDesc as Description; t6 = order t5 by (Key desc); t7 = limit t6 1000; ", queryText);
         }
     }
 }

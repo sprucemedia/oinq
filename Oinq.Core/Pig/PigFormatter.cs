@@ -399,7 +399,7 @@ namespace Oinq.Pig
                 {
                     columnMaps.Add(column.Name, ((ColumnExpression) column.Expression).Name);
                 }
-                Write(String.Format("{0} = order {1} by ", GetNextAliasName(), GetLastAliasName(_alias)));
+                Write(String.Format("{0} = order {1} by (", GetNextAliasName(), GetLastAliasName(_alias)));
 
                 for (Int32 i = 0, n = orderBys.Count; i < n; i++)
                 {
@@ -470,7 +470,7 @@ namespace Oinq.Pig
 
                     WriteOrderByDirection(orderBy.Direction);
                 }
-                Write("; ");
+                Write("); ");
                 AddAlias();
             }
         }
