@@ -1,0 +1,44 @@
+class RunContext
+  attr_reader :msbuild, :compile_target
+
+  def initialize
+    framework_dir = File.join(ENV["windir"].dup, "Microsoft.NET", "Framework64", "v4.0.30319")
+    @msbuild = File.join(framework_dir, "msbuild.exe")
+    @compile_target = ENV.include?("target") ? ENV["target"] : "Debug"
+  end
+end
+
+SOLUTION = "Oinq.sln"
+tests = { "Oinq.Core.Tests" => "Oinq.Tests.dll", "Oinq.EdgeSpring.Tests" => "Oinq.EdgeSpring.Tests.dll" }
+
+def working_dir
+  File.dirname(__FILE__)
+end
+
+def solution_path
+  File.join(working_dir, SOLUTION)
+end
+
+context = RunContext.new
+
+task :default => :test
+
+task :clean do
+  sh "#{context.msbuild} #{solution_path} /t:Clean /p:Configuration=#{context.compile_target}"
+end
+
+task :compile do
+  sh "#{context.msbuild} #{solution_path} /t:Rebuild /p:Configuration=#{context.compile_target}"
+end
+
+task :test => :compile do
+  if !ENV.include?("nunit") || !File.exists?(ENV["nunit"])
+    puts "Skipping tests since there is no NUnit runner defined. The \"nunint\" environment variable should be the full path to the NUnit executable."
+  else
+    tests.each do |test_project, test_dll|
+      test_path = File.join(working_dir, test_project, "bin/Debug", test_dll)
+      sh "#{ENV["nunit"]} #{test_path}"
+    end
+  end
+end
+
