@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
@@ -61,6 +62,17 @@ namespace Oinq.Tests
 
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Dim1 == 'Fake'); t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 1000; ", queryText);
+        }
+
+        [Test]
+        public void it_can_filter_using_contains_on_a_list()
+        {
+            var values = new List<String> { "a", "b"};
+            IQueryable<FakeData> query = _source.AsQueryable<FakeData>().Where(f => values.Contains(f.Dim1));
+
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = filter t0 by (Dim1 in ['a', 'b']); t2 = foreach t1 generate Dim1 as Dim1, Mea1 as Mea1; t3 = limit t2 1000; ", queryText);
         }
 
         [Test]

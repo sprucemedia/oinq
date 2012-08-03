@@ -655,7 +655,7 @@ namespace Oinq.Pig
                 // Do nothing else for now - should be replaces with new EdgeSpring functions once they become available.
                 return node;
             }
-            else if (node.Method.Name == "Contains" || node.Method.Name == "StartsWith" || node.Method.Name == "EndsWith")
+            else if (node.Object.Type == typeof(String) && (node.Method.Name == "Contains" || node.Method.Name == "StartsWith" || node.Method.Name == "EndsWith"))
             {
                 Write("(");
                 Visit(node.Object);
@@ -667,6 +667,22 @@ namespace Oinq.Pig
                                       (node.Method.Name == "StartsWith" || node.Method.Name == "Contains" ? ".*" : ""));
                 Write(value);
                 Write("')");
+                return node;
+            }
+            else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(node.Object.Type) && node.Method.Name == "Contains")
+            {
+                Write("(");
+                Visit(node.Arguments[0]);
+                Write(" in [");
+                var values = (System.Collections.IEnumerable)((ConstantExpression)node.Object).Value;
+                var first = true;
+                foreach(var value in values)
+                {
+                    if (!first) { Write(", "); }
+                    WriteValue(value);
+                    first = false;
+                }
+                Write("])");
                 return node;
             }
             throw new NotSupportedException(String.Format("The method '{0}' is not supported", node.Method.Name));
