@@ -716,6 +716,16 @@ namespace Oinq.Tests
             // Assert
             Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = foreach t1 generate Dim1 as Dimension, (sum(Mea1) * 2) as Total; t3 = limit t2 1000; ", queryText);
         }
+
+        [Test]
+        public void it_can_filter_using_a_custom_extension()
+        {
+            var query = _source.AsQueryable<FakeData>().GroupBy(f => f.Dim1, f => f, (dimension, data) => new { Dimension = dimension, Total = data.MultiplyIt() }).Where(x => x.Total > 3);
+
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            Assert.AreEqual("t0 = load 'FakeData'; t1 = group t0 by (Dim1); t2 = filter t1 by ((sum(Mea1) * 2) > 3); t3 = foreach t2 generate Dim1 as Dimension, (sum(Mea1) * 2) as Total; t4 = limit t3 1000; ", queryText);
+        }
     }
 
     [TestFixture]
