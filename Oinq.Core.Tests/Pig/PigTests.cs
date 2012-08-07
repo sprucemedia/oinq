@@ -347,6 +347,16 @@ namespace Oinq.Tests
         }
 
         [Test]
+        public void it_can_select_just_the_grouping_key()
+        {
+            var query = _source.AsQueryable<FakeDataMeta>().GroupBy(f => new { f.Dim1, f.DimDesc }).Select(g => g.Key);
+
+            var queryText = ((IPigQueryable)query).GetPigQuery();
+
+            Assert.AreEqual("t0 = load 'FakeDataMeta'; t1 = group t0 by (Dim1, DimDesc); t2 = foreach t1 generate Dim1 as Dim1, DimDesc as DimDesc; t3 = limit t2 1000; ", queryText);
+        }
+
+        [Test]
         public void it_can_execute_methods_against_the_projection_locally()
         {
             // Arrange

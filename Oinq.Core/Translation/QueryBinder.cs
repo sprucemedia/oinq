@@ -63,12 +63,21 @@ namespace Oinq.Translation
                     break;
                 case ExpressionType.New:
                     var nex = (NewExpression) source;
-                    for (Int32 i = 0, n = nex.Members.Count; i < n; i++)
+                    // ReSharper thinks that nex.Members can't be null, so it thinks that the "else"
+                    // can't be reached.  That isn't true.
+                    if (nex.Members != null)
                     {
-                        if (MembersMatch(nex.Members[i], node.Member))
+                        for (Int32 i = 0, n = nex.Members.Count; i < n; i++)
                         {
-                            return nex.Arguments[i];
+                            if (MembersMatch(nex.Members[i], node.Member))
+                            {
+                                return nex.Arguments[i];
+                            }
                         }
+                    }
+                    else
+                    {
+                        return nex.Arguments[1];
                     }
                     break;
             }
