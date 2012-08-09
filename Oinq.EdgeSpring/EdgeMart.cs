@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Oinq.EdgeSpring.Web;
 using Oinq.Pig;
 
 namespace Oinq.EdgeSpring
@@ -141,6 +144,18 @@ namespace Oinq.EdgeSpring
             var sourceAttributes = objectType.GetCustomAttributes(typeof (PigSourceMapping), true);
             var martName = sourceAttributes.Length > 0 ? ((PigSourceMapping) sourceAttributes[0]).Path : objectType.Name;
             return new EdgeMart<T>(baseConnectionString + "?edgemart=" + martName);
+        }
+
+        public List<TResult> Execute<TResult>(String pigQuery)
+        {
+            Debug.WriteLine(String.Format("ES query: {0}", pigQuery));
+
+            var query = new Query(pigQuery);
+            QueryResponse<TResult> response = EdgeSpringApi.GetQueryResponse<TResult>(query, AbsoluteUri);
+
+            Debug.WriteLine(String.Format("ES query execution time: {0}", response.query_time));
+
+            return response.results.records;
         }
     }
 }
