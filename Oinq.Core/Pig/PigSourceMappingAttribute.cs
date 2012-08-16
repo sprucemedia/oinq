@@ -5,18 +5,22 @@ namespace Oinq
     /// <summary>
     /// Attribute used for mapping data sources to Pig query source names.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class PigSourceMapping : Attribute
     {
-        private readonly String _path;
-
+        // constructors
+        /// <summary>
+        /// Initializes an member of PigMapping.
+        /// </summary>
+        /// <param path="path"></param>
         public PigSourceMapping(String path)
         {
-            _path = path;
+            Path = path;
         }
 
-        public string Path { get { return _path; } }
-
-        public Int32 Order { get; set; }
+        // public properties
+        /// <summary>
+        /// Gets the path to the data source.
+        /// </summary>
+        public string Path { get; private set; }
     }
 }
